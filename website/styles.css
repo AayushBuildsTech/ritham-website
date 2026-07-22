@@ -180,6 +180,21 @@ h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: clamp
 .playband h2 { margin-bottom: 8px; }
 .playband p { color: rgba(255,255,255,0.86); font-size: 16.5px; }
 
+/* Waitlist / notify form */
+.notify-form { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; flex: 0 0 auto; }
+.notify-input {
+  min-width: 220px; padding: 13px 16px; border-radius: 999px; font: inherit; font-size: 15px;
+  color: #fff; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.28); outline: none;
+}
+.notify-input::placeholder { color: rgba(255,255,255,0.55); }
+.notify-input:focus { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.14); }
+.notify-hp { display: none !important; }
+.notify-btn { cursor: pointer; }
+.notify-btn[disabled] { opacity: 0.6; cursor: default; }
+.notify-msg { flex-basis: 100%; margin: 4px 0 0; min-height: 20px; font-size: 14.5px; color: rgba(255,255,255,0.92); }
+.notify-msg.ok { color: #8affce; }
+.notify-msg.err { color: #ffb0c8; }
+
 /* ── The Journey / cosmic trail ─────────────────────────── */
 .journey { position: relative; padding-top: 40px; }
 .waypoints { position: relative; z-index: 3; max-width: 1060px; margin: 0 auto; }
