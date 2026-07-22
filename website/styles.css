@@ -275,6 +275,9 @@ h2 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: clamp
 .price-table li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
 .price-table li span { color: var(--muted); }
 .price-table li strong { color: #fff; font-weight: 600; white-space: nowrap; }
+.price-cta { text-align: center; margin-top: 8px; }
+.price-cta .btn { margin-bottom: 6px; }
+.price-cta .price-note { margin-top: 18px; }
 .price-note { text-align: center; color: var(--dim); font-size: 14px; margin-top: 34px; max-width: 780px; margin-left: auto; margin-right: auto; }
 .price-note strong { color: var(--muted); }
 
