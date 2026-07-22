@@ -67,7 +67,12 @@
             <h2>Coming Soon to Google Play</h2>
             <p>Ritham is putting the final touches on launch. Be among the first to carry your own AI Vedic astrologer.</p>
           </div>
-          <a class="btn btn-primary" href="#contact">Notify me</a>
+          <form class="notify-form" data-fs-user="rithamastro" data-fs-domain="gmail.com">
+            <input class="notify-hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <input class="notify-input" type="email" name="email" required autocomplete="email" placeholder="Your email" aria-label="Your email address" />
+            <button class="btn btn-primary notify-btn" type="submit">Notify me</button>
+            <p class="notify-msg" role="status" aria-live="polite"></p>
+          </form>
         </div>
       </div>
     </section>
@@ -552,6 +557,48 @@
       }, { passive: true });
       window.addEventListener('resize', update, { passive: true });
       update();
+    })();
+
+    // Waitlist form → submit to FormSubmit (AJAX), show inline confirmation.
+    // Endpoint is assembled at runtime so the email isn't in the page source.
+    (function () {
+      var form = document.querySelector('.notify-form');
+      if (!form) return;
+      var msg = form.querySelector('.notify-msg');
+      var btn = form.querySelector('.notify-btn');
+      var honey = form.querySelector('.notify-hp');
+      var endpoint = 'https://formsubmit.co/ajax/' +
+        form.getAttribute('data-fs-user') + '@' + form.getAttribute('data-fs-domain');
+
+      function say(text, cls) { msg.textContent = text; msg.className = 'notify-msg' + (cls ? ' ' + cls : ''); }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (honey && honey.value) return; // honeypot tripped → silently ignore bots
+        var input = form.querySelector('.notify-input');
+        var email = (input.value || '').trim();
+        if (!email) { say('Please enter your email.', 'err'); return; }
+
+        btn.disabled = true;
+        say('Adding you…', '');
+
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            _subject: 'New Ritham waitlist signup',
+            _template: 'table',
+            _captcha: 'false'
+          })
+        }).then(function (res) {
+          if (!res.ok) throw new Error('bad status');
+          form.reset();
+          say("You're on the list ✦ We'll email you the moment Ritham lands on Google Play.", 'ok');
+        }).catch(function () {
+          say('Something went wrong — please try again in a moment.', 'err');
+        }).then(function () { btn.disabled = false; });
+      });
     })();
   </script>
 </body>
