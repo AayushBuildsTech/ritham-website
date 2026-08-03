@@ -12,5 +12,5 @@ window.RITHAM_SUPABASE = {
 // sawan-verify-payment edge functions are deployed (and migration 032 applied).
 // While false, checkout runs the TEST simulator (no real charge).
 window.RITHAM_PAY = {
-  live: false
+  live: true
 };
