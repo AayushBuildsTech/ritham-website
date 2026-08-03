@@ -34,7 +34,7 @@
     if (alertBar) {
       alertBar.style.background = '#fdecee';
       alertBar.innerHTML = '<b style="color:#d61f3a;">Bookings for Sawan 2026 are now closed.</b> ' +
-        'Thank you to the 12,400+ devotees who registered their Sankalp.';
+        'Thank you to all the devotees who registered their Sankalp.';
     }
     // belt-and-suspenders: hard-disable booking-entry buttons
     ['#hero-cta', '#proceed-sankalp', '#pay-btn', '#sankalp-next'].forEach(function (sel) {
