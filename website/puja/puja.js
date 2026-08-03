@@ -356,17 +356,11 @@
       addr.closest('.field').classList.remove('invalid');
       draft.address = addr.value.trim();
     }
-    var total = P.computeTotal(draft);
-    var pkg = P.getPackage(draft.packageId);
     var btn = $('#pay-btn'); btn.disabled = true;
-    window.RithamPay.pay(total, {
-      description: pkg.name + ' · Sawan Rudrabhishekam',
-      whatsapp: draft.whatsapp
-    }).then(function (payment) {
-      return P.createBooking(draft, payment);
-    }).then(function (record) {
-      // deep-linkable confirmation
-      history.replaceState(null, '', '?booking=' + record.id);
+    // checkout(draft) recomputes the amount server-side, runs Razorpay, verifies
+    // the signature, and returns the confirmed booking record.
+    window.RithamPay.checkout(draft).then(function (record) {
+      history.replaceState(null, '', '?booking=' + record.id); // deep-linkable
       renderConfirmation(record);
       showView('view-confirm');
     }).catch(function (err) {

@@ -193,11 +193,11 @@
   }
 
   // Build the DB row + client record from a draft. Returns { row, record }.
-  function draftToRowRecord(draft, payment) {
+  function draftToRowRecord(draft, payment, forceCode) {
     var pkg = getPackage(draft.packageId);
     var addons = (draft.addonIds || []).map(getAddon).filter(Boolean)
       .map(function (a) { return { id: a.id, name: a.name, price: a.price, homeDelivery: a.homeDelivery }; });
-    var code = genId();
+    var code = forceCode || genId();
     var dakshina = typeof draft.dakshina === 'number' ? draft.dakshina : DAKSHINA_DEFAULT;
     var address = needsAddress(draft) ? (draft.address || null) : null;
     var total = computeTotal(draft);
@@ -239,16 +239,33 @@
     return Promise.resolve(null);
   }
 
-  // Admin: all bookings, newest first.
+  // Build a confirmed record for a given (server-issued) booking code + cache it
+  // locally so the buyer's pass + deep link work. Used after Razorpay verify.
+  function makeRecord(draft, code, payment) {
+    var built = draftToRowRecord(draft, payment, code);
+    cacheLocal(built.record);
+    return built.record;
+  }
+
+  // Invoke a Supabase edge function (used by the Razorpay checkout flow).
+  function invokeFn(name, body) {
+    var c = db();
+    if (!c) return Promise.reject(new Error('Supabase not configured'));
+    return c.functions.invoke(name, { body: body });
+  }
+
+  // Admin: all real bookings, newest first (pending/failed checkouts hidden).
   function listBookings() {
     var c = db();
     if (!c) {
       return Promise.resolve(readAll().slice().sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); }));
     }
-    return c.from('web_puja_bookings').select('*').order('created_at', { ascending: false }).then(function (res) {
-      if (res.error) throw res.error;
-      return (res.data || []).map(rowToRecord);
-    });
+    return c.from('web_puja_bookings').select('*')
+      .not('status', 'in', '("pending_payment","payment_failed")')
+      .order('created_at', { ascending: false }).then(function (res) {
+        if (res.error) throw res.error;
+        return (res.data || []).map(rowToRecord);
+      });
   }
 
   // Admin: update status / fulfilment by booking_code.
@@ -316,6 +333,8 @@
     updateBooking: updateBooking,   // async → Promise
     listBookings: listBookings,     // async → Promise<record[]>
     deleteBooking: deleteBooking,   // async → Promise
+    makeRecord: makeRecord,         // (draft, code, payment) → record (+cache)
+    invokeFn: invokeFn,             // (name, body) → Promise (edge function)
     signIn: signIn,
     signOut: signOut,
     currentUser: currentUser,
