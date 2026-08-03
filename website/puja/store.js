@@ -108,19 +108,57 @@
     return null;
   }
 
-  // ── Persistence (mock API) ──────────────────────────────────
+  // ── Supabase client (primary) with a localStorage fallback ──
+  var _client = null, _clientTried = false;
+  function db() {
+    if (_clientTried) return _client;
+    _clientTried = true;
+    var cfg = global.RITHAM_SUPABASE;
+    if (global.supabase && cfg && cfg.url && cfg.anonKey) {
+      try { _client = global.supabase.createClient(cfg.url, cfg.anonKey); } catch (e) { _client = null; }
+    }
+    return _client;
+  }
+  function hasDB() { return !!db(); }
+
+  // localStorage: fallback store + buyer's own-pass cache (deep link)
   function readAll() {
     try {
       var raw = global.localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      return [];
-    }
+    } catch (e) { return []; }
   }
   function writeAll(list) {
-    try {
-      global.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-    } catch (e) { /* storage may be full / disabled */ }
+    try { global.localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch (e) { /* disabled */ }
+  }
+  function cacheLocal(rec) {
+    var list = readAll();
+    var i = list.findIndex ? list.findIndex(function (r) { return r.id === rec.id; }) : -1;
+    if (i >= 0) list[i] = rec; else list.push(rec);
+    writeAll(list);
+  }
+
+  // Map a DB row (snake_case) to the client record shape.
+  function rowToRecord(r) {
+    return {
+      id: r.booking_code,
+      createdAt: r.created_at,
+      status: r.status,
+      event: EVENT,
+      package: { id: r.package_id, name: r.package_name, subtitle: r.package_subtitle, price: r.package_price_inr, capacity: r.capacity },
+      whatsapp: r.whatsapp,
+      callingNumber: r.calling_number,
+      devotees: r.devotees || [],
+      gotra: r.gotra,
+      gotraUnknown: !!r.gotra_unknown,
+      wish: r.wish || '',
+      addons: r.addons || [],
+      dakshina: r.dakshina_inr,
+      address: r.address,
+      total: r.total_inr,
+      payment: r.payment || {},
+      fulfillment: r.fulfillment || { videoLink: null, courierTracking: null }
+    };
   }
 
   function genId() {
@@ -154,72 +192,97 @@
     });
   }
 
-  // Persist a completed booking. Returns the stored record.
-  function createBooking(draft, payment) {
+  // Build the DB row + client record from a draft. Returns { row, record }.
+  function draftToRowRecord(draft, payment) {
     var pkg = getPackage(draft.packageId);
-    var addons = (draft.addonIds || []).map(getAddon).filter(Boolean);
-    var record = {
-      id: genId(),
-      createdAt: new Date().toISOString(),
-      status: STATUSES[0],
-      event: EVENT,
-      package: pkg ? { id: pkg.id, name: pkg.name, subtitle: pkg.subtitle, price: pkg.price, capacity: pkg.capacity } : null,
-      whatsapp: draft.whatsapp,
-      callingNumber: draft.callingNumber || null,
-      devotees: draft.devotees || [],
-      gotra: draft.gotra,
-      gotraUnknown: !!draft.gotraUnknown,
-      wish: draft.wish || '',
-      addons: addons.map(function (a) { return { id: a.id, name: a.name, price: a.price, homeDelivery: a.homeDelivery }; }),
-      dakshina: typeof draft.dakshina === 'number' ? draft.dakshina : DAKSHINA_DEFAULT,
-      address: needsAddress(draft) ? (draft.address || null) : null,
-      total: computeTotal(draft),
-      payment: payment || { id: null, method: 'simulated' },
-      fulfillment: { videoLink: null, courierTracking: null }
+    var addons = (draft.addonIds || []).map(getAddon).filter(Boolean)
+      .map(function (a) { return { id: a.id, name: a.name, price: a.price, homeDelivery: a.homeDelivery }; });
+    var code = genId();
+    var dakshina = typeof draft.dakshina === 'number' ? draft.dakshina : DAKSHINA_DEFAULT;
+    var address = needsAddress(draft) ? (draft.address || null) : null;
+    var total = computeTotal(draft);
+    payment = payment || { id: null, method: 'simulated' };
+    var row = {
+      booking_code: code, status: STATUSES[0],
+      package_id: pkg ? pkg.id : null, package_name: pkg ? pkg.name : null,
+      package_subtitle: pkg ? pkg.subtitle : null, capacity: pkg ? pkg.capacity : null,
+      package_price_inr: pkg ? pkg.price : 0,
+      whatsapp: draft.whatsapp, calling_number: draft.callingNumber || null,
+      devotees: draft.devotees || [], gotra: draft.gotra, gotra_unknown: !!draft.gotraUnknown,
+      wish: draft.wish || '', addons: addons, dakshina_inr: dakshina,
+      address: address, total_inr: total, payment: payment, fulfillment: {}
     };
-    var list = readAll();
-    list.push(record);
-    writeAll(list);
-    return record;
+    return { row: row, record: rowToRecord(Object.assign({ created_at: new Date().toISOString() }, row)) };
   }
 
+  // Persist a completed booking. Returns Promise<record>.
+  function createBooking(draft, payment) {
+    var built = draftToRowRecord(draft, payment);
+    var c = db();
+    if (!c) { cacheLocal(built.record); return Promise.resolve(built.record); }
+    return c.from('web_puja_bookings').insert(built.row).then(function (res) {
+      if (res.error) throw res.error;
+      cacheLocal(built.record); // keep a local copy so the buyer's pass deep-link works
+      return built.record;
+    }).catch(function (err) {
+      // Never strand the buyer: keep their pass locally even if the write failed.
+      console.warn('Supabase booking insert failed, cached locally:', err && err.message);
+      cacheLocal(built.record);
+      return built.record;
+    });
+  }
+
+  // Buyer's own pass (deep link) — served from the local cache (anon cannot read DB).
   function getBooking(id) {
     var list = readAll();
-    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
-    return null;
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return Promise.resolve(list[i]);
+    return Promise.resolve(null);
   }
 
-  function updateBooking(id, patch) {
-    var list = readAll();
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].id === id) {
-        list[i] = Object.assign({}, list[i], patch);
-        writeAll(list);
-        return list[i];
-      }
-    }
-    return null;
-  }
-
+  // Admin: all bookings, newest first.
   function listBookings() {
-    // newest first
-    return readAll().slice().sort(function (a, b) {
-      return new Date(b.createdAt) - new Date(a.createdAt);
+    var c = db();
+    if (!c) {
+      return Promise.resolve(readAll().slice().sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); }));
+    }
+    return c.from('web_puja_bookings').select('*').order('created_at', { ascending: false }).then(function (res) {
+      if (res.error) throw res.error;
+      return (res.data || []).map(rowToRecord);
     });
   }
 
-  // Seed a few demo bookings (admin preview) — only if empty.
-  function seedDemo() {
-    if (readAll().length) return;
-    var drafts = [
-      { packageId: 'family', whatsapp: '+919876543210', devotees: ['Ramesh Kumar', 'Sita Kumar', 'Aarav Kumar'], gotra: 'Bharadwaj', addonIds: ['prasad-box', 'gau-seva'], dakshina: 501, address: '12 MG Road, Bengaluru, Karnataka 560001' },
-      { packageId: 'individual', whatsapp: '+919812345678', devotees: ['Priya Sharma'], gotra: 'Kashyap', gotraUnknown: true, addonIds: ['doodh-bilva'], dakshina: 251 },
-      { packageId: 'couple', whatsapp: '+919900112233', devotees: ['Arjun Rao', 'Meera Rao'], gotra: 'Vashistha', addonIds: ['prasad-box'], dakshina: 101, address: '4 Temple St, Kolar, Karnataka 563101' }
-    ];
-    drafts.forEach(function (d, i) {
-      var rec = createBooking(d, { id: 'pay_demo_' + i, method: 'simulated' });
-      if (i === 0) updateBooking(rec.id, { status: 'Sankalp Sent' });
+  // Admin: update status / fulfilment by booking_code.
+  function updateBooking(id, patch) {
+    var c = db();
+    if (!c) {
+      var list = readAll();
+      for (var i = 0; i < list.length; i++) if (list[i].id === id) { list[i] = Object.assign({}, list[i], patch); writeAll(list); return Promise.resolve(list[i]); }
+      return Promise.resolve(null);
+    }
+    var upd = {};
+    if (patch.status !== undefined) upd.status = patch.status;
+    if (patch.fulfillment !== undefined) upd.fulfillment = patch.fulfillment;
+    return c.from('web_puja_bookings').update(upd).eq('booking_code', id).then(function (res) {
+      if (res.error) throw res.error; return true;
     });
+  }
+
+  // ── Auth (admin) ────────────────────────────────────────────
+  function signIn(email, password) {
+    var c = db();
+    if (!c) return Promise.reject(new Error('Supabase not configured'));
+    return c.auth.signInWithPassword({ email: email, password: password });
+  }
+  function signOut() { var c = db(); return c ? c.auth.signOut() : Promise.resolve(); }
+  function currentUser() {
+    var c = db();
+    if (!c) return Promise.resolve(null);
+    return c.auth.getUser().then(function (r) { return r.data ? r.data.user : null; });
+  }
+  function isAdmin() {
+    var c = db();
+    if (!c) return Promise.resolve(false);
+    return c.rpc('is_web_puja_admin').then(function (r) { return !r.error && !!r.data; });
   }
 
   global.RithamPuja = {
@@ -235,11 +298,15 @@
     getAddon: getAddon,
     computeTotal: computeTotal,
     needsAddress: needsAddress,
-    createBooking: createBooking,
-    getBooking: getBooking,
-    updateBooking: updateBooking,
-    listBookings: listBookings,
-    seedDemo: seedDemo,
+    hasDB: hasDB,
+    createBooking: createBooking,   // async → Promise<record>
+    getBooking: getBooking,         // async → Promise<record|null>
+    updateBooking: updateBooking,   // async → Promise
+    listBookings: listBookings,     // async → Promise<record[]>
+    signIn: signIn,
+    signOut: signOut,
+    currentUser: currentUser,
+    isAdmin: isAdmin,
     formatINR: function (n) { return '₹' + Number(n).toLocaleString('en-IN'); }
   };
 })(window);

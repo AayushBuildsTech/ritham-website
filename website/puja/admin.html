@@ -27,11 +27,12 @@
   <div class="gate" id="gate">
     <div class="gate-card">
       <h2 class="font-display">Operations Login</h2>
-      <p>Enter the operations passcode to manage Sawan Somvar bookings.</p>
-      <input class="input" id="gate-pass" type="password" placeholder="Passcode" autocomplete="off" />
-      <p class="err-text" id="gate-err">Incorrect passcode.</p>
-      <button class="btn btn-grad btn-block" id="gate-btn">Enter Dashboard</button>
-      <p class="gate-hint">Demo passcode: <b>harharmahadev</b> · client-side gate only (replace with real auth for production).</p>
+      <p>Sign in to manage Sawan Somvar bookings.</p>
+      <input class="input" id="gate-email" type="email" placeholder="Admin email" autocomplete="username" style="margin-bottom:8px;" />
+      <input class="input" id="gate-pass" type="password" placeholder="Password" autocomplete="current-password" />
+      <p class="err-text" id="gate-err">Incorrect credentials.</p>
+      <button class="btn btn-grad btn-block" id="gate-btn">Sign in</button>
+      <p class="gate-hint" id="gate-hint">Access is enforced server-side (Supabase RLS).</p>
     </div>
   </div>
 
@@ -105,7 +106,9 @@
   <div class="toast" id="toast"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="store.js?v=4"></script>
-  <script src="admin.js?v=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=1"></script>
+  <script src="store.js?v=5"></script>
+  <script src="admin.js?v=2"></script>
 </body>
 </html>

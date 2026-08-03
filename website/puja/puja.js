@@ -363,7 +363,8 @@
       description: pkg.name + ' · Sawan Rudrabhishekam',
       whatsapp: draft.whatsapp
     }).then(function (payment) {
-      var record = P.createBooking(draft, payment);
+      return P.createBooking(draft, payment);
+    }).then(function (record) {
       // deep-linkable confirmation
       history.replaceState(null, '', '?booking=' + record.id);
       renderConfirmation(record);
@@ -622,12 +623,12 @@
   function checkDeepLink() {
     var params = new URLSearchParams(location.search);
     var id = params.get('booking');
-    if (!id) return false;
-    var rec = P.getBooking(id);
-    if (!rec) { toast('Booking not found on this device.'); return false; }
-    renderConfirmation(rec);
-    showView('view-confirm');
-    return true;
+    if (!id) return;
+    P.getBooking(id).then(function (rec) {
+      if (!rec) { toast('Booking not found on this device.'); return; }
+      renderConfirmation(rec);
+      showView('view-confirm');
+    });
   }
 
   // ── Wire up ──────────────────────────────────────────────
