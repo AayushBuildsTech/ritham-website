@@ -1,0 +1,685 @@
+/* ─────────────────────────────────────────────────────────────
+   Sawan Somvar Puja — Booking flow controller (vanilla JS)
+   Views: packages → (Sankalp modal) → review/add-ons → confirmation
+   ───────────────────────────────────────────────────────────── */
+(function () {
+  'use strict';
+  var P = window.RithamPuja;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var fmt = P.formatINR;
+
+  // Working draft (in-memory until payment succeeds).
+  var draft = {
+    packageId: null,
+    whatsapp: '', callingNumber: '', sameAsWhatsapp: true,
+    devotees: [], gotra: '', gotraUnknown: false, wish: '',
+    addonIds: [], dakshina: P.DAKSHINA_DEFAULT, address: ''
+  };
+
+  // ── Helpers ──────────────────────────────────────────────
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function showView(id) {
+    $$('.view').forEach(function (v) { v.classList.remove('active'); });
+    var el = document.getElementById(id);
+    if (el) el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+  var toastTimer;
+  function toast(msg) {
+    var t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2600);
+  }
+  function renderStepbars() {
+    $$('.stepbar').forEach(function (bar) {
+      var cur = parseInt(bar.getAttribute('data-step'), 10);
+      var steps = ['Package', 'Sankalp', 'Offerings', 'Confirmed'];
+      var html = '';
+      steps.forEach(function (label, i) {
+        var n = i + 1;
+        var cls = n < cur ? 'done' : (n === cur ? 'active' : '');
+        html += '<div class="step ' + cls + '"><span class="n">' + (n < cur ? '✓' : n) + '</span>' + label + '</div>';
+        if (i < steps.length - 1) html += '<span class="sep"></span>';
+      });
+      bar.innerHTML = html;
+    });
+  }
+
+  // ── VIEW 1 · Packages ────────────────────────────────────
+  function renderPackages() {
+    var grid = $('#pkg-grid');
+    grid.innerHTML = P.PACKAGES.map(function (pkg) {
+      return '' +
+        '<div class="pkg-card' + (pkg.featured ? ' featured' : '') + '" data-id="' + pkg.id + '" role="button" tabindex="0" aria-pressed="false">' +
+          '<span class="pkg-radio" aria-hidden="true"></span>' +
+          '<div class="pkg-sub">' + esc(pkg.subtitle) + '</div>' +
+          '<div class="pkg-name">' + esc(pkg.name) + '</div>' +
+          '<div class="pkg-price">' + fmt(pkg.price) + '</div>' +
+          '<div class="pkg-blurb">' + esc(pkg.blurb) + '</div>' +
+          '<ul class="pkg-perks">' + pkg.perks.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' +
+        '</div>';
+    }).join('');
+
+    $$('.pkg-card', grid).forEach(function (card) {
+      var pick = function () { selectPackage(card.getAttribute('data-id')); };
+      card.addEventListener('click', pick);
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+      });
+    });
+  }
+
+  function selectPackage(id) {
+    draft.packageId = id;
+    var pkg = P.getPackage(id);
+    $$('.pkg-card').forEach(function (c) {
+      var on = c.getAttribute('data-id') === id;
+      c.classList.toggle('selected', on);
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    // sticky bar
+    var bar = $('#sticky-bar');
+    $('#sticky-name').innerHTML = esc(pkg.name) + ' • <b>' + fmt(pkg.price) + '</b>';
+    bar.classList.add('show');
+  }
+
+  // ── Sankalp modal ────────────────────────────────────────
+  function openSankalp() {
+    if (!draft.packageId) { toast('Please select a package first.'); return; }
+    renderStepFor(2);
+    buildDevoteeRows();
+    $('#sankalp-modal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeSankalp() {
+    $('#sankalp-modal').classList.remove('show');
+    document.body.style.overflow = '';
+    // if we're still on the package view, restore its step indicator to 1
+    var bar = $('#view-packages .stepbar');
+    if ($('#view-packages').classList.contains('active') && bar) {
+      bar.setAttribute('data-step', '1');
+      renderStepbars();
+    }
+  }
+  function renderStepFor(step) {
+    // temporarily reflect current step on the visible stepbar (view 1's bar)
+    var bar = $('.view.active .stepbar');
+    if (bar) { bar.setAttribute('data-step', step); renderStepbars(); }
+  }
+
+  function buildDevoteeRows() {
+    var pkg = P.getPackage(draft.packageId);
+    var cap = pkg.capacity;
+    var rows = $('#devotee-rows');
+    var current = draft.devotees.length || 1;
+    var count = Math.min(Math.max(current, 1), cap);
+    rows.innerHTML = '';
+    for (var i = 0; i < count; i++) addDevoteeRow(i);
+    updateDevoteeHint();
+  }
+  function addDevoteeRow(i) {
+    var rows = $('#devotee-rows');
+    var pkg = P.getPackage(draft.packageId);
+    var wrap = document.createElement('div');
+    wrap.className = 'field';
+    wrap.style.margin = '0';
+    var canRemove = rows.children.length > 0;
+    wrap.innerHTML =
+      '<div style="display:flex; gap:8px; align-items:center;">' +
+        '<input class="input devotee-name" type="text" placeholder="Devotee ' + (i + 1) + ' full name"' +
+        ' value="' + esc(draft.devotees[i] || '') + '" />' +
+        (canRemove ? '<button type="button" class="btn btn-ghost btn-sm rm-dev" aria-label="Remove">Remove</button>' : '') +
+      '</div>';
+    if (canRemove) {
+      wrap.querySelector('.rm-dev').addEventListener('click', function () {
+        wrap.remove(); reindexDevotees(); updateDevoteeHint();
+      });
+    }
+    rows.appendChild(wrap);
+    // "add another" control (only while under capacity)
+    refreshAddDevoteeBtn();
+  }
+  function refreshAddDevoteeBtn() {
+    var rows = $('#devotee-rows');
+    var pkg = P.getPackage(draft.packageId);
+    var existing = $('#add-dev-btn');
+    if (existing) existing.remove();
+    if (rows.children.length < pkg.capacity) {
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.id = 'add-dev-btn'; btn.className = 'btn btn-ghost btn-sm';
+      btn.style.marginTop = '4px';
+      btn.textContent = '+ Add another devotee';
+      btn.addEventListener('click', function () {
+        addDevoteeRow(rows.children.length); updateDevoteeHint();
+      });
+      rows.parentNode.insertBefore(btn, $('#devotee-hint'));
+    }
+  }
+  function reindexDevotees() {
+    $$('#devotee-rows .devotee-name').forEach(function (inp, i) {
+      inp.placeholder = 'Devotee ' + (i + 1) + ' full name';
+    });
+    refreshAddDevoteeBtn();
+  }
+  function updateDevoteeHint() {
+    var pkg = P.getPackage(draft.packageId);
+    var n = $$('#devotee-rows .devotee-name').length;
+    $('#devotee-hint').textContent = pkg.name + ' covers up to ' + pkg.capacity +
+      ' member' + (pkg.capacity > 1 ? 's' : '') + '. ' + n + ' added.';
+  }
+
+  // Gotra "unknown" logic
+  function applyUnknownGotra() {
+    var chk = $('#f-unknown-gotra');
+    var gotra = $('#f-gotra');
+    var callout = $('#gotra-callout');
+    if (chk.checked) {
+      gotra.value = 'Kashyap';
+      gotra.disabled = true;
+      gotra.closest('.field').classList.remove('invalid');
+      callout.style.display = 'flex';
+    } else {
+      gotra.disabled = false;
+      if (gotra.value === 'Kashyap') gotra.value = '';
+      callout.style.display = 'none';
+    }
+  }
+
+  function validPhone(v) { return /^[6-9]\d{9}$/.test(v); }
+
+  function validateSankalp() {
+    var ok = true;
+    // whatsapp
+    var wa = $('#f-whatsapp');
+    var waField = wa.closest('.field');
+    if (!validPhone(wa.value.trim())) { waField.classList.add('invalid'); ok = false; }
+    else waField.classList.remove('invalid');
+    // calling number (if shown)
+    if ($('#f-diff-calling').checked) {
+      var cn = $('#f-calling'); var cnField = cn.closest('.field');
+      if (!validPhone(cn.value.trim())) { cnField.classList.add('invalid'); ok = false; }
+      else cnField.classList.remove('invalid');
+    }
+    // devotees — at least the first name required
+    var names = $$('#devotee-rows .devotee-name');
+    var firstField = names[0].closest('.field');
+    if (!names[0].value.trim()) { firstField.classList.add('invalid'); firstField.querySelector('.err-text') || addErr(firstField, 'Please enter at least one devotee name.'); ok = false; }
+    else firstField.classList.remove('invalid');
+    // gotra — must be chosen from the list (unless "unknown" is ticked)
+    var g = $('#f-gotra'); var gField = g.closest('.field');
+    if ($('#f-unknown-gotra').checked || canonicalGotra(g.value)) { gField.classList.remove('invalid'); }
+    else { gField.classList.add('invalid'); ok = false; }
+    return ok;
+  }
+  // Return the canonically-cased gotra if the typed value matches the list, else null.
+  function canonicalGotra(v) {
+    v = (v || '').trim().toLowerCase();
+    if (!v) return null;
+    for (var i = 0; i < P.GOTRAS.length; i++) {
+      if (P.GOTRAS[i].toLowerCase() === v) return P.GOTRAS[i];
+    }
+    return null;
+  }
+  function populateGotras() {
+    var dl = $('#gotra-list');
+    if (!dl) return;
+    dl.innerHTML = P.GOTRAS.map(function (g) { return '<option value="' + esc(g) + '"></option>'; }).join('');
+  }
+  function addErr(field, msg) {
+    if (field.querySelector('.err-text')) { field.querySelector('.err-text').textContent = msg; return; }
+    var p = document.createElement('p'); p.className = 'err-text'; p.textContent = msg;
+    field.appendChild(p);
+  }
+
+  function collectSankalp() {
+    draft.whatsapp = '+91' + $('#f-whatsapp').value.trim();
+    draft.sameAsWhatsapp = !$('#f-diff-calling').checked;
+    draft.callingNumber = draft.sameAsWhatsapp ? '' : ('+91' + $('#f-calling').value.trim());
+    draft.devotees = $$('#devotee-rows .devotee-name')
+      .map(function (i) { return i.value.trim(); })
+      .filter(Boolean);
+    draft.gotraUnknown = $('#f-unknown-gotra').checked;
+    draft.gotra = draft.gotraUnknown ? 'Kashyap' : (canonicalGotra($('#f-gotra').value) || $('#f-gotra').value.trim());
+    draft.wish = $('#f-wish').value.trim();
+  }
+
+  // ── VIEW 2 · Review & add-ons ────────────────────────────
+  function renderAddons() {
+    var list = $('#addon-list');
+    list.innerHTML = P.ADDONS.map(function (a) {
+      var on = draft.addonIds.indexOf(a.id) !== -1;
+      var thumb = '<div class="addon-thumb">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="' + (a.icon || '') + '"/></svg>' +
+        (a.img ? '<img src="' + a.img + '" alt="" loading="lazy" onerror="this.remove()">' : '') +
+        '</div>';
+      return '' +
+        '<div class="addon' + (on ? ' on' : '') + '" data-id="' + a.id + '">' +
+          thumb +
+          '<div class="addon-main">' +
+            '<div class="addon-top"><span class="addon-name">' + esc(a.name) + '</span>' +
+              '<span class="addon-tag' + (a.homeDelivery ? ' deliver' : '') + '">' + esc(a.tag) + '</span></div>' +
+            '<div class="addon-desc">' + esc(a.desc) + '</div>' +
+          '</div>' +
+          '<div class="addon-right">' +
+            '<span class="addon-price">+ ' + fmt(a.price) + '</span>' +
+            '<label class="toggle"><input type="checkbox" ' + (on ? 'checked' : '') + ' aria-label="Add ' + esc(a.name) + '"><span class="track"></span></label>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+    $$('.addon', list).forEach(function (row) {
+      var id = row.getAttribute('data-id');
+      var input = row.querySelector('input');
+      input.addEventListener('change', function () {
+        var idx = draft.addonIds.indexOf(id);
+        if (input.checked && idx === -1) draft.addonIds.push(id);
+        if (!input.checked && idx !== -1) draft.addonIds.splice(idx, 1);
+        row.classList.toggle('on', input.checked);
+        renderBill(); syncAddressPanel();
+      });
+    });
+  }
+
+  function renderDakshina() {
+    var box = $('#dakshina-pills');
+    var html = P.DAKSHINA_OPTIONS.map(function (amt) {
+      var on = draft.dakshina === amt;
+      var isDefault = amt === P.DAKSHINA_DEFAULT;
+      return '<button type="button" class="pill' + (on ? ' on' : '') + '" data-amt="' + amt + '">' +
+        fmt(amt) + (isDefault ? ' · Suggested' : '') + '</button>';
+    }).join('');
+    // optional — devotee may choose to leave the Dakshina
+    html += '<button type="button" class="pill pill-skip' + (draft.dakshina === 0 ? ' on' : '') + '" data-amt="0">Skip / offer later</button>';
+    box.innerHTML = html;
+    $$('.pill', box).forEach(function (p) {
+      p.addEventListener('click', function () {
+        draft.dakshina = parseInt(p.getAttribute('data-amt'), 10);
+        $$('.pill', box).forEach(function (x) { x.classList.remove('on'); });
+        p.classList.add('on');
+        renderBill();
+      });
+    });
+  }
+  function dakshinaLabel() {
+    return draft.dakshina > 0 ? fmt(draft.dakshina) : '<span class="lbl" style="color:var(--dim);">Not added</span>';
+  }
+
+  function syncAddressPanel() {
+    var need = P.needsAddress(draft);
+    $('#address-panel').style.display = need ? 'block' : 'none';
+    if (!need) $('#f-address').closest('.field').classList.remove('invalid');
+  }
+
+  function renderBill() {
+    var pkg = P.getPackage(draft.packageId);
+    var addons = draft.addonIds.map(P.getAddon).filter(Boolean);
+    var addonsTotal = addons.reduce(function (s, a) { return s + a.price; }, 0);
+    var total = P.computeTotal(draft);
+
+    var lines = '';
+    lines += billLine('Base Package — ' + pkg.name, fmt(pkg.price));
+    addons.forEach(function (a) { lines += billLine('&nbsp;&nbsp;+ ' + a.name, fmt(a.price), 'sub'); });
+    lines += billLine('Added Offerings', fmt(addonsTotal));
+    lines += billLine('Pandit Dakshina', dakshinaLabel());
+    lines += billLine('Platform Fee', '<span class="strike">' + fmt(P.FEES.platform) + '</span><span class="free">FREE</span>');
+    lines += billLine('Video Recording &amp; WhatsApp Delivery', '<span class="strike">' + fmt(P.FEES.video) + '</span><span class="free">FREE</span>');
+    $('#bill-lines').innerHTML = lines;
+
+    $('#bill-total').textContent = fmt(total);
+    $('#pay-btn').textContent = 'Pay ' + fmt(total);
+  }
+  function billLine(lbl, val, cls) {
+    return '<div class="bill-line ' + (cls || '') + '"><span class="lbl">' + lbl + '</span><span>' + val + '</span></div>';
+  }
+
+  function goToReview() {
+    renderAddons(); renderDakshina(); syncAddressPanel(); renderBill();
+    showView('view-review');
+    renderStepbars();
+    $('#sticky-bar').classList.remove('show');
+  }
+
+  // ── Payment ──────────────────────────────────────────────
+  function handlePay() {
+    // address validation if needed
+    if (P.needsAddress(draft)) {
+      var addr = $('#f-address');
+      if (!addr.value.trim()) {
+        addr.closest('.field').classList.add('invalid');
+        addr.focus();
+        toast('Please add a delivery address.');
+        return;
+      }
+      addr.closest('.field').classList.remove('invalid');
+      draft.address = addr.value.trim();
+    }
+    var total = P.computeTotal(draft);
+    var pkg = P.getPackage(draft.packageId);
+    var btn = $('#pay-btn'); btn.disabled = true;
+    window.RithamPay.pay(total, {
+      description: pkg.name + ' · Sawan Rudrabhishekam',
+      whatsapp: draft.whatsapp
+    }).then(function (payment) {
+      var record = P.createBooking(draft, payment);
+      // deep-linkable confirmation
+      history.replaceState(null, '', '?booking=' + record.id);
+      renderConfirmation(record);
+      showView('view-confirm');
+    }).catch(function (err) {
+      if (err && err.message === 'cancelled') toast('Payment cancelled.');
+      else toast('Payment could not be completed. Please try again.');
+    }).then(function () { btn.disabled = false; });
+  }
+
+  // ── VIEW 3 · Confirmation ────────────────────────────────
+  function renderConfirmation(rec) {
+    var names = rec.devotees.join(', ');
+    var pass = $('#pass-card');
+    pass.innerHTML =
+      '<div class="pass-top">' +
+        '<div><div class="pass-title">Devotee Pass</div><div class="pass-sub">' + esc(rec.event.title) + '</div></div>' +
+        '<div class="pass-id"><small>Booking ID</small><b>' + esc(rec.id) + '</b></div>' +
+      '</div>' +
+      '<div class="pass-body">' +
+        '<div class="pass-details">' +
+          passRow('Devotee(s)', names) +
+          passRow('Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned)' : '')) +
+          passRow('Package', rec.package.name) +
+          passRow('Date', rec.event.date) +
+          passRow('Temple', rec.event.temple) +
+          passRow('Amount Paid', fmt(rec.total)) +
+        '</div>' +
+        '<div class="pass-qr-wrap"><div class="pass-qr" id="pass-qr" aria-label="Booking QR code"></div><span class="pass-qr-cap">Scan to verify</span></div>' +
+      '</div>';
+
+    // QR → points at this bookable confirmation URL
+    var url = location.origin + location.pathname + '?booking=' + rec.id;
+    renderQR($('#pass-qr'), url, 200);
+
+    // order breakdown
+    var ob = '';
+    ob += billLine('Base Package — ' + rec.package.name, fmt(rec.package.price));
+    rec.addons.forEach(function (a) { ob += billLine('+ ' + a.name + (a.homeDelivery ? ' (home delivery)' : ''), fmt(a.price)); });
+    ob += billLine('Pandit Dakshina', rec.dakshina > 0 ? fmt(rec.dakshina) : '<span style="color:var(--dim);">Not added</span>');
+    ob += billLine('Platform Fee', '<span class="strike">' + fmt(P.FEES.platform) + '</span><span class="free">FREE</span>');
+    ob += billLine('Video &amp; WhatsApp Delivery', '<span class="strike">' + fmt(P.FEES.video) + '</span><span class="free">FREE</span>');
+    if (rec.address) ob += billLine('Delivery Address', esc(rec.address));
+    ob += '<div class="bill-total"><span class="lbl">Total Paid</span><span class="amt">' + fmt(rec.total) + '</span></div>';
+    $('#confirm-order').innerHTML = ob;
+
+    // prasad line
+    var hasDelivery = rec.address != null;
+    $('#prasad-line').textContent = hasDelivery
+      ? 'Your home-delivery items ship to your address within 5–7 days with a tracking number.'
+      : 'No home-delivery items in this order — everything is offered at the temple.';
+
+    // wire actions
+    $('#download-pass').onclick = function () { downloadPass(rec); };
+    $('#share-whatsapp').onclick = function () { shareWhatsApp(rec); };
+  }
+  function passRow(k, v) {
+    return '<div class="row"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v) + '</div></div>';
+  }
+
+  function shareWhatsApp(rec) {
+    var text = 'Har Har Mahadev! I have offered my Sankalp for the Sawan Vishesh Kotilingeshwara Maha Rudrabhishekam on ' +
+      rec.event.date + ' at ' + rec.event.temple + ' through Ritham. ' +
+      'Booking ID: ' + rec.id + '. Join in offering your prayers: ' +
+      location.origin + location.pathname.replace(/\/[^/]*$/, '/');
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  }
+
+  // ── QR helpers (qrcodejs) ────────────────────────────────
+  function renderQR(el, text, size) {
+    if (!el) return;
+    el.innerHTML = '';
+    if (!window.QRCode) return;
+    try {
+      new window.QRCode(el, { text: text, width: size, height: size, colorDark: '#1E1533', colorLight: '#ffffff', correctLevel: window.QRCode.CorrectLevel.M });
+      // qrcodejs appends both a <canvas> and a fallback <img>; keep one
+      var c = el.querySelector('canvas'), im = el.querySelector('img');
+      if (c && im) im.style.display = 'none';
+    } catch (e) { /* ignore */ }
+  }
+  function qrDataURL(text, size) {
+    if (!window.QRCode) return null;
+    var div = document.createElement('div');
+    try {
+      new window.QRCode(div, { text: text, width: size, height: size, colorDark: '#1E1533', colorLight: '#ffffff', correctLevel: window.QRCode.CorrectLevel.M });
+    } catch (e) { return null; }
+    var c = div.querySelector('canvas');
+    if (c) { try { return c.toDataURL('image/png'); } catch (e) { return null; } }
+    var img = div.querySelector('img');
+    return img ? img.src : null;
+  }
+  // Load an image (webp/png) and return a JPEG dataURL + dimensions for jsPDF.
+  function loadImageJPEG(src) {
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var c = document.createElement('canvas');
+          c.width = img.naturalWidth; c.height = img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          resolve({ data: c.toDataURL('image/jpeg', 0.9), w: img.naturalWidth, h: img.naturalHeight });
+        } catch (e) { resolve(null); }
+      };
+      img.onerror = function () { resolve(null); };
+      img.src = src;
+    });
+  }
+
+  // ── PDF digital pass (styled, brand-themed) ──────────────
+  function downloadPass(rec) {
+    if (!window.jspdf) { toast('PDF library still loading — try again.'); return; }
+    toast('Preparing your Devotee Pass…');
+    var url = location.origin + location.pathname + '?booking=' + rec.id;
+    loadImageJPEG('../img/puja-hero-1.webp').then(function (banner) {
+      buildPassPDF(rec, banner, qrDataURL(url, 260));
+    });
+  }
+
+  function buildPassPDF(rec, banner, qrImg, asBlob) {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    var W = doc.internal.pageSize.getWidth();
+    var H = doc.internal.pageSize.getHeight();
+
+    // palette
+    var VIOLET = [123, 44, 191], MAGENTA = [255, 0, 127], SAFFRON = [232, 133, 30],
+        INK = [30, 21, 51], MUTED = [120, 110, 140], GOLD = [214, 160, 60];
+
+    // page background (warm cream)
+    doc.setFillColor(253, 248, 255); doc.rect(0, 0, W, H, 'F');
+
+    // decorative frame
+    doc.setDrawColor(VIOLET[0], VIOLET[1], VIOLET[2]); doc.setLineWidth(1.6);
+    doc.roundedRect(18, 18, W - 36, H - 36, 14, 14, 'S');
+    doc.setDrawColor(GOLD[0], GOLD[1], GOLD[2]); doc.setLineWidth(0.6);
+    doc.roundedRect(24, 24, W - 48, H - 48, 10, 10, 'S');
+
+    var M = 40;
+    var bx = 34, bw = W - 68, bTop = 34, bh = 150;
+
+    // banner image + scrim + title
+    if (banner) {
+      doc.addImage(banner.data, 'JPEG', bx, bTop, bw, bh, undefined, 'FAST');
+    } else {
+      doc.setFillColor(VIOLET[0], VIOLET[1], VIOLET[2]); doc.rect(bx, bTop, bw, bh, 'F');
+    }
+    // dark gradient-ish scrim (two stacked translucent bands)
+    if (doc.GState) {
+      doc.setGState(new doc.GState({ opacity: 0.38 })); doc.setFillColor(18, 8, 28); doc.rect(bx, bTop + bh - 74, bw, 74, 'F');
+      doc.setGState(new doc.GState({ opacity: 0.55 })); doc.setFillColor(18, 8, 28); doc.rect(bx, bTop + bh - 44, bw, 44, 'F');
+      doc.setGState(new doc.GState({ opacity: 1 }));
+    }
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('times', 'bold'); doc.setFontSize(9);
+    doc.text('RITHAM  ·  DEVOTEE PASS', bx + 16, bTop + bh - 30);
+    doc.setFont('times', 'italic'); doc.setFontSize(17);
+    doc.text('Sawan Vishesh Maha Rudrabhishekam & Bilva Arpan', bx + 16, bTop + bh - 12);
+
+    var y = bTop + bh + 26;
+
+    // Booking ID chip (left) + QR (right)
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text('BOOKING ID', M, y);
+    doc.setFillColor(MAGENTA[0], MAGENTA[1], MAGENTA[2]);
+    doc.roundedRect(M, y + 6, 168, 30, 8, 8, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(15);
+    doc.text(rec.id, M + 14, y + 26);
+
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text('Event: ' + rec.event.date + ' · Sawan Somvar + Nag Panchami', M, y + 56);
+    doc.text('Temple: ' + rec.event.temple, M, y + 72);
+
+    // QR at top-right
+    var qrSize = 96, qrX = W - M - qrSize, qrY = y - 2;
+    if (qrImg) {
+      doc.setFillColor(255, 255, 255); doc.roundedRect(qrX - 6, qrY - 6, qrSize + 12, qrSize + 12, 6, 6, 'F');
+      doc.setDrawColor(224, 214, 236); doc.setLineWidth(0.8); doc.roundedRect(qrX - 6, qrY - 6, qrSize + 12, qrSize + 12, 6, 6, 'S');
+      doc.addImage(qrImg, 'PNG', qrX, qrY, qrSize, qrSize);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+      doc.text('Scan to verify', qrX + qrSize / 2, qrY + qrSize + 14, { align: 'center' });
+    }
+
+    y += 96;
+
+    // detail grid (2 columns)
+    doc.setDrawColor(226, 216, 238); doc.setLineWidth(0.8); doc.line(M, y, W - M, y); y += 22;
+    var colX = [M, W / 2 + 6];
+    function cell(col, rowY, k, v) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(VIOLET[0], VIOLET[1], VIOLET[2]);
+      doc.text(k.toUpperCase(), colX[col], rowY);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(12); doc.setTextColor(INK[0], INK[1], INK[2]);
+      var lines = doc.splitTextToSize(v, (W / 2) - M - 10);
+      doc.text(lines, colX[col], rowY + 15);
+    }
+    var pairs = [
+      ['Devotee(s)', rec.devotees.join(', ')],
+      ['Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned — Kashyap)' : '')],
+      ['Package', rec.package.name + ' (' + rec.package.subtitle + ')'],
+      ['Members', String(rec.package.capacity)],
+      ['Amount Paid', 'Rs. ' + Number(rec.total).toLocaleString('en-IN')],
+      ['Status', 'Confirmed']
+    ];
+    for (var i = 0; i < pairs.length; i += 2) {
+      cell(0, y, pairs[i][0], pairs[i][1]);
+      if (pairs[i + 1]) cell(1, y, pairs[i + 1][0], pairs[i + 1][1]);
+      y += 44;
+    }
+    if (rec.wish) { cell(0, y, 'Sankalp / Wish', rec.wish); y += 40; }
+    if (rec.address) { cell(0, y, 'Delivery Address', rec.address); y += 40; }
+
+    // Om divider
+    y += 4;
+    doc.setDrawColor(GOLD[0], GOLD[1], GOLD[2]); doc.setLineWidth(0.8);
+    doc.line(M, y, W / 2 - 70, y); doc.line(W / 2 + 70, y, W - M, y);
+    doc.setFont('times', 'bolditalic'); doc.setFontSize(12); doc.setTextColor(SAFFRON[0], SAFFRON[1], SAFFRON[2]);
+    doc.text('Om Namah Shivaya', W / 2, y + 4, { align: 'center' });
+    y += 26;
+
+    // tinted info box helper
+    function infoBox(title, lines, tint, headColor, italic) {
+      var pad = 14, lh = 15, boxH = 30 + lines.length * lh + 8;
+      doc.setFillColor(tint[0], tint[1], tint[2]);
+      doc.roundedRect(M, y, W - 2 * M, boxH, 10, 10, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(headColor[0], headColor[1], headColor[2]);
+      doc.text(title, M + pad, y + 22);
+      doc.setFont('helvetica', italic ? 'italic' : 'normal'); doc.setFontSize(10.5); doc.setTextColor(70, 62, 90);
+      var ty = y + 40;
+      lines.forEach(function (t) { doc.text(t, M + pad, ty); ty += lh; });
+      y += boxH + 14;
+    }
+    infoBox('Puja Guidelines', [
+      '•  Observe a light, sattvic diet on Sawan Somvar (17 Aug 2026) if you can.',
+      '•  Offer water or milk to a Shivling near you and light a diya at home.',
+      '•  Your name & gotra will be recited by the priests during the Abhishek.',
+      '•  Your personalised puja video arrives on WhatsApp within 3-4 days.'
+    ], [244, 238, 252], VIOLET, false);
+
+    infoBox('Sawan Somvar Mantras', [
+      'Om Namah Shivaya',
+      'Om Tryambakam Yajamahe Sugandhim Pushtivardhanam,',
+      'Urvarukamiva Bandhanan Mrityor Mukshiya Maamritat.'
+    ], [253, 243, 230], SAFFRON, true);
+
+    // footer bar
+    var fy = H - 34 - 26;
+    doc.setFillColor(VIOLET[0], VIOLET[1], VIOLET[2]);
+    doc.roundedRect(24, fy, W - 48, 26, 8, 8, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(255, 255, 255);
+    doc.text('Har Har Mahadev  ·  Ritham  ·  ritham.co.in', W / 2, fy + 17, { align: 'center' });
+
+    if (asBlob) return doc.output('bloburl');
+    doc.save('Ritham-Devotee-Pass-' + rec.id + '.pdf');
+  }
+
+  // ── Deep link (?booking=ID) ──────────────────────────────
+  function checkDeepLink() {
+    var params = new URLSearchParams(location.search);
+    var id = params.get('booking');
+    if (!id) return false;
+    var rec = P.getBooking(id);
+    if (!rec) { toast('Booking not found on this device.'); return false; }
+    renderConfirmation(rec);
+    showView('view-confirm');
+    return true;
+  }
+
+  // ── Wire up ──────────────────────────────────────────────
+  function init() {
+    renderPackages();
+    populateGotras();
+    renderStepbars();
+
+    $('#proceed-sankalp').addEventListener('click', openSankalp);
+    $('#sankalp-close').addEventListener('click', closeSankalp);
+    $('#sankalp-cancel').addEventListener('click', closeSankalp);
+    $('#sankalp-modal').addEventListener('click', function (e) {
+      if (e.target === $('#sankalp-modal')) closeSankalp();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && $('#sankalp-modal').classList.contains('show')) closeSankalp();
+    });
+
+    $('#f-diff-calling').addEventListener('change', function () {
+      $('#calling-field').style.display = this.checked ? 'block' : 'none';
+    });
+    $('#f-unknown-gotra').addEventListener('change', applyUnknownGotra);
+
+    // digit-only phone inputs
+    ['#f-whatsapp', '#f-calling'].forEach(function (sel) {
+      $(sel).addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+      });
+    });
+
+    $('#sankalp-next').addEventListener('click', function () {
+      if (!validateSankalp()) { toast('Please complete the required fields.'); return; }
+      collectSankalp();
+      closeSankalp();
+      goToReview();
+    });
+
+    $('#back-to-pkg').addEventListener('click', function () {
+      showView('view-packages');
+      $('.view.active .stepbar').setAttribute('data-step', '1');
+      renderStepbars();
+      if (draft.packageId) $('#sticky-bar').classList.add('show');
+    });
+
+    $('#pay-btn').addEventListener('click', handlePay);
+    $('#f-address').addEventListener('input', function () {
+      if (this.value.trim()) this.closest('.field').classList.remove('invalid');
+    });
+
+    checkDeepLink();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
