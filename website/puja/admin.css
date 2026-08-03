@@ -66,6 +66,10 @@
 
 .row-manage { white-space: nowrap; }
 
+/* danger (delete) button */
+.btn-danger { background: #fdecee; color: #d61f3a; }
+.btn-danger:hover { background: #fbd9dd; color: #b3122f; }
+
 /* Fulfilment modal specifics */
 .fulfil-meta { background: #faf7fe; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; font-size: 13.5px; }
 .fulfil-meta .k { color: var(--muted); }

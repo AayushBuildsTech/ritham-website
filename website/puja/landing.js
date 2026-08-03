@@ -67,10 +67,8 @@
       $$('button', dotsWrap).forEach(function (d, i) { d.classList.toggle('on', i === idx); });
     }
     function next() { go(idx + 1); }
-    function prev() { go(idx - 1); }
-    function restart() { clearInterval(auto); auto = setInterval(next, 5000); }
-    $('#car-next').addEventListener('click', function () { next(); restart(); });
-    $('#car-prev').addEventListener('click', function () { prev(); restart(); });
+    function restart() { clearInterval(auto); auto = setInterval(next, 4500); }
+    // Automatic carousel (no manual prev/next). Dots remain as passive indicators.
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!reduce) restart();
   }

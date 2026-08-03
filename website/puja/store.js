@@ -267,6 +267,18 @@
     });
   }
 
+  // Admin: delete a booking by booking_code (e.g. remove test data).
+  function deleteBooking(id) {
+    var c = db();
+    if (!c) {
+      writeAll(readAll().filter(function (b) { return b.id !== id; }));
+      return Promise.resolve(true);
+    }
+    return c.from('web_puja_bookings').delete().eq('booking_code', id).then(function (res) {
+      if (res.error) throw res.error; return true;
+    });
+  }
+
   // ── Auth (admin) ────────────────────────────────────────────
   function signIn(email, password) {
     var c = db();
@@ -303,6 +315,7 @@
     getBooking: getBooking,         // async → Promise<record|null>
     updateBooking: updateBooking,   // async → Promise
     listBookings: listBookings,     // async → Promise<record[]>
+    deleteBooking: deleteBooking,   // async → Promise
     signIn: signIn,
     signOut: signOut,
     currentUser: currentUser,

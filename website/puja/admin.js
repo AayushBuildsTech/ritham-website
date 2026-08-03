@@ -243,6 +243,15 @@
         console.error('update failed:', e); toast('Update failed.');
       }).then(function () { btn.disabled = false; });
     };
+    $('#fulfil-delete').onclick = function () {
+      if (!window.confirm('Delete booking ' + currentId + '? This permanently removes it and cannot be undone.')) return;
+      var dbtn = $('#fulfil-delete'); dbtn.disabled = true;
+      P.deleteBooking(currentId).then(function () {
+        closeFulfil(); toast('Booking deleted.'); loadData();
+      }).catch(function (e) {
+        console.error('delete failed:', e); toast('Delete failed.');
+      }).then(function () { dbtn.disabled = false; });
+    };
   }
   function closeFulfil() {
     $('#fulfil-modal').classList.remove('show');

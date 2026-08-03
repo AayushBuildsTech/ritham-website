@@ -473,17 +473,36 @@
     });
   }
 
-  // ── PDF digital pass (styled, brand-themed) ──────────────
+  // Load an image element (for canvas drawing).
+  function loadImg(src) {
+    return new Promise(function (resolve) {
+      if (!src) { resolve(null); return; }
+      var im = new Image();
+      im.onload = function () { resolve(im); };
+      im.onerror = function () { resolve(null); };
+      im.src = src;
+    });
+  }
+
+  // ── PDF digital pass (styled, brand-themed, + Hindi page) ─
   function downloadPass(rec) {
     if (!window.jspdf) { toast('PDF library still loading — try again.'); return; }
     toast('Preparing your Devotee Pass…');
     var url = location.origin + location.pathname + '?booking=' + rec.id;
-    loadImageJPEG('../img/puja-hero-1.webp').then(function (banner) {
-      buildPassPDF(rec, banner, qrDataURL(url, 260));
-    });
+    var qr = qrDataURL(url, 260);
+    var fontReady = (document.fonts && document.fonts.load)
+      ? Promise.all([
+          document.fonts.load('700 20px "Noto Sans Devanagari"'),
+          document.fonts.load('600 20px "Noto Sans Devanagari"'),
+          document.fonts.load('400 20px "Noto Sans Devanagari"')
+        ]).catch(function () {})
+      : Promise.resolve();
+    Promise.all([loadImageJPEG('../img/puja-hero-1.webp'), loadImg('../img/puja-hero-1.webp'), loadImg(qr), fontReady])
+      .then(function (r) { buildPassPDF(rec, r[0], qr, { bannerImg: r[1], qrImgEl: r[2] }); })
+      .catch(function (e) { console.error(e); toast('Could not build the PDF.'); });
   }
 
-  function buildPassPDF(rec, banner, qrImg, asBlob) {
+  function buildPassPDF(rec, banner, qrImg, extras) {
     var jsPDF = window.jspdf.jsPDF;
     var doc = new jsPDF({ unit: 'pt', format: 'a4' });
     var W = doc.internal.pageSize.getWidth();
@@ -615,8 +634,146 @@
     doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(255, 255, 255);
     doc.text('Har Har Mahadev  ·  Ritham  ·  ritham.co.in', W / 2, fy + 17, { align: 'center' });
 
-    if (asBlob) return doc.output('bloburl');
+    // ── Page 2 · Hindi (Devanagari) translation of the whole pass ──
+    try {
+      var hc = renderHindiCanvas(rec, extras || {});
+      doc.addPage();
+      doc.addImage(hc.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, W, H);
+    } catch (e) { console.warn('Hindi page skipped:', e); }
+
     doc.save('Ritham-Devotee-Pass-' + rec.id + '.pdf');
+  }
+
+  // ── Hindi page (drawn to a canvas with a Devanagari web font) ──
+  function hindiPackage(pkg) {
+    if (!pkg) return '';
+    var m = { individual: 'एक संकल्प (व्यक्तिगत)', couple: 'जोड़ी कल्याण (युगल)', family: 'कुटुम्ब रक्षा (परिवार)' };
+    return m[pkg.id] || pkg.name;
+  }
+  function rr(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return; }
+    ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function drawCover(ctx, img, x, y, w, h) {
+    var ir = img.width / img.height, tr = w / h, sw, sh, sx, sy;
+    if (ir > tr) { sh = img.height; sw = sh * tr; sx = (img.width - sw) / 2; sy = 0; }
+    else { sw = img.width; sh = sw / tr; sx = 0; sy = (img.height - sh) / 2; }
+    ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+  }
+  function renderHindiCanvas(rec, extras) {
+    var S = 2, W = 595, H = 842;
+    var cv = document.createElement('canvas'); cv.width = W * S; cv.height = H * S;
+    var ctx = cv.getContext('2d'); ctx.scale(S, S);
+    var DV = '"Noto Sans Devanagari","Nirmala UI",sans-serif';
+    var VIOLET = '#7B2CBF', MAG = '#FF007F', SAFF = '#e8851e', INK = '#1e1533', MUTED = '#786e8c', GOLD = '#d6a03c';
+    var M = 40;
+
+    ctx.fillStyle = '#fdf8ff'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = VIOLET; ctx.lineWidth = 1.6; rr(ctx, 18, 18, W - 36, H - 36, 14); ctx.stroke();
+    ctx.strokeStyle = GOLD; ctx.lineWidth = 0.6; rr(ctx, 24, 24, W - 48, H - 48, 10); ctx.stroke();
+
+    // banner
+    var bx = 34, bTop = 34, bw = W - 68, bh = 150;
+    ctx.save(); rr(ctx, bx, bTop, bw, bh, 0); ctx.clip();
+    if (extras.bannerImg) drawCover(ctx, extras.bannerImg, bx, bTop, bw, bh);
+    else { ctx.fillStyle = VIOLET; ctx.fillRect(bx, bTop, bw, bh); }
+    var g = ctx.createLinearGradient(0, bTop + bh - 78, 0, bTop + bh);
+    g.addColorStop(0, 'rgba(18,8,28,0)'); g.addColorStop(1, 'rgba(18,8,28,0.8)');
+    ctx.fillStyle = g; ctx.fillRect(bx, bTop + bh - 78, bw, 78);
+    ctx.restore();
+    ctx.fillStyle = '#fff'; ctx.textBaseline = 'alphabetic';
+    ctx.font = '700 9px ' + DV; ctx.fillText('रिथम · भक्त पास', bx + 16, bTop + bh - 30);
+    ctx.font = '700 15px ' + DV; ctx.fillText('श्रावण विशेष महा रुद्राभिषेक एवं बिल्व अर्पण', bx + 16, bTop + bh - 12);
+
+    var y = bTop + bh + 26;
+    // Booking ID pill
+    ctx.font = '700 8px ' + DV; ctx.fillStyle = MUTED; ctx.fillText('बुकिंग आईडी', M, y);
+    ctx.fillStyle = MAG; rr(ctx, M, y + 6, 168, 30, 8); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '700 15px "Inter",sans-serif'; ctx.fillText(rec.id, M + 14, y + 27);
+    ctx.fillStyle = MUTED; ctx.font = '400 9px ' + DV;
+    ctx.fillText('आयोजन: 17 अगस्त 2026 · सावन सोमवार + नाग पंचमी', M, y + 56);
+    ctx.fillText('मंदिर: कोटिलिंगेश्वर मंदिर, कोलार', M, y + 72);
+
+    // QR
+    var qs = 96, qx = W - M - qs, qy = y - 2;
+    if (extras.qrImgEl) {
+      ctx.fillStyle = '#fff'; rr(ctx, qx - 6, qy - 6, qs + 12, qs + 12, 6); ctx.fill();
+      ctx.strokeStyle = '#e0d6ec'; ctx.lineWidth = 0.8; rr(ctx, qx - 6, qy - 6, qs + 12, qs + 12, 6); ctx.stroke();
+      ctx.drawImage(extras.qrImgEl, qx, qy, qs, qs);
+      ctx.fillStyle = MUTED; ctx.font = '400 7.5px ' + DV; ctx.textAlign = 'center';
+      ctx.fillText('सत्यापन हेतु स्कैन करें', qx + qs / 2, qy + qs + 14); ctx.textAlign = 'left';
+    }
+
+    y += 96;
+    ctx.strokeStyle = '#e2d8ee'; ctx.lineWidth = 0.8; ctx.beginPath(); ctx.moveTo(M, y); ctx.lineTo(W - M, y); ctx.stroke();
+    y += 22;
+    var colX = [M, W / 2 + 6];
+    function cell(col, rowY, k, v) {
+      ctx.fillStyle = VIOLET; ctx.font = '700 8px ' + DV; ctx.fillText(k, colX[col], rowY);
+      ctx.fillStyle = INK; ctx.font = '400 12px ' + DV;
+      var maxW = (W / 2) - M - 10, words = String(v == null ? '' : v).split(' '), line = '', ty = rowY + 15;
+      for (var i = 0; i < words.length; i++) {
+        var test = line ? line + ' ' + words[i] : words[i];
+        if (ctx.measureText(test).width > maxW && line) { ctx.fillText(line, colX[col], ty); line = words[i]; ty += 14; }
+        else line = test;
+      }
+      ctx.fillText(line, colX[col], ty);
+    }
+    var pairs = [
+      ['भक्त', rec.devotees.join(', ')],
+      ['गोत्र', rec.gotra + (rec.gotraUnknown ? ' (निर्धारित — कश्यप)' : '')],
+      ['पैकेज', hindiPackage(rec.package)],
+      ['सदस्य', String(rec.package ? rec.package.capacity : '')],
+      ['भुगतान राशि', '₹' + Number(rec.total).toLocaleString('en-IN')],
+      ['स्थिति', 'पुष्टि (Confirmed)']
+    ];
+    for (var i = 0; i < pairs.length; i += 2) {
+      cell(0, y, pairs[i][0], pairs[i][1]);
+      if (pairs[i + 1]) cell(1, y, pairs[i + 1][0], pairs[i + 1][1]);
+      y += 44;
+    }
+    if (rec.wish) { cell(0, y, 'संकल्प / मनोकामना', rec.wish); y += 40; }
+    if (rec.address) { cell(0, y, 'पता', rec.address); y += 40; }
+
+    // Om divider
+    y += 4;
+    ctx.strokeStyle = GOLD; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(M, y); ctx.lineTo(W / 2 - 70, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W / 2 + 70, y); ctx.lineTo(W - M, y); ctx.stroke();
+    ctx.fillStyle = SAFF; ctx.font = '700 13px ' + DV; ctx.textAlign = 'center';
+    ctx.fillText('ॐ नमः शिवाय', W / 2, y + 5); ctx.textAlign = 'left';
+    y += 26;
+
+    function box(title, lines, tint, head, lh2) {
+      var pad = 14, lh = lh2 || 16, boxH = 30 + lines.length * lh + 8;
+      ctx.fillStyle = tint; rr(ctx, M, y, W - 2 * M, boxH, 10); ctx.fill();
+      ctx.fillStyle = head; ctx.font = '700 12px ' + DV; ctx.fillText(title, M + pad, y + 22);
+      ctx.fillStyle = '#463e5a'; ctx.font = '400 10.5px ' + DV;
+      var ty = y + 40;
+      lines.forEach(function (t) { ctx.fillText(t, M + pad, ty); ty += lh; });
+      y += boxH + 14;
+    }
+    box('पूजा दिशा-निर्देश', [
+      '•  सावन सोमवार (17 अगस्त 2026) पर यथासंभव हल्का, सात्विक आहार लें।',
+      '•  अपने निकट किसी शिवलिंग पर जल/दूध अर्पित करें और घर में दीप जलाएँ।',
+      '•  अभिषेक के समय पुजारी आपका नाम एवं गोत्र का उच्चारण करेंगे।',
+      '•  आपकी व्यक्तिगत पूजा वीडियो 3-4 दिनों में व्हाट्सएप पर प्राप्त होगी।'
+    ], '#f4eefc', VIOLET);
+    box('सावन सोमवार मंत्र', [
+      'ॐ नमः शिवाय',
+      'ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम् ।',
+      'उर्वारुकमिव बन्धनान् मृत्योर्मुक्षीय माऽमृतात् ॥'
+    ], '#fdf3e6', SAFF);
+
+    // footer
+    var fy = H - 34 - 26;
+    ctx.fillStyle = VIOLET; rr(ctx, 24, fy, W - 48, 26, 8); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '700 9.5px ' + DV; ctx.textAlign = 'center';
+    ctx.fillText('हर हर महादेव · रिथम · ritham.co.in', W / 2, fy + 17); ctx.textAlign = 'left';
+
+    return cv;
   }
 
   // ── Deep link (?booking=ID) ──────────────────────────────
