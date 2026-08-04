@@ -588,7 +588,9 @@ a:hover { text-decoration: underline; }
 .chadhava-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
 .chadhava-price { font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; color: var(--ink); }
 .chadhava-toggle { min-width: 92px; }
-.chadhava-checkout { margin-top: 8px; }
+.chadhava-checkout { margin-top: 8px; scroll-margin-top: 90px; }
+/* clear the fixed chadhava bar so it never covers the Pay button */
+@media (max-width: 760px) { .chadhava-checkout { padding-bottom: 84px; } }
 
 @media (max-width: 720px) {
   .path-grid { grid-template-columns: 1fr; }

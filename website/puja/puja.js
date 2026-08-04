@@ -85,6 +85,7 @@
     var bar = $('#sticky-bar');
     $('#sticky-name').innerHTML = esc(pkg.name) + ' • <b>' + fmt(pkg.price) + '</b>';
     bar.classList.add('show');
+    $('#chadhava-bar').classList.remove('show');   // package & chadhava bars are mutually exclusive
   }
 
   // ── Sankalp modal ────────────────────────────────────────
@@ -830,6 +831,27 @@
     $('#ch-address-panel').style.display = chadhavaDeliveryNeeded() ? 'block' : 'none';
     var box = $('#chadhava-checkout');
     box.style.display = chadhava.addonIds.length ? 'block' : 'none';
+    updateChadhavaBar();
+  }
+
+  // Sticky bottom bar — reassures the user their seva is counted and gives a
+  // one-tap jump to checkout (mirrors the package flow's "Proceed to Sankalp").
+  function updateChadhavaBar() {
+    var bar = $('#chadhava-bar');
+    if (!bar) return;
+    var n = chadhava.addonIds.length;
+    if (!n) { bar.classList.remove('show'); return; }
+    var total = chadhava.addonIds.map(P.getAddon).filter(Boolean).reduce(function (s, a) { return s + a.price; }, 0);
+    $('#chadhava-bar-name').innerHTML = n + ' seva' + (n > 1 ? 's' : '') + ' added • <b>' + fmt(total) + '</b>';
+    $('#sticky-bar').classList.remove('show');   // don't stack over the package bar
+    bar.classList.add('show');
+  }
+  function goToChadhavaCheckout() {
+    var box = $('#chadhava-checkout');
+    box.style.display = 'block';
+    $('#chadhava-bar').classList.remove('show');  // hide so it doesn't cover the Pay button
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(function () { var el = $('#ch-name'); if (el) el.focus({ preventScroll: true }); }, 420);
   }
 
   function renderChadhavaBill() {
@@ -876,6 +898,7 @@
     };
     var btn = $('#ch-pay-btn'); btn.disabled = true;
     window.RithamPay.checkout(draft).then(function (record) {
+      $('#chadhava-bar').classList.remove('show');
       history.replaceState(null, '', '?booking=' + record.id);
       renderConfirmation(record);
       showView('view-confirm');
@@ -917,6 +940,7 @@
       if (this.value.trim()) this.closest('.field').classList.remove('invalid');
     });
     $('#ch-pay-btn').addEventListener('click', payChadhava);
+    $('#chadhava-checkout-btn').addEventListener('click', goToChadhavaCheckout);
 
     $('#proceed-sankalp').addEventListener('click', openSankalp);
     $('#sankalp-close').addEventListener('click', closeSankalp);
