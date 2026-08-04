@@ -809,7 +809,10 @@
             '<div class="chadhava-top"><span class="chadhava-name">' + esc(a.name) + '</span>' +
               '<span class="addon-tag' + (a.homeDelivery ? ' deliver' : '') + '">' + esc(a.tag) + '</span></div>' +
             '<p class="chadhava-desc">' + esc(a.desc) + '</p>' +
-            '<p class="chadhava-video">Includes a video of this seva on WhatsApp.</p>' +
+            '<div class="chadhava-incl">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 3zM10 8.5l4 2.5-4 2.5z"/></svg>' +
+              '<span>Video of this seva <b>+ puja highlights</b>, sent on WhatsApp</span>' +
+            '</div>' +
           '</div>' +
           '<div class="chadhava-foot">' +
             '<span class="chadhava-price">' + fmt(a.price) + '</span>' +

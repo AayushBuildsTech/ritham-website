@@ -584,7 +584,10 @@ a:hover { text-decoration: underline; }
 .chadhava-top .addon-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: #f0e9fa; color: var(--violet); white-space: nowrap; }
 .chadhava-top .addon-tag.deliver { background: var(--warn-bg); color: var(--warn); }
 .chadhava-desc { color: var(--muted); font-size: 13.5px; line-height: 1.5; }
-.chadhava-video { color: var(--violet); font-size: 12.5px; font-weight: 600; margin-top: 8px; }
+.chadhava-incl { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 10px; background: #f4eefc; border: 1px solid var(--line); border-radius: 10px; }
+.chadhava-incl svg { width: 17px; height: 17px; color: var(--violet); flex: 0 0 auto; }
+.chadhava-incl span { font-size: 12px; line-height: 1.35; color: var(--ink); }
+.chadhava-incl b { color: var(--violet); font-weight: 700; }
 .chadhava-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
 .chadhava-price { font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; color: var(--ink); }
 .chadhava-toggle { min-width: 92px; }
