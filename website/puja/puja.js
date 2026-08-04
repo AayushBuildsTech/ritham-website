@@ -34,6 +34,23 @@
     var t = $('#toast'); t.textContent = msg; t.classList.add('show');
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2600);
   }
+
+  // ── Meta Pixel conversion events ─────────────────────────
+  function fbqTrack(event, params) {
+    if (typeof window.fbq === 'function') { try { window.fbq('track', event, params); } catch (e) { /* ignore */ } }
+  }
+  // Purchase must fire once per successful transaction — never again on reload /
+  // deep-link. We remember the booking codes we've already counted (localStorage).
+  function trackPurchaseOnce(record) {
+    if (!record || !record.id) return;
+    var KEY = 'ritham_fbq_purchased';
+    var done = [];
+    try { done = JSON.parse(window.localStorage.getItem(KEY) || '[]'); } catch (e) { done = []; }
+    if (done.indexOf(record.id) !== -1) return;   // already counted this booking
+    done.push(record.id);
+    try { window.localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) { /* disabled */ }
+    fbqTrack('Purchase', { value: record.total, currency: 'INR' });
+  }
   function renderStepbars() {
     $$('.stepbar').forEach(function (bar) {
       var cur = parseInt(bar.getAttribute('data-step'), 10);
@@ -357,9 +374,11 @@
       draft.address = addr.value.trim();
     }
     var btn = $('#pay-btn'); btn.disabled = true;
+    fbqTrack('InitiateCheckout', { value: P.computeTotal(draft), currency: 'INR' });
     // checkout(draft) recomputes the amount server-side, runs Razorpay, verifies
     // the signature, and returns the confirmed booking record.
     window.RithamPay.checkout(draft).then(function (record) {
+      trackPurchaseOnce(record);
       history.replaceState(null, '', '?booking=' + record.id); // deep-linkable
       renderConfirmation(record);
       showView('view-confirm');
@@ -898,7 +917,9 @@
       address: chadhavaDeliveryNeeded() ? $('#ch-address').value.trim() : ''
     };
     var btn = $('#ch-pay-btn'); btn.disabled = true;
+    fbqTrack('InitiateCheckout', { value: P.computeTotal(draft), currency: 'INR' });
     window.RithamPay.checkout(draft).then(function (record) {
+      trackPurchaseOnce(record);
       $('#chadhava-bar').classList.remove('show');
       history.replaceState(null, '', '?booking=' + record.id);
       renderConfirmation(record);
