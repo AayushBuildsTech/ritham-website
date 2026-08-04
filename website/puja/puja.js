@@ -85,7 +85,6 @@
     var bar = $('#sticky-bar');
     $('#sticky-name').innerHTML = esc(pkg.name) + ' • <b>' + fmt(pkg.price) + '</b>';
     bar.classList.add('show');
-    $('#chadhava-bar').classList.remove('show');   // package & chadhava bars are mutually exclusive
   }
 
   // ── Sankalp modal ────────────────────────────────────────
@@ -846,7 +845,6 @@
     if (!n) { bar.classList.remove('show'); return; }
     var total = chadhava.addonIds.map(P.getAddon).filter(Boolean).reduce(function (s, a) { return s + a.price; }, 0);
     $('#chadhava-bar-name').innerHTML = n + ' seva' + (n > 1 ? 's' : '') + ' added • <b>' + fmt(total) + '</b>';
-    $('#sticky-bar').classList.remove('show');   // don't stack over the package bar
     bar.classList.add('show');
   }
   function goToChadhavaCheckout() {
@@ -924,26 +922,11 @@
   }
 
   // ── Wire up ──────────────────────────────────────────────
-  function init() {
+  // The full-puja flow (/puja) and the chadhava flow (/chadhava) live on separate
+  // pages sharing this script. Each block only wires up if its markup is present.
+  function initPackageFlow() {
     renderPackages();
-    renderChadhavaGrid();
-    renderChadhavaBill();
     populateGotras();
-    renderStepbars();
-
-    // Chadhava flow wiring
-    $('#ch-whatsapp').addEventListener('input', function () {
-      this.value = this.value.replace(/\D/g, '').slice(0, 10);
-      if (validPhone(this.value)) this.closest('.field').classList.remove('invalid');
-    });
-    $('#ch-name').addEventListener('input', function () {
-      if (this.value.trim()) this.closest('.field').classList.remove('invalid');
-    });
-    $('#ch-address').addEventListener('input', function () {
-      if (this.value.trim()) this.closest('.field').classList.remove('invalid');
-    });
-    $('#ch-pay-btn').addEventListener('click', payChadhava);
-    $('#chadhava-checkout-btn').addEventListener('click', goToChadhavaCheckout);
 
     $('#proceed-sankalp').addEventListener('click', openSankalp);
     $('#sankalp-close').addEventListener('click', closeSankalp);
@@ -985,7 +968,30 @@
     $('#f-address').addEventListener('input', function () {
       if (this.value.trim()) this.closest('.field').classList.remove('invalid');
     });
+  }
 
+  function initChadhavaFlow() {
+    renderChadhavaGrid();
+    renderChadhavaBill();
+
+    $('#ch-whatsapp').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 10);
+      if (validPhone(this.value)) this.closest('.field').classList.remove('invalid');
+    });
+    $('#ch-name').addEventListener('input', function () {
+      if (this.value.trim()) this.closest('.field').classList.remove('invalid');
+    });
+    $('#ch-address').addEventListener('input', function () {
+      if (this.value.trim()) this.closest('.field').classList.remove('invalid');
+    });
+    $('#ch-pay-btn').addEventListener('click', payChadhava);
+    $('#chadhava-checkout-btn').addEventListener('click', goToChadhavaCheckout);
+  }
+
+  function init() {
+    renderStepbars();
+    if ($('#pkg-grid')) initPackageFlow();
+    if ($('#chadhava-grid')) initChadhavaFlow();
     checkDeepLink();
   }
 

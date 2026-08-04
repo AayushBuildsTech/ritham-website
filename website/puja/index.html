@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="puja.css?v=12" />
+  <link rel="stylesheet" href="puja.css?v=13" />
 </head>
 <body>
   <header class="puja-header">
@@ -93,7 +93,6 @@
         <div class="an-inner">
           <a href="#about">About Puja</a>
           <a href="#packages">Packages</a>
-          <a href="#chadhava">Chadhava</a>
           <a href="#process">8-Step Process</a>
           <a href="#benefits">Benefits</a>
           <a href="#temple">Kotilingeshwara Temple</a>
@@ -127,30 +126,6 @@
         </div>
       </section>
 
-      <!-- A2 · CHOOSE HOW TO PARTICIPATE -->
-      <section class="landing-section" id="participate">
-        <div class="wrap">
-          <div class="section-head">
-            <h2>Choose How to Participate</h2>
-            <p>Book the complete puja for your family, or offer a single chadhava directly — either way, your personalised video arrives on WhatsApp.</p>
-          </div>
-          <div class="path-grid">
-            <a href="#packages" class="path-card">
-              <span class="path-eyebrow">Complete Seva</span>
-              <h3>Book the Full Puja</h3>
-              <p>The complete Maha Rudrabhishekam Sankalp in your name &amp; gotra, with a full video of the ritual on WhatsApp.</p>
-              <span class="path-foot"><span class="path-price">From ₹401</span><span class="path-go">Choose a package →</span></span>
-            </a>
-            <a href="#chadhava" class="path-card alt">
-              <span class="path-eyebrow">Quick Offering</span>
-              <h3>Offer a Chadhava</h3>
-              <p>Short on time? Offer a single seva — prasad, Bilva Patra or Gau Seva — and receive a video of that offering.</p>
-              <span class="path-foot"><span class="path-price">From ₹51</span><span class="path-go">Offer directly →</span></span>
-            </a>
-          </div>
-        </div>
-      </section>
-
       <!-- B · PACKAGES -->
       <section class="landing-section" id="packages">
         <div class="wrap">
@@ -160,65 +135,6 @@
             <p>Choose the Sankalp that fits your family. All packages include your personalised Sankalp and video delivery.</p>
           </div>
           <div class="pkg-grid" id="pkg-grid"><!-- injected by puja.js --></div>
-        </div>
-      </section>
-
-      <!-- B2 · CHADHAVA · standalone offerings -->
-      <section class="landing-section" id="chadhava">
-        <div class="wrap">
-          <div class="section-head">
-            <h2>Or Offer a Chadhava Directly</h2>
-            <p>No full puja needed. Choose one or more sevas below, add your details, and receive a video of your offering on WhatsApp.</p>
-          </div>
-          <div class="chadhava-grid" id="chadhava-grid"><!-- injected by puja.js --></div>
-
-          <div class="chadhava-checkout" id="chadhava-checkout" style="display:none;">
-            <div class="review-grid">
-              <div>
-                <div class="panel">
-                  <h3>Your Details</h3>
-                  <p class="panel-sub">So we can name your offering and send your video.</p>
-                  <div class="field">
-                    <label for="ch-name">Your Name <span class="req">*</span></label>
-                    <input class="input" id="ch-name" type="text" placeholder="Full name" autocomplete="name" />
-                    <p class="err-text">Please enter your name.</p>
-                  </div>
-                  <div class="field">
-                    <label for="ch-whatsapp">WhatsApp Number for Video <span class="req">*</span></label>
-                    <div class="input-prefix">
-                      <span class="prefix">+91</span>
-                      <input class="input" id="ch-whatsapp" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel-national" />
-                    </div>
-                    <p class="err-text">Enter a valid 10-digit Indian mobile number.</p>
-                  </div>
-                  <div class="field" id="ch-address-panel" style="display:none;">
-                    <label for="ch-address">Home Delivery Address <span class="req">*</span></label>
-                    <textarea class="textarea" id="ch-address" placeholder="House / flat, street, area, city, state, PIN code"></textarea>
-                    <p class="err-text">Please enter a delivery address for your prasad / items.</p>
-                  </div>
-                  <div class="field">
-                    <label for="ch-wish">Wish / Intention <span class="hint">(optional)</span></label>
-                    <textarea class="textarea" id="ch-wish" placeholder="Optional — e.g. health of family, peace at home"></textarea>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div class="panel bill">
-                  <h3>Bill Summary</h3>
-                  <div id="ch-bill-lines"><!-- injected --></div>
-                  <div class="bill-total">
-                    <span class="lbl">Final Payable</span>
-                    <span class="amt" id="ch-bill-total">₹0</span>
-                  </div>
-                  <button class="btn btn-grad btn-block" id="ch-pay-btn" style="margin-top:14px;">Pay ₹0</button>
-                  <div class="trust-row">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9.5 12l1.8 1.8 3.2-3.6"/></svg>
-                    Secured by Razorpay · UPI, cards &amp; netbanking
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -474,17 +390,6 @@
     </div>
   </div>
 
-  <!-- ═══ CHADHAVA STICKY BAR ═══════════════════════════════ -->
-  <div class="sticky-bar" id="chadhava-bar">
-    <div class="inner">
-      <div class="sel-info">
-        <div class="sel-name" id="chadhava-bar-name">1 seva added</div>
-        <div class="sel-sub">Offer directly · video on WhatsApp</div>
-      </div>
-      <button class="btn btn-grad" id="chadhava-checkout-btn">Checkout →</button>
-    </div>
-  </div>
-
   <!-- ═══ SANKALP MODAL ═════════════════════════════════════ -->
   <div class="modal-overlay" id="sankalp-modal">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sankalp-title">
@@ -568,7 +473,7 @@
   <script src="config.js?v=3"></script>
   <script src="store.js?v=8"></script>
   <script src="payment.js?v=3"></script>
-  <script src="puja.js?v=10"></script>
-  <script src="landing.js?v=3"></script>
+  <script src="puja.js?v=11"></script>
+  <script src="landing.js?v=4"></script>
 </body>
 </html>

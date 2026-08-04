@@ -36,8 +36,8 @@
       alertBar.innerHTML = '<b style="color:#d61f3a;">Bookings for Sawan 2026 are now closed.</b> ' +
         'Thank you to all the devotees who registered their Sankalp.';
     }
-    // belt-and-suspenders: hard-disable booking-entry buttons
-    ['#hero-cta', '#proceed-sankalp', '#pay-btn', '#sankalp-next'].forEach(function (sel) {
+    // belt-and-suspenders: hard-disable booking-entry buttons (both flows)
+    ['#hero-cta', '#proceed-sankalp', '#pay-btn', '#sankalp-next', '#ch-pay-btn', '#chadhava-checkout-btn'].forEach(function (sel) {
       var el = $(sel); if (el) { el.setAttribute('aria-disabled', 'true'); el.disabled = true; }
     });
   }
