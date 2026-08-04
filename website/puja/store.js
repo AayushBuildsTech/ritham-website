@@ -54,6 +54,16 @@
 
   var ADDONS = [
     {
+      id: 'ganga-jal',
+      name: 'Ganga Jal Arpan',
+      price: 51,
+      homeDelivery: false,
+      tag: 'At Temple',
+      desc: 'Sacred Ganga Jal offered over the Shivling in your name during the Abhishek.',
+      img: '../img/addon-ganga-jal.webp',
+      icon: 'M12 2c3.5 4 5.5 6.7 5.5 9.5a5.5 5.5 0 0 1-11 0C6.5 8.7 8.5 6 12 2zM9.2 11.6c.9.9 1.8.9 2.8 0s1.9-.9 2.8 0'
+    },
+    {
       id: 'prasad-box',
       name: 'Kotilingeshwara Sawan Prasad Box',
       price: 301,
