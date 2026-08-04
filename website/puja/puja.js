@@ -370,8 +370,22 @@
   }
 
   // ── VIEW 3 · Confirmation ────────────────────────────────
+  // A booking with no package is a standalone chadhava offering.
+  function isChadhavaOnly(rec) { return !rec.package || !rec.package.id; }
+  function chadhavaLabel(rec) {
+    return (rec.addons && rec.addons.length) ? rec.addons.map(function (a) { return a.name; }).join(', ') : 'Chadhava Offering';
+  }
+
   function renderConfirmation(rec) {
     var names = rec.devotees.join(', ');
+    var isChadhava = isChadhavaOnly(rec);
+    var pkgLabel = isChadhava ? chadhavaLabel(rec) : rec.package.name;
+    var details = passRow('Devotee(s)', names);
+    if (!isChadhava) details += passRow('Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned)' : ''));
+    details += passRow(isChadhava ? 'Offering' : 'Package', pkgLabel);
+    details += passRow('Date', rec.event.date);
+    details += passRow('Temple', rec.event.temple);
+    details += passRow('Amount Paid', fmt(rec.total));
     var pass = $('#pass-card');
     pass.innerHTML =
       '<div class="pass-top">' +
@@ -379,14 +393,7 @@
         '<div class="pass-id"><small>Booking ID</small><b>' + esc(rec.id) + '</b></div>' +
       '</div>' +
       '<div class="pass-body">' +
-        '<div class="pass-details">' +
-          passRow('Devotee(s)', names) +
-          passRow('Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned)' : '')) +
-          passRow('Package', rec.package.name) +
-          passRow('Date', rec.event.date) +
-          passRow('Temple', rec.event.temple) +
-          passRow('Amount Paid', fmt(rec.total)) +
-        '</div>' +
+        '<div class="pass-details">' + details + '</div>' +
         '<div class="pass-qr-wrap"><div class="pass-qr" id="pass-qr" aria-label="Booking QR code"></div><span class="pass-qr-cap">Scan to verify</span></div>' +
       '</div>';
 
@@ -396,9 +403,9 @@
 
     // order breakdown
     var ob = '';
-    ob += billLine('Base Package — ' + rec.package.name, fmt(rec.package.price));
+    if (!isChadhava) ob += billLine('Base Package — ' + rec.package.name, fmt(rec.package.price));
     rec.addons.forEach(function (a) { ob += billLine('+ ' + a.name + (a.homeDelivery ? ' (home delivery)' : ''), fmt(a.price)); });
-    ob += billLine('Pandit Dakshina', rec.dakshina > 0 ? fmt(rec.dakshina) : '<span style="color:var(--dim);">Not added</span>');
+    if (!isChadhava) ob += billLine('Pandit Dakshina', rec.dakshina > 0 ? fmt(rec.dakshina) : '<span style="color:var(--dim);">Not added</span>');
     ob += billLine('Platform Fee', '<span class="strike">' + fmt(P.FEES.platform) + '</span><span class="free">FREE</span>');
     ob += billLine('Video &amp; WhatsApp Delivery', '<span class="strike">' + fmt(P.FEES.video) + '</span><span class="free">FREE</span>');
     if (rec.address) ob += billLine('Delivery Address', esc(rec.address));
@@ -572,14 +579,17 @@
       var lines = doc.splitTextToSize(v, (W / 2) - M - 10);
       doc.text(lines, colX[col], rowY + 15);
     }
-    var pairs = [
-      ['Devotee(s)', rec.devotees.join(', ')],
-      ['Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned — Kashyap)' : '')],
-      ['Package', rec.package.name + ' (' + rec.package.subtitle + ')'],
-      ['Members', String(rec.package.capacity)],
-      ['Amount Paid', 'Rs. ' + Number(rec.total).toLocaleString('en-IN')],
-      ['Status', 'Confirmed']
-    ];
+    var isChadhava = isChadhavaOnly(rec);
+    var pairs = [['Devotee(s)', rec.devotees.join(', ')]];
+    if (isChadhava) {
+      pairs.push(['Offering', chadhavaLabel(rec)]);
+    } else {
+      pairs.push(['Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned — Kashyap)' : '')]);
+      pairs.push(['Package', rec.package.name + ' (' + rec.package.subtitle + ')']);
+      pairs.push(['Members', String(rec.package.capacity)]);
+    }
+    pairs.push(['Amount Paid', 'Rs. ' + Number(rec.total).toLocaleString('en-IN')]);
+    pairs.push(['Status', 'Confirmed']);
     for (var i = 0; i < pairs.length; i += 2) {
       cell(0, y, pairs[i][0], pairs[i][1]);
       if (pairs[i + 1]) cell(1, y, pairs[i + 1][0], pairs[i + 1][1]);
@@ -715,14 +725,17 @@
       }
       ctx.fillText(line, colX[col], ty);
     }
-    var pairs = [
-      ['भक्त', rec.devotees.join(', ')],
-      ['गोत्र', rec.gotra + (rec.gotraUnknown ? ' (निर्धारित — कश्यप)' : '')],
-      ['पैकेज', hindiPackage(rec.package)],
-      ['सदस्य', String(rec.package ? rec.package.capacity : '')],
-      ['भुगतान राशि', '₹' + Number(rec.total).toLocaleString('en-IN')],
-      ['स्थिति', 'पुष्टि (Confirmed)']
-    ];
+    var isChadhava = isChadhavaOnly(rec);
+    var pairs = [['भक्त', rec.devotees.join(', ')]];
+    if (isChadhava) {
+      pairs.push(['चढ़ावा', (rec.addons && rec.addons.length) ? rec.addons.map(function (a) { return a.name; }).join(', ') : 'चढ़ावा']);
+    } else {
+      pairs.push(['गोत्र', rec.gotra + (rec.gotraUnknown ? ' (निर्धारित — कश्यप)' : '')]);
+      pairs.push(['पैकेज', hindiPackage(rec.package)]);
+      pairs.push(['सदस्य', String(rec.package && rec.package.capacity ? rec.package.capacity : '')]);
+    }
+    pairs.push(['भुगतान राशि', '₹' + Number(rec.total).toLocaleString('en-IN')]);
+    pairs.push(['स्थिति', 'पुष्टि (Confirmed)']);
     for (var i = 0; i < pairs.length; i += 2) {
       cell(0, y, pairs[i][0], pairs[i][1]);
       if (pairs[i + 1]) cell(1, y, pairs[i + 1][0], pairs[i + 1][1]);
@@ -770,6 +783,108 @@
     return cv;
   }
 
+  // ── CHADHAVA · standalone offering flow (no full puja) ───
+  // A lightweight parallel flow: pick one or more sevas, give a name + WhatsApp,
+  // and pay. Reuses the shared checkout + confirmation; the booking is package-less.
+  var chadhava = { addonIds: [] };
+
+  function chadhavaDeliveryNeeded() {
+    return P.needsAddress({ packageId: null, addonIds: chadhava.addonIds });
+  }
+
+  function renderChadhavaGrid() {
+    var grid = $('#chadhava-grid');
+    if (!grid) return;
+    grid.innerHTML = P.ADDONS.map(function (a) {
+      var on = chadhava.addonIds.indexOf(a.id) !== -1;
+      var thumb = '<div class="chadhava-thumb">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="' + (a.icon || '') + '"/></svg>' +
+        (a.img ? '<img src="' + a.img + '" alt="" loading="lazy" onerror="this.remove()">' : '') +
+        '</div>';
+      return '' +
+        '<div class="chadhava-card' + (on ? ' on' : '') + '" data-id="' + a.id + '">' +
+          thumb +
+          '<div class="chadhava-body">' +
+            '<div class="chadhava-top"><span class="chadhava-name">' + esc(a.name) + '</span>' +
+              '<span class="addon-tag' + (a.homeDelivery ? ' deliver' : '') + '">' + esc(a.tag) + '</span></div>' +
+            '<p class="chadhava-desc">' + esc(a.desc) + '</p>' +
+            '<p class="chadhava-video">Includes a video of this seva on WhatsApp.</p>' +
+          '</div>' +
+          '<div class="chadhava-foot">' +
+            '<span class="chadhava-price">' + fmt(a.price) + '</span>' +
+            '<button type="button" class="btn btn-sm chadhava-toggle ' + (on ? 'btn-grad' : 'btn-ghost') + '">' + (on ? 'Added ✓' : 'Add') + '</button>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+    $$('.chadhava-card', grid).forEach(function (card) {
+      var id = card.getAttribute('data-id');
+      card.querySelector('.chadhava-toggle').addEventListener('click', function () { toggleChadhava(id); });
+    });
+  }
+
+  function toggleChadhava(id) {
+    var idx = chadhava.addonIds.indexOf(id);
+    if (idx === -1) chadhava.addonIds.push(id); else chadhava.addonIds.splice(idx, 1);
+    renderChadhavaGrid();
+    renderChadhavaBill();
+    $('#ch-address-panel').style.display = chadhavaDeliveryNeeded() ? 'block' : 'none';
+    var box = $('#chadhava-checkout');
+    box.style.display = chadhava.addonIds.length ? 'block' : 'none';
+  }
+
+  function renderChadhavaBill() {
+    var addons = chadhava.addonIds.map(P.getAddon).filter(Boolean);
+    var total = addons.reduce(function (s, a) { return s + a.price; }, 0);
+    var lines = '';
+    if (!addons.length) {
+      lines = billLine('<span style="color:var(--dim);">No chadhava selected yet</span>', '');
+    } else {
+      addons.forEach(function (a) { lines += billLine(a.name + (a.homeDelivery ? ' (home delivery)' : ''), fmt(a.price)); });
+      lines += billLine('Video Recording &amp; WhatsApp Delivery', '<span class="strike">' + fmt(P.FEES.video) + '</span><span class="free">FREE</span>');
+    }
+    $('#ch-bill-lines').innerHTML = lines;
+    $('#ch-bill-total').textContent = fmt(total);
+    $('#ch-pay-btn').textContent = 'Pay ' + fmt(total);
+  }
+
+  function validateChadhava() {
+    var ok = true;
+    var name = $('#ch-name'), nf = name.closest('.field');
+    if (!name.value.trim()) { nf.classList.add('invalid'); ok = false; } else nf.classList.remove('invalid');
+    var wa = $('#ch-whatsapp'), wf = wa.closest('.field');
+    if (!validPhone(wa.value.trim())) { wf.classList.add('invalid'); ok = false; } else wf.classList.remove('invalid');
+    if (chadhavaDeliveryNeeded()) {
+      var ad = $('#ch-address'), af = ad.closest('.field');
+      if (!ad.value.trim()) { af.classList.add('invalid'); ok = false; } else af.classList.remove('invalid');
+    }
+    return ok;
+  }
+
+  function payChadhava() {
+    if (!chadhava.addonIds.length) { toast('Please select at least one chadhava.'); return; }
+    if (!validateChadhava()) { toast('Please complete the required fields.'); return; }
+    var draft = {
+      packageId: null,
+      addonIds: chadhava.addonIds.slice(),
+      dakshina: 0,
+      whatsapp: '+91' + $('#ch-whatsapp').value.trim(),
+      callingNumber: '', sameAsWhatsapp: true,
+      devotees: [$('#ch-name').value.trim()],
+      gotra: '', gotraUnknown: false,
+      wish: $('#ch-wish').value.trim(),
+      address: chadhavaDeliveryNeeded() ? $('#ch-address').value.trim() : ''
+    };
+    var btn = $('#ch-pay-btn'); btn.disabled = true;
+    window.RithamPay.checkout(draft).then(function (record) {
+      history.replaceState(null, '', '?booking=' + record.id);
+      renderConfirmation(record);
+      showView('view-confirm');
+    }).catch(function (err) {
+      if (err && err.message === 'cancelled') toast('Payment cancelled.');
+      else toast('Payment could not be completed. Please try again.');
+    }).then(function () { btn.disabled = false; });
+  }
+
   // ── Deep link (?booking=ID) ──────────────────────────────
   function checkDeepLink() {
     var params = new URLSearchParams(location.search);
@@ -785,8 +900,23 @@
   // ── Wire up ──────────────────────────────────────────────
   function init() {
     renderPackages();
+    renderChadhavaGrid();
+    renderChadhavaBill();
     populateGotras();
     renderStepbars();
+
+    // Chadhava flow wiring
+    $('#ch-whatsapp').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 10);
+      if (validPhone(this.value)) this.closest('.field').classList.remove('invalid');
+    });
+    $('#ch-name').addEventListener('input', function () {
+      if (this.value.trim()) this.closest('.field').classList.remove('invalid');
+    });
+    $('#ch-address').addEventListener('input', function () {
+      if (this.value.trim()) this.closest('.field').classList.remove('invalid');
+    });
+    $('#ch-pay-btn').addEventListener('click', payChadhava);
 
     $('#proceed-sankalp').addEventListener('click', openSankalp);
     $('#sankalp-close').addEventListener('click', closeSankalp);

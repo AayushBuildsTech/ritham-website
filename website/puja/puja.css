@@ -549,3 +549,47 @@ a:hover { text-decoration: underline; }
   .anchor-nav { top: 55px; }
   .hero-cta { width: 100%; }
 }
+
+/* ── Choose how to participate (two-path chooser) ────────── */
+.path-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.path-card {
+  position: relative; display: flex; flex-direction: column; text-align: left;
+  background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
+  padding: 26px 24px; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.path-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--violet-l); }
+.path-card.alt { background: linear-gradient(180deg, #fff, #fff7fb); }
+.path-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--magenta); }
+.path-card h3 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 23px; margin: 6px 0 8px; color: var(--ink); }
+.path-card > p { color: var(--muted); font-size: 14.5px; line-height: 1.5; flex: 1 1 auto; }
+.path-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.path-price { font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; color: var(--ink); }
+.path-go { font-size: 13.5px; font-weight: 700; color: var(--violet); }
+.path-card:hover .path-go { color: var(--magenta); }
+
+/* ── Chadhava · standalone offerings ─────────────────────── */
+.chadhava-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.chadhava-card {
+  display: flex; flex-direction: column; background: var(--surface); border: 2px solid var(--line);
+  border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-sm); transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.chadhava-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--violet-l); }
+.chadhava-card.on { border-color: var(--magenta); box-shadow: 0 0 0 3px rgba(255,0,127,0.14), var(--shadow); }
+.chadhava-thumb { position: relative; width: 100%; height: 130px; border-radius: 14px; background: var(--grad); display: grid; place-items: center; overflow: hidden; box-shadow: var(--shadow-sm); }
+.chadhava-thumb svg { width: 40px; height: 40px; color: #fff; }
+.chadhava-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.chadhava-body { flex: 1 1 auto; padding: 14px 2px 2px; }
+.chadhava-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+.chadhava-name { font-family: 'Fraunces', serif; font-weight: 600; font-size: 17px; color: var(--ink); }
+.chadhava-top .addon-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: #f0e9fa; color: var(--violet); white-space: nowrap; }
+.chadhava-top .addon-tag.deliver { background: var(--warn-bg); color: var(--warn); }
+.chadhava-desc { color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+.chadhava-video { color: var(--violet); font-size: 12.5px; font-weight: 600; margin-top: 8px; }
+.chadhava-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.chadhava-price { font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; color: var(--ink); }
+.chadhava-toggle { min-width: 92px; }
+.chadhava-checkout { margin-top: 8px; }
+
+@media (max-width: 720px) {
+  .path-grid { grid-template-columns: 1fr; }
+}
