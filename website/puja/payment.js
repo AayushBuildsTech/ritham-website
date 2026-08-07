@@ -40,7 +40,8 @@
       gotra: draft.gotra,
       gotraUnknown: !!draft.gotraUnknown,
       wish: draft.wish || '',
-      address: draft.address || null
+      address: draft.address || null,
+      icEventId: draft.icEventId || null   // dedup key for the server-side InitiateCheckout
     };
   }
 

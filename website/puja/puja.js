@@ -36,11 +36,24 @@
   }
 
   // ── Meta Pixel conversion events ─────────────────────────
-  function fbqTrack(event, params) {
-    if (typeof window.fbq === 'function') { try { window.fbq('track', event, params); } catch (e) { /* ignore */ } }
+  // These browser beacons are unreliable for real buyers (mobile / in-app
+  // browsers / ad-blockers drop the request around the Razorpay hand-off), so the
+  // edge functions ALSO fire the same events server-side (Conversions API). The
+  // eventId ties the browser + server copy together so Meta dedupes them —
+  // whichever arrives is counted exactly once.
+  function fbqTrack(event, params, eventId) {
+    if (typeof window.fbq !== 'function') return;
+    try {
+      if (eventId) window.fbq('track', event, params, { eventID: eventId });
+      else window.fbq('track', event, params);
+    } catch (e) { /* ignore */ }
+  }
+  function icEventId() {
+    return 'ic-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   }
   // Purchase must fire once per successful transaction — never again on reload /
   // deep-link. We remember the booking codes we've already counted (localStorage).
+  // event_id = booking code, matching the server-side (CAPI) Purchase for dedup.
   function trackPurchaseOnce(record) {
     if (!record || !record.id) return;
     var KEY = 'ritham_fbq_purchased';
@@ -49,7 +62,7 @@
     if (done.indexOf(record.id) !== -1) return;   // already counted this booking
     done.push(record.id);
     try { window.localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) { /* disabled */ }
-    fbqTrack('Purchase', { value: record.total, currency: 'INR' });
+    fbqTrack('Purchase', { value: record.total, currency: 'INR' }, record.id);
   }
   function renderStepbars() {
     $$('.stepbar').forEach(function (bar) {
@@ -374,7 +387,8 @@
       draft.address = addr.value.trim();
     }
     var btn = $('#pay-btn'); btn.disabled = true;
-    fbqTrack('InitiateCheckout', { value: P.computeTotal(draft), currency: 'INR' });
+    draft.icEventId = icEventId();   // shared with the server-side InitiateCheckout (dedup)
+    fbqTrack('InitiateCheckout', { value: P.computeTotal(draft), currency: 'INR' }, draft.icEventId);
     // checkout(draft) recomputes the amount server-side, runs Razorpay, verifies
     // the signature, and returns the confirmed booking record.
     window.RithamPay.checkout(draft).then(function (record) {
@@ -917,7 +931,8 @@
       address: chadhavaDeliveryNeeded() ? $('#ch-address').value.trim() : ''
     };
     var btn = $('#ch-pay-btn'); btn.disabled = true;
-    fbqTrack('InitiateCheckout', { value: P.computeTotal(draft), currency: 'INR' });
+    draft.icEventId = icEventId();   // shared with the server-side InitiateCheckout (dedup)
+    fbqTrack('InitiateCheckout', { value: P.computeTotal(draft), currency: 'INR' }, draft.icEventId);
     window.RithamPay.checkout(draft).then(function (record) {
       trackPurchaseOnce(record);
       $('#chadhava-bar').classList.remove('show');
