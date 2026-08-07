@@ -54,6 +54,16 @@
 
   var ADDONS = [
     {
+      id: 'combo-trio',
+      name: 'All 3 Offerings Combo',
+      price: 101,
+      homeDelivery: false,
+      tag: 'Best Value',
+      desc: 'Ganga Jal Arpan + Doodh & Bilva Patra Seva + Nandi & Gau Seva — all three offered in your name (save ₹52).',
+      img: '../img/addon-ganga-jal.webp',
+      icon: 'M12 3l9 4.5-9 4.5-9-4.5L12 3zM3 12l9 4.5 9-4.5M3 16.5l9 4.5 9-4.5'
+    },
+    {
       id: 'ganga-jal',
       name: 'Ganga Jal Arpan',
       price: 51,
@@ -76,7 +86,7 @@
     {
       id: 'doodh-bilva',
       name: 'Doodh & Bilva Patra Seva',
-      price: 101,
+      price: 51,
       homeDelivery: false,
       tag: 'At Temple',
       desc: 'Special offering of Milk and 108 Bel Patra during Abhishek.',
@@ -86,7 +96,7 @@
     {
       id: 'gau-seva',
       name: 'Nandi & Gau Seva',
-      price: 151,
+      price: 51,
       homeDelivery: false,
       tag: 'At Temple',
       desc: 'Feed green fodder to cows and sacred bulls in temple premises.',
