@@ -54,16 +54,6 @@
 
   var ADDONS = [
     {
-      id: 'combo-trio',
-      name: 'All 3 Offerings Combo',
-      price: 101,
-      homeDelivery: false,
-      tag: 'Best Value',
-      desc: 'Ganga Jal Arpan + Doodh & Bilva Patra Seva + Nandi & Gau Seva — all three offered in your name (save ₹52).',
-      img: '../img/addon-combo.webp',
-      icon: 'M12 3l9 4.5-9 4.5-9-4.5L12 3zM3 12l9 4.5 9-4.5M3 16.5l9 4.5 9-4.5'
-    },
-    {
       id: 'gau-seva',
       name: 'Nandi & Gau Seva',
       price: 51,
@@ -92,6 +82,16 @@
       desc: 'Special offering of Milk and 108 Bel Patra during Abhishek.',
       img: '../img/addon-doodh-bilva.webp',
       icon: 'M12 3c3.2 3.2 3.2 7.5 0 10.7-3.2-3.2-3.2-7.5 0-10.7zM12 13.7V21M8 21h8'
+    },
+    {
+      id: 'combo-trio',
+      name: 'All 3 Offerings Combo',
+      price: 101,
+      homeDelivery: false,
+      tag: 'Best Value',
+      desc: 'Ganga Jal Arpan + Doodh & Bilva Patra Seva + Nandi & Gau Seva — all three offered in your name (save ₹52).',
+      img: '../img/addon-combo.webp',
+      icon: 'M12 3l9 4.5-9 4.5-9-4.5L12 3zM3 12l9 4.5 9-4.5M3 16.5l9 4.5 9-4.5'
     },
     {
       id: 'prasad-box',
