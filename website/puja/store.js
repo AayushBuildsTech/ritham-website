@@ -60,8 +60,18 @@
       homeDelivery: false,
       tag: 'Best Value',
       desc: 'Ganga Jal Arpan + Doodh & Bilva Patra Seva + Nandi & Gau Seva — all three offered in your name (save ₹52).',
-      img: '../img/addon-ganga-jal.webp',
+      img: '../img/addon-combo.webp',
       icon: 'M12 3l9 4.5-9 4.5-9-4.5L12 3zM3 12l9 4.5 9-4.5M3 16.5l9 4.5 9-4.5'
+    },
+    {
+      id: 'gau-seva',
+      name: 'Nandi & Gau Seva',
+      price: 51,
+      homeDelivery: false,
+      tag: 'At Temple',
+      desc: 'Feed green fodder to cows and sacred bulls in temple premises.',
+      img: '../img/addon-gau.webp',
+      icon: 'M4 8c0 4.4 3.6 7.5 8 7.5s8-3.1 8-7.5M6.5 8 5 5.5M17.5 8 19 5.5M9.5 11.5h.01M14.5 11.5h.01'
     },
     {
       id: 'ganga-jal',
@@ -74,16 +84,6 @@
       icon: 'M12 2c3.5 4 5.5 6.7 5.5 9.5a5.5 5.5 0 0 1-11 0C6.5 8.7 8.5 6 12 2zM9.2 11.6c.9.9 1.8.9 2.8 0s1.9-.9 2.8 0'
     },
     {
-      id: 'prasad-box',
-      name: 'Kotilingeshwara Sawan Prasad Box',
-      price: 301,
-      homeDelivery: true,
-      tag: 'Home Delivery',
-      desc: 'Panchmeva, Sacred Bhasma, Kolar Temple Jal, and Panchmukhi Rudraksha.',
-      img: '../img/addon-prasad.webp',
-      icon: 'M3 8h18v3H3zM5 11v9h14v-9M12 8v12M8.5 8C7 8 6 7 6 5.5S7.5 4 9 5s3 3 3 3M15.5 8C17 8 18 7 18 5.5S16.5 4 15 5s-3 3-3 3'
-    },
-    {
       id: 'doodh-bilva',
       name: 'Doodh & Bilva Patra Seva',
       price: 51,
@@ -94,14 +94,14 @@
       icon: 'M12 3c3.2 3.2 3.2 7.5 0 10.7-3.2-3.2-3.2-7.5 0-10.7zM12 13.7V21M8 21h8'
     },
     {
-      id: 'gau-seva',
-      name: 'Nandi & Gau Seva',
-      price: 51,
-      homeDelivery: false,
-      tag: 'At Temple',
-      desc: 'Feed green fodder to cows and sacred bulls in temple premises.',
-      img: '../img/addon-gau.webp',
-      icon: 'M4 8c0 4.4 3.6 7.5 8 7.5s8-3.1 8-7.5M6.5 8 5 5.5M17.5 8 19 5.5M9.5 11.5h.01M14.5 11.5h.01'
+      id: 'prasad-box',
+      name: 'Kotilingeshwara Sawan Prasad Box',
+      price: 301,
+      homeDelivery: true,
+      tag: 'Home Delivery',
+      desc: 'Panchmeva, Sacred Bhasma, Kolar Temple Jal, and Panchmukhi Rudraksha.',
+      img: '../img/addon-prasad.webp',
+      icon: 'M3 8h18v3H3zM5 11v9h14v-9M12 8v12M8.5 8C7 8 6 7 6 5.5S7.5 4 9 5s3 3 3 3M15.5 8C17 8 18 7 18 5.5S16.5 4 15 5s-3 3-3 3'
     }
   ];
 
