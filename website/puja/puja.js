@@ -414,7 +414,7 @@
     var isChadhava = isChadhavaOnly(rec);
     var pkgLabel = isChadhava ? chadhavaLabel(rec) : rec.package.name;
     var details = passRow('Devotee(s)', names);
-    if (!isChadhava) details += passRow('Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned)' : ''));
+    if (rec.gotra) details += passRow('Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned)' : ''));
     details += passRow(isChadhava ? 'Offering' : 'Package', pkgLabel);
     details += passRow('Date', rec.event.date);
     details += passRow('Temple', rec.event.temple);
@@ -616,6 +616,7 @@
     var pairs = [['Devotee(s)', rec.devotees.join(', ')]];
     if (isChadhava) {
       pairs.push(['Offering', chadhavaLabel(rec)]);
+      if (rec.gotra) pairs.push(['Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned — Kashyap)' : '')]);
     } else {
       pairs.push(['Gotra', rec.gotra + (rec.gotraUnknown ? ' (assigned — Kashyap)' : '')]);
       pairs.push(['Package', rec.package.name + ' (' + rec.package.subtitle + ')']);
@@ -762,6 +763,7 @@
     var pairs = [['भक्त', rec.devotees.join(', ')]];
     if (isChadhava) {
       pairs.push(['चढ़ावा', (rec.addons && rec.addons.length) ? rec.addons.map(function (a) { return a.name; }).join(', ') : 'चढ़ावा']);
+      if (rec.gotra) pairs.push(['गोत्र', rec.gotra + (rec.gotraUnknown ? ' (निर्धारित — कश्यप)' : '')]);
     } else {
       pairs.push(['गोत्र', rec.gotra + (rec.gotraUnknown ? ' (निर्धारित — कश्यप)' : '')]);
       pairs.push(['पैकेज', hindiPackage(rec.package)]);
@@ -909,6 +911,9 @@
     if (!name.value.trim()) { nf.classList.add('invalid'); ok = false; } else nf.classList.remove('invalid');
     var wa = $('#ch-whatsapp'), wf = wa.closest('.field');
     if (!validPhone(wa.value.trim())) { wf.classList.add('invalid'); ok = false; } else wf.classList.remove('invalid');
+    var g = $('#f-gotra'), gField = g.closest('.field');
+    if ($('#f-unknown-gotra').checked || canonicalGotra(g.value)) { gField.classList.remove('invalid'); }
+    else { gField.classList.add('invalid'); ok = false; }
     if (chadhavaDeliveryNeeded()) {
       var ad = $('#ch-address'), af = ad.closest('.field');
       if (!ad.value.trim()) { af.classList.add('invalid'); ok = false; } else af.classList.remove('invalid');
@@ -926,7 +931,8 @@
       whatsapp: '+91' + $('#ch-whatsapp').value.trim(),
       callingNumber: '', sameAsWhatsapp: true,
       devotees: [$('#ch-name').value.trim()],
-      gotra: '', gotraUnknown: false,
+      gotraUnknown: $('#f-unknown-gotra').checked,
+      gotra: $('#f-unknown-gotra').checked ? 'Kashyap' : (canonicalGotra($('#f-gotra').value) || $('#f-gotra').value.trim()),
       wish: $('#ch-wish').value.trim(),
       address: chadhavaDeliveryNeeded() ? $('#ch-address').value.trim() : ''
     };
@@ -1009,6 +1015,12 @@
   function initChadhavaFlow() {
     renderChadhavaGrid();
     renderChadhavaBill();
+    populateGotras();
+
+    $('#f-unknown-gotra').addEventListener('change', applyUnknownGotra);
+    $('#f-gotra').addEventListener('input', function () {
+      if (canonicalGotra(this.value)) this.closest('.field').classList.remove('invalid');
+    });
 
     $('#ch-whatsapp').addEventListener('input', function () {
       this.value = this.value.replace(/\D/g, '').slice(0, 10);
