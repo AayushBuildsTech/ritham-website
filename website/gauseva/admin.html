@@ -59,6 +59,7 @@
     .pill.recv{background:#fff3d6;color:var(--warn)}
     .pill.sent{background:#dcf3e4;color:var(--ok)}
     .pill.ref{background:#f3dcdc;color:#b3261e}
+    .pill.pend{background:#ece7f5;color:#7a728f}
     .wa-badge{font-size:11.5px;color:var(--ok);font-weight:600}
     .wa-no{font-size:11.5px;color:var(--warn);font-weight:600}
     .bk .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
@@ -120,7 +121,8 @@
     // Public anon key — safe to ship; all access is enforced by RLS.
     var SB_URL = 'https://eaxdqizerkuqkujxacru.supabase.co';
     var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVheGRxaXplcmt1cWt1anhhY3J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MTU2MjksImV4cCI6MjA5ODQ5MTYyOX0.TB2A8e_7sl1rhH7aRi3QVJ5Q-QMgNlHnygK9TAiSFzI';
-    var STATUSES = ['Payment Received','Video Sent','Refunded'];
+    var STATUSES = ['Payment Successful','Video Sent','Refunded'];
+    var PAID = ['Payment Successful','Video Sent']; // count toward money/seva totals
     var client = window.supabase.createClient(SB_URL, SB_ANON);
 
     var $ = function(s){ return document.querySelector(s); };
@@ -189,27 +191,27 @@
       return state.rows.filter(function(b){
         if(state.filter!=='all' && b.status!==state.filter) return false;
         if(state.search){
-          var hay = [b.name,b.phone,b.email,b.razorpay_payment_id].join(' ').toLowerCase();
+          var hay = [b.name,b.whatsapp,b.email,b.razorpay_payment_id].join(' ').toLowerCase();
           if(hay.indexOf(state.search)<0) return false;
         }
         return true;
       });
     }
-    function pillClass(s){ return s==='Video Sent'?'sent':s==='Refunded'?'ref':'recv'; }
+    function pillClass(s){ return s==='Video Sent'?'sent':s==='Refunded'?'ref':s==='Payment Successful'?'recv':'pend'; }
 
     function render(){
       var rows = filtered();
-      // stats reflect ALL rows (not the filter), minus refunds for money/seva
-      var live = state.rows.filter(function(b){ return b.status!=='Refunded'; });
-      $('#s-count').textContent = state.rows.length;
-      $('#s-total').textContent = inr(live.reduce(function(a,b){return a+(Number(b.amount_inr)||0);},0));
-      $('#s-seva').textContent  = live.reduce(function(a,b){return a+(Number(b.seva_count)||0);},0);
+      // money / seva totals count only genuinely paid rows (exclude pending, failed, refunded)
+      var paid = state.rows.filter(function(b){ return PAID.indexOf(b.status)>=0; });
+      $('#s-count').textContent = paid.length;
+      $('#s-total').textContent = inr(paid.reduce(function(a,b){return a+(Number(b.amount_inr)||0);},0));
+      $('#s-seva').textContent  = paid.reduce(function(a,b){return a+(Number(b.seva_count)||0);},0);
 
       var wrap = $('#cards'); $('#empty').classList.toggle('hidden', rows.length>0);
       wrap.innerHTML = rows.map(function(b){
-        var wd = waDigits(b.phone);
-        var wa = wd ? 'WhatsApp: <a href="https://wa.me/'+wd+'" target="_blank" rel="noopener">'+esc(b.phone)+'</a>' : '<span>'+esc(b.phone||'—')+'</span>';
-        var next = b.status==='Payment Received' ? 'Video Sent' : (b.status==='Video Sent' ? 'Payment Received' : null);
+        var wd = waDigits(b.whatsapp);
+        var wa = wd ? 'WhatsApp: <a href="https://wa.me/'+wd+'" target="_blank" rel="noopener">'+esc(b.whatsapp)+'</a>' : '<span>'+esc(b.whatsapp||'—')+'</span>';
+        var next = b.status==='Payment Successful' ? 'Video Sent' : null;
         return '<div class="bk">'+
           '<div class="r1">'+
             '<div><div class="name">'+esc(b.name||'Anonymous')+'</div>'+
@@ -227,7 +229,7 @@
           '<div class="meta" style="margin-top:8px;font-size:12px;opacity:.8"><span>'+esc(b.razorpay_payment_id)+'</span></div>'+
           '<div class="actions">'+
             (next?'<button class="btn btn-grad btn-sm" data-act="status" data-id="'+esc(b.id)+'" data-to="'+esc(next)+'">Mark: '+esc(next)+'</button>':'')+
-            (b.status!=='Refunded'?'<button class="btn btn-ghost btn-sm" data-act="status" data-id="'+esc(b.id)+'" data-to="Refunded">Mark refunded</button>':'')+
+            (PAID.indexOf(b.status)>=0?'<button class="btn btn-ghost btn-sm" data-act="status" data-id="'+esc(b.id)+'" data-to="Refunded">Mark refunded</button>':'')+
           '</div>'+
         '</div>';
       }).join('');
@@ -247,7 +249,7 @@
 
     // ── CSV export ──
     $('#export').addEventListener('click', function(){
-      var cols = ['created_at','name','phone','email','amount_inr','seva_count','status','whatsapp_sent','razorpay_payment_id','razorpay_order_id'];
+      var cols = ['created_at','name','whatsapp','email','amount_inr','seva_count','status','whatsapp_sent','razorpay_payment_id','razorpay_order_id','booking_code'];
       var lines = [cols.join(',')].concat(state.rows.map(function(b){
         return cols.map(function(c){ var v=b[c]==null?'':String(b[c]); return '"'+v.replace(/"/g,'""')+'"'; }).join(',');
       }));

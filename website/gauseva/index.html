@@ -184,6 +184,38 @@
       background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.22)}
     .wa-float svg{width:28px;height:28px;color:#fff}
 
+    /* Checkout modal */
+    .modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+      background:rgba(30,21,51,.55);backdrop-filter:blur(3px);padding:18px}
+    .modal.open{display:flex}
+    .modal-card{position:relative;background:var(--surface);border-radius:var(--radius);width:100%;max-width:400px;
+      padding:26px 22px 22px;box-shadow:0 24px 60px rgba(30,21,51,.35);animation:pop .18s ease}
+    @keyframes pop{from{transform:translateY(10px) scale(.98);opacity:.6}to{transform:none;opacity:1}}
+    .modal-x{position:absolute;top:10px;right:12px;background:none;border:0;font-size:26px;line-height:1;color:var(--dim);cursor:pointer}
+    .ck-amt{font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--ink);margin:4px 0 16px}
+    .ck-l{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:10px 0 5px}
+    .ck-in,.ck-phone{width:100%;min-height:50px;border:1.5px solid var(--line);border-radius:12px;
+      font-size:16px;font-family:'Inter',sans-serif;background:#fff;color:var(--ink)}
+    .ck-in{padding:0 14px}
+    .ck-in:focus,.ck-phone:focus-within{outline:none;border-color:var(--magenta)}
+    .ck-phone{display:flex;align-items:center;overflow:hidden}
+    .ck-phone span{padding:0 10px 0 14px;color:var(--muted);font-weight:600;border-right:1px solid var(--line);align-self:stretch;display:flex;align-items:center}
+    .ck-phone input{flex:1;min-width:0;border:0;background:none;padding:0 14px;font-size:16px;font-family:'Inter',sans-serif;color:var(--ink)}
+    .ck-phone input:focus{outline:none}
+    .ck-note{color:var(--muted);font-size:13px;margin:12px 0 4px}
+    .ck-err{color:#b3261e;font-size:13.5px;min-height:18px;margin:2px 0}
+    .btn-block{display:flex;width:100%}
+    .ck-secure{text-align:center;color:var(--dim);font-size:12px;margin-top:10px}
+    .ck-center{text-align:center;padding:12px 4px}
+    .ck-center h3{font-size:22px;margin:14px 0 6px}
+    .ck-center p{color:var(--muted);font-size:15px}
+    .ck-code{font-family:'Fraunces',serif;color:var(--ink);font-weight:600;margin-top:10px!important}
+    .ck-tick{width:64px;height:64px;border-radius:50%;background:var(--grad-soft);color:var(--ok);display:flex;align-items:center;justify-content:center;margin:0 auto}
+    .ck-tick svg{width:32px;height:32px}
+    #ck-done{margin-top:16px}
+    .spinner{width:40px;height:40px;border:4px solid var(--line);border-top-color:var(--magenta);border-radius:50%;margin:8px auto;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
     @media(min-width:680px){
       .hero h1{font-size:46px}
       .section-head h2{font-size:33px}
@@ -248,32 +280,32 @@
 
       <div class="tiers" id="tiers">
         <!-- data-amt drives the sticky bar + pixel value; data-count draws the cows; data-link is the hosted payment URL -->
-        <div class="tier" data-amt="11" data-count="1" data-link="PAYMENT_LINK_11" tabindex="0" role="button" aria-label="Book 11 rupee seva, 1 Seva">
+        <div class="tier" data-amt="11" data-count="1" tabindex="0" role="button" aria-label="Book 11 rupee seva, 1 Seva">
           <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹11</span><span class="cnt">1 Seva</span></div>
           <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier" data-amt="51" data-count="5" data-link="PAYMENT_LINK_51" tabindex="0" role="button" aria-label="Book 51 rupee seva, 5 Seva">
+        <div class="tier" data-amt="51" data-count="5" tabindex="0" role="button" aria-label="Book 51 rupee seva, 5 Seva">
           <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹51</span><span class="cnt">5 Seva</span></div>
           <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier loved" data-amt="101" data-count="11" data-link="PAYMENT_LINK_101" tabindex="0" role="button" aria-label="Book 101 rupee seva, 11 Seva, most loved">
+        <div class="tier loved" data-amt="101" data-count="11" tabindex="0" role="button" aria-label="Book 101 rupee seva, 11 Seva, most loved">
           <span class="badge">Most Loved</span>
           <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹101</span><span class="cnt">11 Seva</span></div>
           <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier" data-amt="251" data-count="31" data-link="PAYMENT_LINK_251" tabindex="0" role="button" aria-label="Book 251 rupee seva, 31 Seva">
+        <div class="tier" data-amt="251" data-count="31" tabindex="0" role="button" aria-label="Book 251 rupee seva, 31 Seva">
           <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹251</span><span class="cnt">31 Seva</span></div>
           <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier max" data-amt="501" data-count="51" data-link="PAYMENT_LINK_501" tabindex="0" role="button" aria-label="Book 501 rupee seva, 51 Seva, maximum blessing">
+        <div class="tier max" data-amt="501" data-count="51" tabindex="0" role="button" aria-label="Book 501 rupee seva, 51 Seva, maximum blessing">
           <span class="badge">Maximum Blessing</span>
           <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹501</span><span class="cnt">51 Seva</span></div>
@@ -385,52 +417,174 @@
   <!-- ══════════ STICKY CONTRIBUTE BAR ══════════ -->
   <div class="sticky-bar">
     <div class="lbl"><small id="sb-sub">Selected seva</small><b id="sb-amt">₹101 · 11 Seva</b></div>
-    <a class="btn btn-grad" id="sb-go" href="PAYMENT_LINK_101">Book Seva</a>
+    <button class="btn btn-grad" id="sb-go" type="button">Book Seva</button>
   </div>
 
-  <!-- ══════════ MINIMAL VANILLA JS ══════════ -->
+  <!-- ══════════ CHECKOUT MODAL (on-site Razorpay, like the Sawan puja) ══════════ -->
+  <div class="modal" id="checkout" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Book your seva">
+      <button class="modal-x" id="ck-close" type="button" aria-label="Close">&times;</button>
+
+      <div id="ck-form">
+        <div class="eyebrow">Book your Seva</div>
+        <div class="ck-amt"><span id="ck-amt">₹101</span> · <span id="ck-count">11</span> Seva</div>
+        <label class="ck-l" for="ck-name">Your name</label>
+        <input class="ck-in" id="ck-name" type="text" placeholder="Name for the sankalp" autocomplete="name" maxlength="80" />
+        <label class="ck-l" for="ck-wa">WhatsApp number</label>
+        <div class="ck-phone"><span>+91</span><input id="ck-wa" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit number" autocomplete="tel-national" /></div>
+        <p class="ck-note">Your proof video is delivered here on WhatsApp within 7 days.</p>
+        <p class="ck-err" id="ck-err"></p>
+        <button class="btn btn-grad btn-block" id="ck-pay" type="button">Proceed to Pay</button>
+        <p class="ck-secure">Secure UPI / card payment · powered by Razorpay</p>
+      </div>
+
+      <div id="ck-processing" class="ck-center" style="display:none">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Opening secure payment…</p>
+      </div>
+
+      <div id="ck-success" class="ck-center" style="display:none">
+        <div class="ck-tick"><svg><use href="#check"/></svg></div>
+        <h3>Seva booked</h3>
+        <p>Your Gau Seva is confirmed. Your proof video will be delivered on WhatsApp <b>within 7 days</b>. Gau Mata ki jai.</p>
+        <p class="ck-code" id="ck-code"></p>
+        <button class="btn btn-ghost" id="ck-done" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PAYMENT + UI JS (on-site Razorpay, mirrors the Sawan puja) ══════════ -->
   <script>
   (function(){
-    var CAP = 11; // max cow icons drawn before we show a "×N" multiplier
+    // Supabase public anon key — safe to ship; the amount is recomputed and the
+    // payment verified server-side in the gau-seva-* edge functions.
+    var SB_URL  = 'https://eaxdqizerkuqkujxacru.supabase.co';
+    var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVheGRxaXplcmt1cWt1anhhY3J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MTU2MjksImV4cCI6MjA5ODQ5MTYyOX0.TB2A8e_7sl1rhH7aRi3QVJ5Q-QMgNlHnygK9TAiSFzI';
+    var CAP = 11;
+
     var tiers = document.querySelectorAll('.tier');
     var sbAmt = document.getElementById('sb-amt');
     var sbGo  = document.getElementById('sb-go');
     var selected = null;
 
-    // Draw the cow "value ladder" (SVG, no emojis).
     function drawCows(el, count){
       var n = Math.min(count, CAP), html = '';
       for (var i=0;i<n;i++) html += '<svg><use href="#cow"/></svg>';
       if (count > CAP) html += '<span class="mult">×'+count+'</span>';
       el.innerHTML = html;
     }
-
-    function fireIC(amt){
-      if (window.fbq){ try{ fbq('track','InitiateCheckout',{value:Number(amt),currency:'INR'}); }catch(e){} }
+    function invokeFn(name, body){
+      return fetch(SB_URL + '/functions/v1/' + name, {
+        method:'POST',
+        headers:{ 'apikey':SB_ANON, 'Authorization':'Bearer '+SB_ANON, 'Content-Type':'application/json' },
+        body: JSON.stringify(body || {})
+      }).then(function(r){ return r.json().then(function(d){ return { status:r.status, data:d }; }, function(){ return { status:r.status, data:{} }; }); });
     }
+    function fireIC(amt, eventId){
+      if (window.fbq){ try{ fbq('track','InitiateCheckout',{value:Number(amt),currency:'INR'}, eventId?{eventID:eventId}:undefined); }catch(e){} }
+    }
+    function uuid(){ return 'ic-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10); }
     function select(t){
       if (selected) selected.classList.remove('sel');
       selected = t; t.classList.add('sel');
       sbAmt.textContent = '₹' + t.getAttribute('data-amt') + ' · ' + t.getAttribute('data-count') + ' Seva';
-      sbGo.setAttribute('href', t.getAttribute('data-link'));
     }
 
+    // ── Checkout modal ──────────────────────────────────────
+    var modal = document.getElementById('checkout');
+    var elForm = document.getElementById('ck-form'), elProc = document.getElementById('ck-processing'), elSucc = document.getElementById('ck-success');
+    var elErr = document.getElementById('ck-err'), elName = document.getElementById('ck-name'), elWa = document.getElementById('ck-wa');
+    var elPay = document.getElementById('ck-pay'), current = { amount:101, count:11 };
+
+    function showPane(w){ elForm.style.display=(w==='form'?'block':'none'); elProc.style.display=(w==='proc'?'block':'none'); elSucc.style.display=(w==='succ'?'block':'none'); }
+    function openCheckout(amount, count){
+      current = { amount:amount, count:count };
+      document.getElementById('ck-amt').textContent = '₹'+amount;
+      document.getElementById('ck-count').textContent = count;
+      elErr.textContent=''; elPay.disabled=false; showPane('form');
+      modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+      setTimeout(function(){ elName.focus(); }, 60);
+    }
+    function closeModal(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+    document.getElementById('ck-close').addEventListener('click', closeModal);
+    document.getElementById('ck-done').addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e){ if(e.target===modal) closeModal(); });
+    elWa.addEventListener('input', function(){ elWa.value = elWa.value.replace(/\D/g,'').slice(0,10); });
+
+    function loadRazorpay(){
+      return new Promise(function(resolve, reject){
+        if (window.Razorpay){ resolve(); return; }
+        var s=document.createElement('script'); s.src='https://checkout.razorpay.com/v1/checkout.js';
+        s.onload=resolve; s.onerror=function(){ reject(new Error('rzp_load_failed')); };
+        document.head.appendChild(s);
+      });
+    }
+    function openRzp(ctx, whatsapp, name){
+      return new Promise(function(resolve, reject){
+        var rzp = new window.Razorpay({
+          key: ctx.keyId, amount: ctx.amountPaise, currency:'INR',
+          name:'Ritham · Gau Seva', description: current.count+' Seva',
+          order_id: ctx.orderId, theme:{ color:'#7B2CBF' },
+          prefill:{ name:name, contact: whatsapp.replace('+91','') },
+          handler:function(resp){ resolve(resp); },
+          modal:{ ondismiss:function(){ reject(new Error('cancelled')); } }
+        });
+        rzp.on('payment.failed', function(){ reject(new Error('payment_failed')); });
+        rzp.open();
+      });
+    }
+    function pay(){
+      var name = elName.value.trim();
+      var digits = elWa.value.replace(/\D/g,'');
+      if (name.length < 2){ elErr.textContent='Please enter your name.'; elName.focus(); return; }
+      if (!/^[6-9]\d{9}$/.test(digits)){ elErr.textContent='Enter a valid 10-digit WhatsApp number.'; elWa.focus(); return; }
+      elErr.textContent=''; elPay.disabled=true;
+      var whatsapp = '+91'+digits, icId = uuid();
+      fireIC(current.amount, icId);
+      showPane('proc');
+      invokeFn('gau-seva-create-order', { amount: current.amount, name: name, whatsapp: whatsapp, icEventId: icId })
+        .then(function(r){
+          var d = r.data || {};
+          if (!d.ok || !d.orderId) throw new Error(d.error || 'order_failed');
+          return loadRazorpay().then(function(){ return openRzp(d, whatsapp, name); });
+        })
+        .then(function(resp){
+          return invokeFn('gau-seva-verify-payment', {
+            razorpay_order_id: resp.razorpay_order_id,
+            razorpay_payment_id: resp.razorpay_payment_id,
+            razorpay_signature: resp.razorpay_signature
+          }).then(function(v){
+            if (!v.data || !v.data.ok) throw new Error('verify_failed');
+            document.getElementById('ck-code').textContent = 'Booking ref: ' + (v.data.bookingCode||'');
+            showPane('succ');
+          });
+        })
+        .catch(function(err){
+          elPay.disabled=false; showPane('form');
+          var m = String(err && err.message || err);
+          if (m==='cancelled') elErr.textContent='Payment cancelled — you can try again.';
+          else if (m==='bookings_closed') elErr.textContent='Bookings for this round are closed.';
+          else if (m==='payment_failed') elErr.textContent='The payment did not go through. Please try again.';
+          else elErr.textContent='Something went wrong. Please try again.';
+        });
+    }
+    elPay.addEventListener('click', pay);
+    elWa.addEventListener('keydown', function(e){ if(e.key==='Enter') pay(); });
+
+    // ── Wire tiers ──────────────────────────────────────────
     tiers.forEach(function(t){
       drawCows(t.querySelector('.cows'), Number(t.getAttribute('data-count')));
-      var link = t.getAttribute('data-link');
-      var amt  = t.getAttribute('data-amt');
-      // "Book Seva" goes straight to payment (minimal friction).
-      t.querySelector('.go').addEventListener('click', function(e){
-        e.stopPropagation(); fireIC(amt); window.location.href = link;
-      });
-      // Tapping elsewhere selects the tier (updates the sticky bar).
+      var amt = Number(t.getAttribute('data-amt')), cnt = Number(t.getAttribute('data-count'));
+      // "Book Seva" opens the on-site checkout for this tier.
+      t.querySelector('.go').addEventListener('click', function(e){ e.stopPropagation(); select(t); openCheckout(amt, cnt); });
+      // Tapping elsewhere just selects (updates the sticky bar).
       t.addEventListener('click', function(){ select(t); });
-      t.addEventListener('keydown', function(e){
-        if (e.key==='Enter' || e.key===' '){ e.preventDefault(); select(t); }
-      });
+      t.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); select(t); openCheckout(amt, cnt); } });
     });
-
-    sbGo.addEventListener('click', function(){ fireIC(selected ? selected.getAttribute('data-amt') : '101'); });
+    sbGo.addEventListener('click', function(){
+      var t = selected || document.querySelector('.tier.loved');
+      openCheckout(Number(t.getAttribute('data-amt')), Number(t.getAttribute('data-count')));
+    });
 
     var def = document.querySelector('.tier.loved');
     if (def) select(def);

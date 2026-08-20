@@ -1,110 +1,97 @@
-# Ritham · Gau Seva — landing page
+# Ritham · Gau Seva — landing page + on-site payments
 
-A single-file, static landing page (`index.html`) for the Gau Seva seva campaign.
-No backend, no build step — GitHub Pages serves it as-is. Lives at **ritham.co.in/gauseva/**.
+A static landing page (`index.html`) for the Gau Seva seva campaign, with an
+**on-site Razorpay checkout** wired to Supabase edge functions — exactly like the
+Sawan puja flow (no hosted payment links). Lives at **ritham.co.in/gauseva/**.
 
-## Placeholders to replace (find-and-replace in `index.html`)
+## How payment works (same pattern as the Sawan puja)
+
+1. The visitor taps **Book Seva** on a tier → a small modal collects **name +
+   WhatsApp number**.
+2. The page calls **`gau-seva-create-order`** (Supabase edge fn) with the tier
+   amount. The server **recomputes the amount** from the fixed seva ladder
+   (₹11→1, ₹51→5, ₹101→11, ₹251→31, ₹501→51 — the client price is never
+   trusted), creates a Razorpay order, and writes a `pending_payment` row in
+   `gau_seva_bookings`.
+3. **Razorpay Checkout** opens on the page (UPI / cards).
+4. On success the page calls **`gau-seva-verify-payment`**, which verifies the
+   HMAC signature, flips the booking to **`Payment Successful`**, sends the
+   **WhatsApp welcome** (proof-video-in-7-days), and fires Meta `Purchase`.
+5. **`gau-seva-webhook`** is the server-to-server fallback (Razorpay
+   `payment.captured`) for when the browser is torn down during the UPI hop — it
+   does the same idempotent flip + WhatsApp + Purchase. Verify and webhook are
+   safely redundant (only the first flip sends).
+
+There are **no payment links to paste.** The Supabase URL + public anon key are
+already inlined in `index.html` (same key the rest of the site uses; safe — all
+access is enforced server-side).
+
+## Deploy the backend (in the `ritham` repo — you deploy)
+
+1. **Apply migration** `supabase/migrations/034_gau_seva_bookings.sql`
+   (`supabase db push`, or paste into the SQL editor).
+2. **Deploy the three functions:**
+   ```
+   supabase functions deploy gau-seva-create-order
+   supabase functions deploy gau-seva-verify-payment
+   supabase functions deploy gau-seva-webhook --no-verify-jwt
+   ```
+   (Or paste each `index.ts` into the Supabase dashboard, like the sawan-* fns.)
+3. **Razorpay keys** — `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` are already set
+   (shared with the app + Sawan puja), so create-order/verify work immediately.
+4. **Webhook:** Razorpay Dashboard → Settings → Webhooks → add
+   `https://eaxdqizerkuqkujxacru.supabase.co/functions/v1/gau-seva-webhook`,
+   event **`payment.captured`**, set a secret → store as **`GAU_WEBHOOK_SECRET`**.
+5. **WhatsApp welcome** (optional but requested) — set `WHATSAPP_TOKEN` +
+   `WHATSAPP_PHONE_NUMBER_ID`, and **create/get approved** a template named
+   `gau_seva_welcome` (category *Utility*), body e.g.:
+   > 🙏 Namaste {{1}}, your Gau Seva ({{2}} Seva) is received. Your proof video of the seva will be delivered to you within **7 days**. Gau Mata ki jai!
+
+   Two body variables: `{{1}}` = name, `{{2}}` = seva count. Business-initiated
+   WhatsApp messages *require* an approved template. Until the token is set, the
+   welcome is a safe no-op (payments still work).
+6. **Meta CAPI** (optional) — set `META_CAPI_TOKEN` to activate the server-side
+   `Purchase` / `InitiateCheckout`.
+
+## Placeholders still to replace in `index.html`
 
 | Placeholder | Where | What to put |
 |---|---|---|
-| `PAYMENT_LINK_11` | ₹11 tier + (if selected) sticky bar | Hosted Razorpay Payment Page/Link URL for ₹11 |
-| `PAYMENT_LINK_51` | ₹51 tier | Razorpay link for ₹51 |
-| `PAYMENT_LINK_101` | ₹101 tier **and** the sticky-bar default `id="sb-go"` | Razorpay link for ₹101 |
-| `PAYMENT_LINK_251` | ₹251 tier | Razorpay link for ₹251 |
-| `PAYMENT_LINK_501` | ₹501 tier | Razorpay link for ₹501 |
-| `WHATSAPP_NUMBER` | footer, final CTA, floating button (3+ spots) | Full international number, digits only — e.g. `919876543210` |
-| `PIXEL_ID` | `<head>` Meta Pixel (4 spots: init, noscript img, + comment) | Your Meta Pixel id (Ritham ad pixel is `1001713839547879`) |
+| `PIXEL_ID` | `<head>` Meta Pixel (4 spots) | Your Meta Pixel id (Ritham ad pixel: `1001713839547879`) |
+| `WHATSAPP_NUMBER` | footer, final CTA, floating button (support chat) | Full international number, digits only — e.g. `919876543210` |
 
-> Tip: `PAYMENT_LINK_101` appears **twice** (the tier card and the sticky-bar button default). Replace all.
+> The browser pixel fires `InitiateCheckout` (with the tier amount + an
+> `eventID`) when checkout opens, and the server fires the deduped copy. The
+> reliable **`Purchase`** is fired server-side from verify/webhook — no thank-you
+> page needed (unlike hosted links).
 
-## Image / video assets to add (in `gauseva/img/` and `gauseva/`)
+## Images to add (in `gauseva/img/` and `gauseva/`)
 
 | File | Used for | Notes |
 |---|---|---|
-| `img/gau-hero.jpg` | Hero image (above the fold) | Warm photo of gau seva / feeding cows. ~16:10. Optimise (WebP/JPG, trimmed). Loads eagerly. |
-| `img/video-poster.jpg` | Proof-video poster | Small still; the video itself is `preload="none"` so only the poster loads until play. |
-| `gau-seva-proof.mp4` | Sample proof video | A real short proof clip. Keep it small / compressed for slow-4G. |
+| `img/gau-hero.jpg` | Hero image | Warm gau-seva photo, ~16:9, optimised WebP/JPG. |
 | `img/gau-og.jpg` (optional) | Social share image | Update the `og:image` meta to its absolute URL. |
 
-All images should be **trimmed WebP/optimised JPG** (small, fast) — never multi-MB PNGs.
-
-## Meta Pixel / ads
-
-- `PageView` fires on load; **`InitiateCheckout`** fires on every tier tap with `value` = the tier amount and `currency: INR`, so Ads Manager shows which tier converts.
-- **The ad algorithm optimises on `Purchase`.** That event **cannot** fire on this static page — the buyer leaves for the hosted Razorpay page. You **must** add a `Purchase` pixel (same `PIXEL_ID`, `value` + `currency: INR`) on the Razorpay **thank-you / callback page**, or the campaign has nothing to optimise against. (Because real buyers' browser beacons often drop around the payment hand-off on mobile/in-app browsers, a server-side Conversions API Purchase is strongly recommended too — same approach already used for the Sawan puja.)
-
-## Proof-video delivery promise
-
-The page states in multiple places (hero, tiers note, proof section, How-it-works, FAQ, footer) that the **proof video is delivered within 7 days**. Keep this consistent with the post-payment WhatsApp welcome message.
-
-## Backend — contributions DB + WhatsApp auto-welcome (you deploy)
-
-The static page can't record contributions or send WhatsApp on its own, so a
-single **Razorpay webhook** does both. Written & ready in the `ritham` repo:
-
-- **`supabase/migrations/034_gau_seva_bookings.sql`** — the `gau_seva_bookings`
-  table + RLS (only owner accounts, via the existing `is_web_puja_admin()`
-  gate, can read; the webhook writes with the service role). Apply it (`supabase
-  db push`, or paste in the SQL editor).
-- **`supabase/functions/gau-seva-webhook/index.ts`** — on `payment.captured` it
-  verifies the signature, inserts a booking (idempotent on payment id), sends
-  the WhatsApp welcome (**promising the proof video within 7 days**), and fires
-  Meta CAPI `Purchase`. Deploy with:
-  `supabase functions deploy gau-seva-webhook --no-verify-jwt`
-
-**Wire it up:**
-1. Razorpay Dashboard → Settings → **Webhooks** → add the function URL
-   (`https://eaxdqizerkuqkujxacru.supabase.co/functions/v1/gau-seva-webhook`),
-   select event **`payment.captured`**, set a secret.
-2. Set Supabase secrets:
-   - `GAU_WEBHOOK_SECRET` (**required**) — the webhook secret from step 1.
-   - `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID` — Meta WhatsApp Cloud API
-     (welcome send is a no-op until both are set).
-   - `WHATSAPP_TEMPLATE_NAME` (default `gau_seva_welcome`), `WHATSAPP_TEMPLATE_LANG` (default `en`).
-   - `META_CAPI_TOKEN` (optional) to activate the server-side Purchase.
-3. **Create & get approved** a WhatsApp template named `gau_seva_welcome`
-   (category *Utility*) with body text like:
-   > 🙏 Namaste {{1}}, your Gau Seva ({{2}} Seva) is received. 🐄 Your proof video of the seva will be delivered to you within **7 days**. Gau Mata ki jai!
-
-   Two body variables: `{{1}}` = name, `{{2}}` = seva count. (Business-initiated
-   WhatsApp messages *require* an approved template — free text won't send.)
-
-> Note: the Razorpay **Payment Page** should collect the contributor's name +
-> phone. Phone comes through as the payment `contact`; put the name into the
-> Payment Page fields / `notes` so it lands in the booking row.
+All images should be trimmed WebP / optimised JPG — never multi-MB PNGs.
 
 ## Admin — `gauseva/admin.html`
 
-Self-contained (no build), served alongside the page, `noindex`. Sign in with an
-owner account (same `is_web_puja_admin` gate as before) to see every
-contribution: name, tappable WhatsApp, amount, seva count, status, whether the
-welcome was sent, plus totals and **CSV export**. Statuses: *Payment Received →
-Video Sent*, and *Refunded*. It reads `gau_seva_bookings` directly over RLS, so
-it works the moment migration 034 is applied.
+Self-contained (no build), `noindex`. Sign in with an owner account (same
+`is_web_puja_admin` gate) to see every contribution — name, tappable WhatsApp,
+amount, seva count, status, whether the welcome was sent — with totals (paid
+only) and **CSV export**. Statuses: *Payment Successful → Video Sent*, and
+*Refunded*. Reads `gau_seva_bookings` over RLS, so it works the moment migration
+034 is applied.
 
-## Decommission the old Sawan puja campaign (your action on live)
+## Terms
 
-The `/puja` + `/chadhava` **pages/files are deleted** here. The old campaign also
-had live backend pieces that only *you* can remove (I only prepared local
-files, per your choice). When ready, on Supabase / Razorpay:
-- Remove/disable the `sawan-create-order`, `sawan-verify-payment`,
-  `sawan-razorpay-webhook` edge functions and their Razorpay webhook.
-- The `web_puja_bookings` data can be dropped once you've kept your CSV export.
-  (Migration files 030–033 are left in place as schema history — drop the table
-  via a new migration if you want it gone, rather than deleting past migrations.)
-- The old puja admin lived under `/puja/` and is gone with that folder.
+`gauseva/terms.html` — a paid **seva service** (not a donation; no 80G), the
+7-day video delivery promise, payment, refunds/cancellation. Linked from the
+page footer + the "Is this a donation?" FAQ.
 
 ## Enable GitHub Pages
 
-The live site deploys from the **separate `ritham-website` repo** (`.github/workflows/static.yml` publishes its `website/` subfolder to Pages on push to `main`). To go live:
-1. Copy this `gauseva/` folder into the `ritham-website` repo's `website/` folder.
-2. Commit & push to `main` → the Actions workflow rebuilds Pages (~1–2 min).
-3. Verify at `https://ritham.co.in/gauseva/` (hard-refresh; add `?v=1` cache-buster if needed).
-
-The custom domain (`CNAME` = ritham.co.in) and HTTPS are already configured for the site.
-
-## Verify at 360px
-
-Design is mobile-first for a 360px phone. Open DevTools, set width to 360px, and confirm:
-tier cards stack vertically, the sticky contribute bar sits at the bottom, tap targets ≥ 44px,
-and nothing overflows horizontally.
+The live site deploys from the separate **`ritham-website`** repo (its
+`.github/workflows/static.yml` publishes `website/` to Pages on push to `main`).
+Copy this `gauseva/` folder into that repo's `website/`, commit & push `main`,
+then verify at `https://ritham.co.in/gauseva/`.
