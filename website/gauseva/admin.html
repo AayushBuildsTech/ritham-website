@@ -143,30 +143,30 @@
       var date = b.created_at ? new Date(b.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
       var code = b.booking_code || '';
       return [
-        '🙏 Har Har Mahadev 🙏','',
+        'Har Har Mahadev','',
         'Namaste '+name+' ji,','',
-        'Welcome to the Ritham family! 🔱','',
-        'Your Gau Seva has been successfully booked ✅','',
-        '📿 Your Seva Details:',
-        'Gau Seva – '+seva,
-        '🧾 Booking ID: '+code,
-        '📅 Date: '+date,'',
+        'Welcome to the Ritham family!','',
+        'Your Gau Seva has been successfully booked.','',
+        'Your Seva Details:',
+        'Gau Seva - '+seva,
+        'Booking ID: '+code,
+        'Date: '+date,'',
         'On your behalf, green fodder will be lovingly offered to the cows (Gau Mata) at the goshala. The proof video of your seva will be sent to this WhatsApp number within 7 days.','',
-        "May Gau Mata's blessings bring health, prosperity and peace to you and your family. 🐄🙏",'',
-        "For any questions, just message here — we're at your service. 🙏",'',
-        '━━━━━━━━━━━━━━','',
-        '🙏 हर हर महादेव 🙏','',
+        "May Gau Mata's blessings bring health, prosperity and peace to you and your family.",'',
+        "For any questions, just message here - we're at your service.",'',
+        '--------------------','',
+        'Har Har Mahadev','',
         'नमस्ते '+name+' जी,','',
-        'Ritham परिवार में आपका हार्दिक स्वागत है! 🔱','',
-        'आपकी गौ सेवा सफलतापूर्वक बुक हो गई है ✅','',
-        '📿 आपकी सेवा का विवरण:',
-        'गौ सेवा – '+sevaHi,
-        '🧾 बुकिंग आईडी: '+code,
-        '📅 तिथि: '+date,'',
+        'Ritham परिवार में आपका हार्दिक स्वागत है!','',
+        'आपकी गौ सेवा सफलतापूर्वक बुक हो गई है।','',
+        'आपकी सेवा का विवरण:',
+        'गौ सेवा - '+sevaHi,
+        'बुकिंग आईडी: '+code,
+        'तिथि: '+date,'',
         'आपकी ओर से गौशाला में गौ माता को हरा चारा अर्पित किया जाएगा। आपकी सेवा का वीडियो सेवा पूर्ण होने के 7 दिन बाद इसी WhatsApp नंबर पर भेजा जाएगा।','',
-        'गौ माता का आशीर्वाद आप और आपके परिवार को स्वास्थ्य, समृद्धि और शांति प्रदान करे। 🐄🙏','',
-        'किसी भी प्रश्न के लिए यहाँ संदेश करें — हम आपकी सेवा में हैं। 🙏','',
-        '— Team Ritham | टीम Ritham'
+        'गौ माता का आशीर्वाद आप और आपके परिवार को स्वास्थ्य, समृद्धि और शांति प्रदान करे।','',
+        'किसी भी प्रश्न के लिए यहाँ संदेश करें - हम आपकी सेवा में हैं।','',
+        '- Team Ritham | टीम Ritham'
       ].join('\n');
     }
     // Copy to clipboard (WhatsApp Web/Desktop strips emojis from ?text= prefill;
@@ -305,7 +305,7 @@
           window.open('https://wa.me/'+wd+'?text='+encodeURIComponent(msg), '_blank', 'noopener');
           client.from('gau_seva_bookings').update({ whatsapp_sent:true, whatsapp_sent_at:new Date().toISOString() }).eq('id',id).then(function(r){
             if(r.error){ toast('Chat opened + message copied (could not mark sent).'); return; }
-            row.whatsapp_sent = true; toast('Chat opened. Message copied — if emojis are missing, paste (Ctrl/Cmd+V).'); render();
+            row.whatsapp_sent = true; toast('Chat opened. Message also copied - paste (Ctrl/Cmd+V) if the text is missing.'); render();
           });
         });
       });
