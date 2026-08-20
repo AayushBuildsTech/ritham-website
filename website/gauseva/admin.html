@@ -134,12 +134,40 @@
     function inr(n){ return '₹'+Number(n||0).toLocaleString('en-IN'); }
     function fmtDate(iso){ var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
     function waDigits(p){ return String(p||'').replace(/\D/g,''); }
-    // Prefilled welcome the owner sends manually (name + seva + 7-day promise).
+    // Prefilled bilingual onboarding message the owner sends manually.
+    // Name / seva tier / date / booking id auto-filled from the booking.
     function welcomeMsg(b){
       var name = (b.name||'').trim() || 'Devotee';
-      var seva = (b.seva_count!=null) ? (b.seva_count + ' Seva') : 'your seva';
-      return 'Namaste ' + name + ', your Gau Seva (' + seva + ') is received. ' +
-        'Your proof video of the seva will be delivered to you here on WhatsApp within 7 days. Gau Mata ki jai!';
+      var seva = (b.seva_count!=null) ? (b.seva_count + ' Seva') : 'Seva';
+      var sevaHi = (b.seva_count!=null) ? (b.seva_count + ' सेवा') : 'सेवा';
+      var date = b.created_at ? new Date(b.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
+      var code = b.booking_code || '';
+      return [
+        '🙏 Har Har Mahadev 🙏','',
+        'Namaste '+name+' ji,','',
+        'Welcome to the Ritham family! 🔱','',
+        'Your Gau Seva has been successfully booked ✅','',
+        '📿 Your Seva Details:',
+        'Gau Seva – '+seva,
+        '🧾 Booking ID: '+code,
+        '📅 Date: '+date,'',
+        'On your behalf, green fodder will be lovingly offered to the cows (Gau Mata) at the goshala. The proof video of your seva will be sent to this WhatsApp number within 7 days.','',
+        "May Gau Mata's blessings bring health, prosperity and peace to you and your family. 🐄🙏",'',
+        "For any questions, just message here — we're at your service. 🙏",'',
+        '━━━━━━━━━━━━━━','',
+        '🙏 हर हर महादेव 🙏','',
+        'नमस्ते '+name+' जी,','',
+        'Ritham परिवार में आपका हार्दिक स्वागत है! 🔱','',
+        'आपकी गौ सेवा सफलतापूर्वक बुक हो गई है ✅','',
+        '📿 आपकी सेवा का विवरण:',
+        'गौ सेवा – '+sevaHi,
+        '🧾 बुकिंग आईडी: '+code,
+        '📅 तिथि: '+date,'',
+        'आपकी ओर से गौशाला में गौ माता को हरा चारा अर्पित किया जाएगा। आपकी सेवा का वीडियो सेवा पूर्ण होने के 7 दिन बाद इसी WhatsApp नंबर पर भेजा जाएगा।','',
+        'गौ माता का आशीर्वाद आप और आपके परिवार को स्वास्थ्य, समृद्धि और शांति प्रदान करे। 🐄🙏','',
+        'किसी भी प्रश्न के लिए यहाँ संदेश करें — हम आपकी सेवा में हैं। 🙏','',
+        '— Team Ritham | टीम Ritham'
+      ].join('\n');
     }
 
     // ── Auth gate ──
