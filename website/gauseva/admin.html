@@ -52,6 +52,7 @@
     .bk{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 6px 16px rgba(90,30,18,.06)}
     .bk .r1{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
     .bk .name{font-family:'Fraunces',serif;font-size:18px;color:var(--maroon);font-weight:600}
+    .bk .bcode{font-family:'Fraunces',serif;font-size:13px;color:var(--violet);font-weight:600;letter-spacing:.02em}
     .bk .amt{font-family:'Fraunces',serif;font-size:20px;color:var(--maroon)}
     .bk .meta{color:var(--brown);font-size:13.5px;margin-top:4px;display:flex;flex-wrap:wrap;gap:10px}
     .bk .meta a{font-weight:600}
@@ -198,7 +199,7 @@
       return state.rows.filter(function(b){
         if(state.filter!=='all' && b.status!==state.filter) return false;
         if(state.search){
-          var hay = [b.name,b.whatsapp,b.email,b.razorpay_payment_id].join(' ').toLowerCase();
+          var hay = [b.name,b.whatsapp,b.email,b.razorpay_payment_id,b.booking_code].join(' ').toLowerCase();
           if(hay.indexOf(state.search)<0) return false;
         }
         return true;
@@ -222,6 +223,7 @@
         return '<div class="bk">'+
           '<div class="r1">'+
             '<div><div class="name">'+esc(b.name||'Anonymous')+'</div>'+
+              '<div class="bcode">'+esc(b.booking_code||'')+'</div>'+
               '<div class="meta">'+wa+
                 (b.email?'<span>'+esc(b.email)+'</span>':'')+
                 '<span>'+fmtDate(b.created_at)+'</span>'+
