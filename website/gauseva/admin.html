@@ -301,11 +301,14 @@
           var wd = waDigits(row.whatsapp);
           if(!wd){ toast('No WhatsApp number for this booking.'); return; }
           var msg = welcomeMsg(row);
-          copyText(msg); // guarantees emojis on desktop — paste if the prefill drops them
-          window.open('https://wa.me/'+wd+'?text='+encodeURIComponent(msg), '_blank', 'noopener');
+          // Copy the exact message; open the chat WITHOUT a ?text= prefill —
+          // WhatsApp Web mangles Hindi/non-Latin in prefills (shows "?"), so the
+          // owner pastes the clipboard text instead. Paste preserves everything.
+          copyText(msg);
+          window.open('https://wa.me/'+wd, '_blank', 'noopener');
           client.from('gau_seva_bookings').update({ whatsapp_sent:true, whatsapp_sent_at:new Date().toISOString() }).eq('id',id).then(function(r){
             if(r.error){ toast('Chat opened + message copied (could not mark sent).'); return; }
-            row.whatsapp_sent = true; toast('Chat opened. Message also copied - paste (Ctrl/Cmd+V) if the text is missing.'); render();
+            row.whatsapp_sent = true; toast('Chat opened. Message copied - paste (Ctrl/Cmd+V) into the chat and send.'); render();
           });
         });
       });
