@@ -169,6 +169,15 @@
         '— Team Ritham | टीम Ritham'
       ].join('\n');
     }
+    // Copy to clipboard (WhatsApp Web/Desktop strips emojis from ?text= prefill;
+    // pasting from the clipboard preserves them everywhere).
+    function copyText(t){
+      try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t); return; } } catch(e){}
+      try {
+        var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      } catch(e){}
+    }
 
     // ── Auth gate ──
     function showDash(user){
@@ -291,10 +300,12 @@
           var row = state.rows.find(function(x){return x.id===id;}); if(!row) return;
           var wd = waDigits(row.whatsapp);
           if(!wd){ toast('No WhatsApp number for this booking.'); return; }
-          window.open('https://wa.me/'+wd+'?text='+encodeURIComponent(welcomeMsg(row)), '_blank', 'noopener');
+          var msg = welcomeMsg(row);
+          copyText(msg); // guarantees emojis on desktop — paste if the prefill drops them
+          window.open('https://wa.me/'+wd+'?text='+encodeURIComponent(msg), '_blank', 'noopener');
           client.from('gau_seva_bookings').update({ whatsapp_sent:true, whatsapp_sent_at:new Date().toISOString() }).eq('id',id).then(function(r){
-            if(r.error){ toast('Opened chat (could not mark sent: '+r.error.message+')'); return; }
-            row.whatsapp_sent = true; toast('Welcome opened in WhatsApp.'); render();
+            if(r.error){ toast('Chat opened + message copied (could not mark sent).'); return; }
+            row.whatsapp_sent = true; toast('Chat opened. Message copied — if emojis are missing, paste (Ctrl/Cmd+V).'); render();
           });
         });
       });
