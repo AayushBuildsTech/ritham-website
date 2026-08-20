@@ -42,14 +42,17 @@ access is enforced server-side).
 4. **Webhook:** Razorpay Dashboard → Settings → Webhooks → add
    `https://eaxdqizerkuqkujxacru.supabase.co/functions/v1/gau-seva-webhook`,
    event **`payment.captured`**, set a secret → store as **`GAU_WEBHOOK_SECRET`**.
-5. **WhatsApp welcome** (optional but requested) — set `WHATSAPP_TOKEN` +
-   `WHATSAPP_PHONE_NUMBER_ID`, and **create/get approved** a template named
-   `gau_seva_welcome` (category *Utility*), body e.g.:
-   > 🙏 Namaste {{1}}, your Gau Seva ({{2}} Seva) is received. Your proof video of the seva will be delivered to you within **7 days**. Gau Mata ki jai!
-
-   Two body variables: `{{1}}` = name, `{{2}}` = seva count. Business-initiated
-   WhatsApp messages *require* an approved template. Until the token is set, the
-   welcome is a safe no-op (payments still work).
+5. **WhatsApp welcome — current approach is MANUAL from the admin** (no Meta app
+   / provider needed): each paid booking in `gauseva/admin.html` has a **Send
+   welcome** button that opens WhatsApp with a prefilled message (name + seva +
+   the 7-day proof-video promise) and marks the row as messaged. Nothing to
+   configure.
+   *Optional auto-send (left dormant in the code):* if you later get WhatsApp
+   Cloud API access (directly or via a BSP), set `WHATSAPP_TOKEN` +
+   `WHATSAPP_PHONE_NUMBER_ID` and get a template `gau_seva_welcome` (Utility,
+   body `Namaste {{1}}, your Gau Seva ({{2}} Seva) is received. Your proof video
+   … within 7 days. Gau Mata ki jai!`, vars `{{1}}`=name `{{2}}`=seva) approved.
+   Until then the auto-send is a safe no-op (payments unaffected).
 6. **Meta CAPI** (optional) — set `META_CAPI_TOKEN` to activate the server-side
    `Purchase` / `InitiateCheckout`.
 

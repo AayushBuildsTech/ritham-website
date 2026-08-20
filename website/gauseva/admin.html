@@ -133,6 +133,13 @@
     function inr(n){ return '₹'+Number(n||0).toLocaleString('en-IN'); }
     function fmtDate(iso){ var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
     function waDigits(p){ return String(p||'').replace(/\D/g,''); }
+    // Prefilled welcome the owner sends manually (name + seva + 7-day promise).
+    function welcomeMsg(b){
+      var name = (b.name||'').trim() || 'Devotee';
+      var seva = (b.seva_count!=null) ? (b.seva_count + ' Seva') : 'your seva';
+      return 'Namaste ' + name + ', your Gau Seva (' + seva + ') is received. ' +
+        'Your proof video of the seva will be delivered to you here on WhatsApp within 7 days. Gau Mata ki jai!';
+    }
 
     // ── Auth gate ──
     function showDash(user){
@@ -228,7 +235,8 @@
           '</div>'+
           '<div class="meta" style="margin-top:8px;font-size:12px;opacity:.8"><span>'+esc(b.razorpay_payment_id)+'</span></div>'+
           '<div class="actions">'+
-            (next?'<button class="btn btn-grad btn-sm" data-act="status" data-id="'+esc(b.id)+'" data-to="'+esc(next)+'">Mark: '+esc(next)+'</button>':'')+
+            (PAID.indexOf(b.status)>=0?'<button class="btn btn-grad btn-sm" data-act="welcome" data-id="'+esc(b.id)+'">'+(b.whatsapp_sent?'Resend welcome':'Send welcome')+'</button>':'')+
+            (next?'<button class="btn btn-ghost btn-sm" data-act="status" data-id="'+esc(b.id)+'" data-to="'+esc(next)+'">Mark: '+esc(next)+'</button>':'')+
             (PAID.indexOf(b.status)>=0?'<button class="btn btn-ghost btn-sm" data-act="status" data-id="'+esc(b.id)+'" data-to="Refunded">Mark refunded</button>':'')+
           '</div>'+
         '</div>';
@@ -242,6 +250,21 @@
             if(r.error){ toast('Update failed: '+r.error.message); btn.disabled=false; return; }
             var row = state.rows.find(function(x){return x.id===id;}); if(row) row.status=to;
             toast('Updated → '+to); render();
+          });
+        });
+      });
+
+      // Manual WhatsApp welcome: open a prefilled chat, then mark as sent.
+      Array.prototype.forEach.call(wrap.querySelectorAll('[data-act="welcome"]'), function(btn){
+        btn.addEventListener('click', function(){
+          var id = btn.getAttribute('data-id');
+          var row = state.rows.find(function(x){return x.id===id;}); if(!row) return;
+          var wd = waDigits(row.whatsapp);
+          if(!wd){ toast('No WhatsApp number for this booking.'); return; }
+          window.open('https://wa.me/'+wd+'?text='+encodeURIComponent(welcomeMsg(row)), '_blank', 'noopener');
+          client.from('gau_seva_bookings').update({ whatsapp_sent:true, whatsapp_sent_at:new Date().toISOString() }).eq('id',id).then(function(r){
+            if(r.error){ toast('Opened chat (could not mark sent: '+r.error.message+')'); return; }
+            row.whatsapp_sent = true; toast('Welcome opened in WhatsApp.'); render();
           });
         });
       });
