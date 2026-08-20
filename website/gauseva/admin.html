@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gau Seva Ops · Admin · Ritham</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="../favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{--saffron:#F28C1E;--marigold:#F6A800;--gold:#C98A2B;--maroon:#5A1E12;--deep:#3D1408;--brown:#7A3B1E;--cream:#FFF7EC;--cream-2:#FBEAD1;--ink:#2A1408;--line:rgba(90,30,18,.14);--ok:#137a3f;--warn:#9a6a00}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Mukta',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.5}
+    h1,h2,h3{font-family:'Fraunces',serif;color:var(--maroon)}
+    a{color:var(--maroon)}
+    .wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+    header.top{background:linear-gradient(90deg,var(--maroon),var(--deep));color:var(--cream-2);padding:14px 0}
+    header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    header.top .brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:#fff}
+    header.top .brand img{width:26px;height:26px;border-radius:6px}
+    header.top .who{font-size:13px;opacity:.9}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 16px;border-radius:10px;font-weight:600;font-family:'Mukta',sans-serif;font-size:15px;cursor:pointer;border:0}
+    .btn-grad{background:linear-gradient(90deg,var(--saffron),var(--marigold));color:#3a1a00}
+    .btn-ghost{background:#fff;border:1.5px solid var(--gold);color:var(--maroon)}
+    .btn-sm{min-height:34px;padding:0 12px;font-size:13.5px;border-radius:8px}
+    .input{width:100%;min-height:44px;padding:0 12px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;font-family:'Mukta',sans-serif;background:#fff}
+
+    /* Gate */
+    .gate{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .gate .card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(90,30,18,.14);padding:26px;max-width:380px;width:100%}
+    .gate h2{font-size:22px;margin-bottom:6px}
+    .gate p{color:var(--brown);font-size:14px;margin-bottom:16px}
+    .gate .input{margin-bottom:10px}
+    .err{color:#b3261e;font-size:13.5px;min-height:18px;margin:2px 0 8px}
+
+    /* Dashboard */
+    main{padding:20px 0 60px}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+    .stat b{font-family:'Fraunces',serif;font-size:24px;color:var(--maroon);display:block}
+    .stat span{color:var(--brown);font-size:13px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+    .toolbar .input{flex:1 1 200px;max-width:320px}
+    .filters{display:flex;gap:6px;flex-wrap:wrap}
+    .chip{border:1.5px solid var(--line);background:#fff;color:var(--brown);border-radius:999px;padding:7px 13px;font-size:13.5px;cursor:pointer;font-weight:600}
+    .chip.on{background:var(--maroon);color:#fff;border-color:var(--maroon)}
+
+    .cards{display:grid;gap:12px}
+    .bk{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 6px 16px rgba(90,30,18,.06)}
+    .bk .r1{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+    .bk .name{font-family:'Fraunces',serif;font-size:18px;color:var(--maroon);font-weight:600}
+    .bk .amt{font-family:'Fraunces',serif;font-size:20px;color:var(--maroon)}
+    .bk .meta{color:var(--brown);font-size:13.5px;margin-top:4px;display:flex;flex-wrap:wrap;gap:10px}
+    .bk .meta a{font-weight:600}
+    .pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.02em}
+    .pill.recv{background:#fff3d6;color:var(--warn)}
+    .pill.sent{background:#dcf3e4;color:var(--ok)}
+    .pill.ref{background:#f3dcdc;color:#b3261e}
+    .wa-badge{font-size:11.5px;color:var(--ok);font-weight:600}
+    .wa-no{font-size:11.5px;color:var(--warn);font-weight:600}
+    .bk .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
+    .empty{text-align:center;color:var(--brown);padding:40px 0}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--maroon);color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.25s}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .hidden{display:none!important}
+    @media(max-width:560px){.stats{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="brand"><img src="../logo.png" alt="Ritham" /> Gau Seva · Admin</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="who hidden" id="who"></span>
+        <button class="btn btn-ghost btn-sm hidden" id="signout">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- GATE -->
+  <div class="gate" id="gate">
+    <div class="card">
+      <h2>Operations Login</h2>
+      <p>Sign in with your Ritham owner account to view Gau Seva contributions. Access is enforced server-side (Supabase RLS).</p>
+      <input class="input" id="email" type="email" placeholder="Owner email" autocomplete="username" />
+      <input class="input" id="pass" type="password" placeholder="Password" autocomplete="current-password" />
+      <p class="err" id="gerr"></p>
+      <button class="btn btn-grad" style="width:100%" id="signin">Sign in</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <main id="dash" class="hidden">
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat"><b id="s-count">0</b><span>Contributions</span></div>
+        <div class="stat"><b id="s-total">₹0</b><span>Total received</span></div>
+        <div class="stat"><b id="s-seva">0</b><span>Total Seva</span></div>
+      </div>
+      <div class="toolbar">
+        <input class="input" id="search" placeholder="Search name / phone / payment id…" />
+        <div class="filters" id="filters"></div>
+        <button class="btn btn-ghost btn-sm" id="refresh">Refresh</button>
+        <button class="btn btn-ghost btn-sm" id="export">Export CSV</button>
+      </div>
+      <div class="cards" id="cards"></div>
+      <div class="empty hidden" id="empty">No contributions yet.</div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (function(){
+    'use strict';
+    // Public anon key — safe to ship; all access is enforced by RLS.
+    var SB_URL = 'https://eaxdqizerkuqkujxacru.supabase.co';
+    var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVheGRxaXplcmt1cWt1anhhY3J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MTU2MjksImV4cCI6MjA5ODQ5MTYyOX0.TB2A8e_7sl1rhH7aRi3QVJ5Q-QMgNlHnygK9TAiSFzI';
+    var STATUSES = ['Payment Received','Video Sent','Refunded'];
+    var client = window.supabase.createClient(SB_URL, SB_ANON);
+
+    var $ = function(s){ return document.querySelector(s); };
+    var state = { rows: [], filter: 'all', search: '' };
+    var toastTimer;
+    function toast(m){ var t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove('show');},2400); }
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+    function inr(n){ return '₹'+Number(n||0).toLocaleString('en-IN'); }
+    function fmtDate(iso){ var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
+    function waDigits(p){ return String(p||'').replace(/\D/g,''); }
+
+    // ── Auth gate ──
+    function showDash(user){
+      $('#gate').classList.add('hidden'); $('#dash').classList.remove('hidden');
+      $('#who').textContent = user.email; $('#who').classList.remove('hidden');
+      $('#signout').classList.remove('hidden');
+      buildFilters(); load();
+    }
+    function gateErr(m){ $('#gerr').textContent = m || ''; }
+
+    function checkAdmin(){
+      return client.rpc('is_web_puja_admin').then(function(r){ return !r.error && !!r.data; });
+    }
+    function signIn(){
+      gateErr('');
+      var email = $('#email').value.trim(), pass = $('#pass').value;
+      if(!email || !pass){ gateErr('Enter email and password.'); return; }
+      $('#signin').disabled = true;
+      client.auth.signInWithPassword({ email: email, password: pass }).then(function(r){
+        if(r.error){ gateErr('Incorrect credentials.'); $('#signin').disabled=false; return; }
+        return checkAdmin().then(function(ok){
+          if(!ok){ gateErr('This account is not an authorised owner.'); client.auth.signOut(); $('#signin').disabled=false; return; }
+          showDash(r.data.user);
+        });
+      }).catch(function(){ gateErr('Sign-in failed.'); $('#signin').disabled=false; });
+    }
+    $('#signin').addEventListener('click', signIn);
+    $('#pass').addEventListener('keydown', function(e){ if(e.key==='Enter') signIn(); });
+    $('#signout').addEventListener('click', function(){ client.auth.signOut().then(function(){ location.reload(); }); });
+
+    // resume existing session
+    client.auth.getUser().then(function(r){
+      var u = r && r.data && r.data.user; if(!u) return;
+      checkAdmin().then(function(ok){ if(ok) showDash(u); });
+    });
+
+    // ── Data ──
+    function load(){
+      client.from('gau_seva_bookings').select('*').order('created_at',{ascending:false}).then(function(r){
+        if(r.error){ toast('Load failed: '+r.error.message); return; }
+        state.rows = r.data || []; render();
+      });
+    }
+    $('#refresh').addEventListener('click', load);
+
+    function buildFilters(){
+      var f = $('#filters'); var items = [{id:'all',label:'All'}].concat(STATUSES.map(function(s){return {id:s,label:s};}));
+      f.innerHTML = items.map(function(it){ return '<span class="chip'+(state.filter===it.id?' on':'')+'" data-f="'+esc(it.id)+'">'+esc(it.label)+'</span>'; }).join('');
+      Array.prototype.forEach.call(f.querySelectorAll('.chip'), function(c){
+        c.addEventListener('click', function(){ state.filter = c.getAttribute('data-f'); buildFilters(); render(); });
+      });
+    }
+    $('#search').addEventListener('input', function(e){ state.search = e.target.value.toLowerCase().trim(); render(); });
+
+    function filtered(){
+      return state.rows.filter(function(b){
+        if(state.filter!=='all' && b.status!==state.filter) return false;
+        if(state.search){
+          var hay = [b.name,b.phone,b.email,b.razorpay_payment_id].join(' ').toLowerCase();
+          if(hay.indexOf(state.search)<0) return false;
+        }
+        return true;
+      });
+    }
+    function pillClass(s){ return s==='Video Sent'?'sent':s==='Refunded'?'ref':'recv'; }
+
+    function render(){
+      var rows = filtered();
+      // stats reflect ALL rows (not the filter), minus refunds for money/seva
+      var live = state.rows.filter(function(b){ return b.status!=='Refunded'; });
+      $('#s-count').textContent = state.rows.length;
+      $('#s-total').textContent = inr(live.reduce(function(a,b){return a+(Number(b.amount_inr)||0);},0));
+      $('#s-seva').textContent  = live.reduce(function(a,b){return a+(Number(b.seva_count)||0);},0);
+
+      var wrap = $('#cards'); $('#empty').classList.toggle('hidden', rows.length>0);
+      wrap.innerHTML = rows.map(function(b){
+        var wd = waDigits(b.phone);
+        var wa = wd ? '<a href="https://wa.me/'+wd+'" target="_blank" rel="noopener">💬 '+esc(b.phone)+'</a>' : '<span>'+esc(b.phone||'—')+'</span>';
+        var next = b.status==='Payment Received' ? 'Video Sent' : (b.status==='Video Sent' ? 'Payment Received' : null);
+        return '<div class="bk">'+
+          '<div class="r1">'+
+            '<div><div class="name">'+esc(b.name||'Anonymous')+'</div>'+
+              '<div class="meta">'+wa+
+                (b.email?'<span>'+esc(b.email)+'</span>':'')+
+                '<span>'+fmtDate(b.created_at)+'</span>'+
+                (b.whatsapp_sent?'<span class="wa-badge">✓ WhatsApp sent</span>':'<span class="wa-no">WhatsApp not sent</span>')+
+              '</div>'+
+            '</div>'+
+            '<div style="text-align:right"><div class="amt">'+inr(b.amount_inr)+'</div>'+
+              '<div style="color:var(--brown);font-size:13px">'+(b.seva_count!=null?b.seva_count+' Seva':'custom')+'</div>'+
+              '<div style="margin-top:6px"><span class="pill '+pillClass(b.status)+'">'+esc(b.status)+'</span></div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="meta" style="margin-top:8px;font-size:12px;opacity:.8"><span>'+esc(b.razorpay_payment_id)+'</span></div>'+
+          '<div class="actions">'+
+            (next?'<button class="btn btn-grad btn-sm" data-act="status" data-id="'+esc(b.id)+'" data-to="'+esc(next)+'">Mark: '+esc(next)+'</button>':'')+
+            (b.status!=='Refunded'?'<button class="btn btn-ghost btn-sm" data-act="status" data-id="'+esc(b.id)+'" data-to="Refunded">Mark refunded</button>':'')+
+          '</div>'+
+        '</div>';
+      }).join('');
+
+      Array.prototype.forEach.call(wrap.querySelectorAll('[data-act="status"]'), function(btn){
+        btn.addEventListener('click', function(){
+          var id = btn.getAttribute('data-id'), to = btn.getAttribute('data-to');
+          btn.disabled = true;
+          client.from('gau_seva_bookings').update({status:to}).eq('id',id).then(function(r){
+            if(r.error){ toast('Update failed: '+r.error.message); btn.disabled=false; return; }
+            var row = state.rows.find(function(x){return x.id===id;}); if(row) row.status=to;
+            toast('Updated → '+to); render();
+          });
+        });
+      });
+    }
+
+    // ── CSV export ──
+    $('#export').addEventListener('click', function(){
+      var cols = ['created_at','name','phone','email','amount_inr','seva_count','status','whatsapp_sent','razorpay_payment_id','razorpay_order_id'];
+      var lines = [cols.join(',')].concat(state.rows.map(function(b){
+        return cols.map(function(c){ var v=b[c]==null?'':String(b[c]); return '"'+v.replace(/"/g,'""')+'"'; }).join(',');
+      }));
+      var blob = new Blob([lines.join('\n')], {type:'text/csv'});
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'gau-seva-contributions-'+new Date().toISOString().slice(0,10)+'.csv';
+      a.click(); URL.revokeObjectURL(a.href);
+    });
+  })();
+  </script>
+</body>
+</html>
