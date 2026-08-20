@@ -68,6 +68,17 @@
     .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--maroon);color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.25s}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .hidden{display:none!important}
+    /* Welcome modal */
+    .wmodal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(30,21,51,.55);padding:16px}
+    .wmodal.open{display:flex}
+    .wcard{background:#fff;border-radius:16px;max-width:480px;width:100%;padding:22px;position:relative;box-shadow:0 24px 60px rgba(30,21,51,.35)}
+    .wx{position:absolute;top:8px;right:12px;background:none;border:0;font-size:26px;line-height:1;color:var(--brown);cursor:pointer}
+    .wcard h3{margin-bottom:2px}
+    .wsub{color:var(--brown);font-size:13px;margin-bottom:12px}
+    .wta{width:100%;height:240px;border:1.5px solid var(--line);border-radius:10px;padding:12px;font-size:13px;line-height:1.5;font-family:inherit;resize:vertical;background:#faf8ff;color:var(--ink);white-space:pre-wrap}
+    .wbtns{display:flex;gap:10px;margin-top:12px}
+    .wbtns .btn{flex:1}
+    .whint{color:var(--brown);font-size:12px;margin-top:10px;text-align:center}
     @media(max-width:560px){.stats{grid-template-columns:1fr 1fr}}
   </style>
 </head>
@@ -114,6 +125,21 @@
   </main>
 
   <div class="toast" id="toast"></div>
+
+  <!-- Welcome message modal -->
+  <div class="wmodal" id="wmodal">
+    <div class="wcard">
+      <button class="wx" id="wclose" type="button" aria-label="Close">&times;</button>
+      <h3>Send welcome</h3>
+      <p class="wsub" id="wsub"></p>
+      <textarea class="wta" id="wta" readonly></textarea>
+      <div class="wbtns">
+        <button class="btn btn-grad" id="wcopy" type="button">Copy message</button>
+        <a class="btn btn-ghost" id="wopen" target="_blank" rel="noopener">Open WhatsApp</a>
+      </div>
+      <p class="whint">Copy the message, open WhatsApp, then paste (Ctrl/Cmd+V) and send.</p>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -298,21 +324,39 @@
         btn.addEventListener('click', function(){
           var id = btn.getAttribute('data-id');
           var row = state.rows.find(function(x){return x.id===id;}); if(!row) return;
-          var wd = waDigits(row.whatsapp);
-          if(!wd){ toast('No WhatsApp number for this booking.'); return; }
-          var msg = welcomeMsg(row);
-          // Copy the exact message; open the chat WITHOUT a ?text= prefill —
-          // WhatsApp Web mangles Hindi/non-Latin in prefills (shows "?"), so the
-          // owner pastes the clipboard text instead. Paste preserves everything.
-          copyText(msg);
-          window.open('https://wa.me/'+wd, '_blank', 'noopener');
-          client.from('gau_seva_bookings').update({ whatsapp_sent:true, whatsapp_sent_at:new Date().toISOString() }).eq('id',id).then(function(r){
-            if(r.error){ toast('Chat opened + message copied (could not mark sent).'); return; }
-            row.whatsapp_sent = true; toast('Chat opened. Message copied - paste (Ctrl/Cmd+V) into the chat and send.'); render();
-          });
+          openWelcome(row);
         });
       });
     }
+
+    // ── Welcome modal: shows the exact message on screen (no fragile prefill /
+    //    focus-racing clipboard). Owner copies, opens WhatsApp, pastes, sends. ──
+    var wRow = null;
+    function openWelcome(row){
+      wRow = row;
+      var wd = waDigits(row.whatsapp);
+      $('#wta').value = welcomeMsg(row);
+      $('#wsub').textContent = (row.name||'Anonymous') + '  ·  ' + (row.booking_code||'') + (wd ? '' : '  ·  no WhatsApp number');
+      var wopen = $('#wopen');
+      if (wd){ wopen.href = 'https://wa.me/'+wd; wopen.style.display=''; } else { wopen.removeAttribute('href'); wopen.style.display='none'; }
+      $('#wmodal').classList.add('open');
+      setTimeout(function(){ $('#wta').focus(); $('#wta').select(); }, 40);
+    }
+    function closeWelcome(){ $('#wmodal').classList.remove('open'); }
+    $('#wclose').addEventListener('click', closeWelcome);
+    $('#wmodal').addEventListener('click', function(e){ if(e.target===$('#wmodal')) closeWelcome(); });
+    $('#wcopy').addEventListener('click', function(){
+      var ta = $('#wta'); ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+      var ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+      try{ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value); }catch(e){}
+      toast(ok ? 'Message copied — paste into WhatsApp.' : 'Press Ctrl/Cmd+C to copy the selected text.');
+    });
+    $('#wopen').addEventListener('click', function(){
+      if(!wRow) return; var id = wRow.id, r0 = wRow;
+      client.from('gau_seva_bookings').update({ whatsapp_sent:true, whatsapp_sent_at:new Date().toISOString() }).eq('id',id).then(function(r){
+        if(!r.error){ r0.whatsapp_sent = true; render(); }
+      });
+    });
 
     // ── CSV export ──
     $('#export').addEventListener('click', function(){
