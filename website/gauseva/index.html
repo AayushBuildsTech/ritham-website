@@ -4,29 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gau Seva · Feed & Serve Gau Mata · Ritham</title>
-  <meta name="description" content="Contribute to Gau Seva — feeding and caring for cows (Gau Mata). Choose your seva, and receive a real proof video of the seva performed in your name within 7 days. A punya act of blessings. Bookings close 31 October 2026." />
+  <meta name="description" content="Book a Gau Seva — cows (Gau Mata) are fed and cared for in your name, and you receive a real video of the seva within 7 days. A sacred punya act. A paid seva service, not a donation." />
   <link rel="icon" href="../favicon.png" />
 
   <!-- Open Graph (for Facebook / Instagram / WhatsApp shares) -->
   <meta property="og:title" content="Gau Seva · Serve Gau Mata · Ritham" />
-  <meta property="og:description" content="Serve and feed cows in your name. Receive a real proof video within 7 days. A sacred punya act." />
+  <meta property="og:description" content="Book a seva for cows in your name. Receive a real video within 7 days. A sacred punya act." />
   <meta property="og:type" content="website" />
-  <!-- REPLACE: absolute URL of the OG share image once hosted, e.g. https://ritham.co.in/gauseva/img/gau-og.jpg -->
+  <!-- REPLACE with the absolute URL of the OG share image once hosted -->
   <meta property="og:image" content="img/gau-hero.jpg" />
 
   <!-- ════════════════════════════════════════════════════════════
        META PIXEL  —  REPLACE  PIXEL_ID  with your real pixel id.
-       (The Ritham ad pixel is 1001713839547879; kept as PIXEL_ID
-       placeholder here per spec so you confirm the value on paste.)
-       • PageView fires on load.
-       • 'InitiateCheckout' fires on every tier tap (see JS below),
-         with value = the tier amount + currency INR, so you can see
-         which tier converts in Ads Manager.
-       • IMPORTANT: the ad algorithm optimises on 'Purchase'. That
-         event CANNOT fire on this static page (the buyer leaves for
-         the hosted Razorpay page). You MUST add a Purchase pixel on
-         the Razorpay THANK-YOU / callback page — otherwise the
-         campaign has nothing to optimise against.
+       • PageView on load.  • 'InitiateCheckout' on every tier tap
+         (value = tier amount, currency INR) so Ads Manager shows which
+         tier converts.
+       • The ad algorithm optimises on 'Purchase' — that event CANNOT
+         fire on this static page (the buyer leaves for Razorpay). Add a
+         Purchase pixel on the Razorpay thank-you page.
        ════════════════════════════════════════════════════════════ -->
   <script>
   !function(f,b,e,v,n,t,s)
@@ -44,188 +39,201 @@
     src="https://www.facebook.com/tr?id=PIXEL_ID&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel Code -->
 
-  <!-- Fonts: one request, font-display:swap so text never blocks paint.
-       Fraunces = warm display serif; Mukta = clean Devanagari-friendly body. -->
+  <!-- Brand fonts: Fraunces (display) + Inter (body) + Noto Sans Devanagari. -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- ══════════ CRITICAL CSS (inline — no external stylesheet, fast first paint) ══════════ -->
+  <!-- ══════════ CRITICAL CSS (inline — light brand theme, fast first paint) ══════════ -->
   <style>
     :root{
-      --saffron:#F28C1E; --marigold:#F6A800; --gold:#C98A2B;
-      --maroon:#5A1E12; --deep:#3D1408; --brown:#7A3B1E;
-      --cream:#FFF7EC; --cream-2:#FBEAD1; --ink:#2A1408;
-      --line:rgba(90,30,18,.14); --shadow:0 10px 30px rgba(90,30,18,.14);
-      --radius:18px; --tap:54px;
+      --magenta:#FF007F; --magenta-d:#D6006B; --violet:#7B2CBF; --violet-l:#9D4EDD;
+      --gold:#E8A33D; --saffron:#F4820B;
+      --grad:linear-gradient(135deg,#7B2CBF 0%,#FF007F 100%);
+      --grad-soft:linear-gradient(135deg,rgba(123,44,191,.10),rgba(255,0,127,.08));
+      --bg:#FBF7FF; --bg-warm:#FFF9F3; --surface:#FFFFFF;
+      --ink:#1E1533; --muted:#6B6382; --dim:#948CAC;
+      --line:rgba(123,44,191,.16); --line-strong:rgba(255,0,127,.45);
+      --shadow:0 12px 34px rgba(123,44,191,.12); --shadow-sm:0 4px 14px rgba(123,44,191,.08);
+      --ok:#1a9d6a; --radius:20px; --tap:54px;
     }
     *{box-sizing:border-box;margin:0;padding:0}
-    html{-webkit-text-size-adjust:100%}
+    html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
     body{
-      font-family:'Mukta',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-      color:var(--ink); background:var(--cream);
-      line-height:1.6; font-size:17px; overflow-x:hidden;
+      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      color:var(--ink);background:var(--bg);line-height:1.7;font-size:16px;overflow-x:hidden;
       -webkit-font-smoothing:antialiased;
     }
-    h1,h2,h3,.display{font-family:'Fraunces',Georgia,serif;line-height:1.15;color:var(--maroon);font-weight:600}
-    a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
-    .wrap{width:100%;max-width:760px;margin:0 auto;padding:0 18px}
-    .grad-text{background:linear-gradient(90deg,var(--saffron),var(--gold));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-    .eyebrow{font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12.5px;color:var(--gold)}
-    .center{text-align:center}
-    section{padding:44px 0}
-    .section-head{max-width:600px;margin:0 auto 26px;text-align:center}
-    .section-head h2{font-size:27px;margin:6px 0 8px}
-    .section-head p{color:var(--brown)}
-
-    /* ── Deadline banner (sticky top) ── */
-    .deadline{
-      position:sticky;top:0;z-index:60;
-      background:linear-gradient(90deg,var(--maroon),var(--deep));
-      color:var(--cream-2);text-align:center;
-      font-size:13.5px;font-weight:600;padding:9px 14px;letter-spacing:.02em;
-    }
-    .deadline b{color:var(--marigold)}
-
-    /* ── Hero ── */
-    .hero{position:relative;padding:34px 0 8px;text-align:center;
+    body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
       background:
-        radial-gradient(120% 90% at 50% 0%, var(--cream-2) 0%, var(--cream) 60%);
-    }
-    .hero .om{font-size:22px;color:var(--saffron);font-weight:700;margin-bottom:6px}
-    .hero h1{font-size:34px;margin:8px 0 10px}
-    .hero h1 .big{display:block;font-size:40px}
-    .hero p.lede{font-size:17.5px;color:var(--brown);max-width:520px;margin:0 auto 18px}
-    .hero-media{position:relative;margin:16px auto 0;max-width:520px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
-    .hero-media img{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;background:var(--cream-2)}
-    .cow-strip{font-size:26px;letter-spacing:2px;margin:14px 0 4px}
+        radial-gradient(ellipse 46% 40% at 8% 4%, rgba(255,0,127,.06), transparent 60%),
+        radial-gradient(ellipse 50% 44% at 94% 26%, rgba(123,44,191,.07), transparent 60%),
+        radial-gradient(ellipse 44% 40% at 40% 100%, rgba(232,163,61,.06), transparent 60%);}
+    h1,h2,h3,.display{font-family:'Fraunces',Georgia,serif;line-height:1.14;color:var(--ink);font-weight:600}
+    a{color:var(--violet);text-decoration:none}
+    img{max-width:100%;display:block}
+    .deva{font-family:'Noto Sans Devanagari','Inter',sans-serif}
+    .wrap{width:100%;max-width:780px;margin:0 auto;padding:0 20px}
+    .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+    .eyebrow{font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:var(--magenta-d)}
+    .center{text-align:center}
+    section{padding:46px 0}
+    .section-head{max-width:620px;margin:0 auto 28px;text-align:center}
+    .section-head h2{font-size:28px;margin:8px 0 8px;letter-spacing:-.01em}
+    .section-head p{color:var(--muted)}
+    .cow-ic{width:1em;height:1em;color:var(--violet);vertical-align:-.12em}
 
-    /* ── Buttons ── */
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      min-height:var(--tap);padding:0 22px;border-radius:999px;font-weight:700;
-      font-family:'Mukta',sans-serif;font-size:16.5px;cursor:pointer;border:0;
-      transition:transform .12s ease, box-shadow .12s ease;width:auto;
-    }
+    /* Banner */
+    .banner{position:sticky;top:0;z-index:60;background:var(--grad);color:#fff;text-align:center;
+      font-size:13px;font-weight:600;letter-spacing:.04em;padding:9px 14px;text-transform:uppercase}
+
+    /* Buttons */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--tap);
+      padding:0 26px;border-radius:999px;font-weight:700;font-family:'Inter',sans-serif;font-size:16px;
+      cursor:pointer;border:0;transition:transform .12s ease,box-shadow .12s ease;line-height:1}
     .btn:active{transform:translateY(1px) scale(.99)}
-    .btn-grad{background:linear-gradient(90deg,var(--saffron),var(--marigold));color:#3a1a00;box-shadow:0 8px 20px rgba(242,140,30,.35)}
-    .btn-ghost{background:transparent;border:1.5px solid var(--gold);color:var(--maroon)}
-    .btn-block{display:flex;width:100%}
-    .btn-wa{background:#25D366;color:#04310f}
+    .btn-grad{background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(214,0,107,.28)}
+    .btn-ghost{background:#fff;border:1.5px solid var(--line-strong);color:var(--violet)}
+    .btn svg{width:18px;height:18px}
 
-    /* ── Video (proof) ── */
-    .proof-video{max-width:520px;margin:18px auto 0;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);background:#000;position:relative}
-    .proof-video video{width:100%;height:auto;display:block;aspect-ratio:16/9;background:#1a0e06}
-    .proof-tag{display:inline-flex;gap:7px;align-items:center;background:var(--cream-2);color:var(--maroon);font-weight:600;font-size:13px;padding:6px 12px;border-radius:999px;margin-top:14px}
+    /* Hero */
+    .hero{padding:36px 0 6px;text-align:center}
+    .hero .kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px}
+    .hero .kicker .deva{font-size:15px;color:var(--magenta-d);font-weight:600}
+    .hero h1{font-size:36px;margin:6px 0 12px;letter-spacing:-.02em}
+    .hero h1 .big{display:block;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .hero p.lede{font-size:17px;color:var(--muted);max-width:540px;margin:0 auto 20px}
+    .hero-media{position:relative;margin:20px auto 0;max-width:560px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
+    .hero-media img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:var(--grad-soft)}
 
-    /* ── Tiers ── */
-    #seva{background:linear-gradient(180deg,var(--cream) 0%, var(--cream-2) 100%)}
-    .tiers{display:flex;flex-direction:column;gap:14px;max-width:520px;margin:0 auto}
-    .tier{
-      position:relative;display:flex;align-items:center;gap:14px;
-      background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);
-      padding:16px 16px;box-shadow:var(--shadow);cursor:pointer;
-      transition:border-color .15s ease, transform .12s ease, box-shadow .15s ease;
-    }
+    /* Tiers */
+    #seva{background:linear-gradient(180deg,var(--bg) 0%, #F6EEFF 100%)}
+    .tiers{display:flex;flex-direction:column;gap:14px;max-width:540px;margin:0 auto}
+    .tier{position:relative;display:flex;align-items:center;gap:14px;background:var(--surface);
+      border:1.5px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-sm);
+      cursor:pointer;transition:border-color .15s ease,transform .12s ease,box-shadow .15s ease}
     .tier:active{transform:scale(.995)}
-    .tier.sel{border-color:var(--saffron);box-shadow:0 0 0 3px rgba(242,140,30,.18),var(--shadow)}
-    .tier .cows{font-size:22px;line-height:1.25;flex:0 0 auto;width:86px;word-break:break-word}
+    .tier.sel{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(255,0,127,.14),var(--shadow-sm)}
+    .tier .cows{flex:0 0 auto;width:92px;display:flex;flex-wrap:wrap;gap:3px;align-items:center;color:var(--violet-l)}
+    .tier .cows svg{width:15px;height:15px}
+    .tier .cows .mult{font-family:'Fraunces',serif;font-weight:700;font-size:14px;color:var(--violet);margin-left:2px}
     .tier .info{flex:1 1 auto;min-width:0}
-    .tier .amt{font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--maroon);display:block}
-    .tier .cnt{font-weight:600;color:var(--brown);font-size:14.5px}
-    .tier .go{flex:0 0 auto;background:linear-gradient(90deg,var(--saffron),var(--marigold));color:#3a1a00;font-weight:700;border-radius:999px;min-height:44px;padding:0 16px;display:inline-flex;align-items:center;font-size:14.5px;white-space:nowrap}
-    .tier .badge{position:absolute;top:-11px;left:16px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:linear-gradient(90deg,var(--maroon),var(--brown));padding:4px 11px;border-radius:999px;box-shadow:0 4px 10px rgba(90,30,18,.3)}
-    .tier.loved{border-color:var(--marigold)}
-    .tier.loved .badge{background:linear-gradient(90deg,var(--saffron),var(--gold))}
-    .tier.max .badge{background:linear-gradient(90deg,#8a1c66,#5A1E12)}
-    .seva-note{max-width:520px;margin:16px auto 0;text-align:center;color:var(--brown);font-size:14px}
+    .tier .amt{font-family:'Fraunces',serif;font-size:27px;font-weight:700;color:var(--ink);display:block;line-height:1.1}
+    .tier .cnt{font-weight:600;color:var(--muted);font-size:14px}
+    .tier .go{flex:0 0 auto;background:var(--grad);color:#fff;font-weight:700;border-radius:999px;
+      min-height:44px;padding:0 16px;display:inline-flex;align-items:center;font-size:14px;white-space:nowrap}
+    .tier .badge{position:absolute;top:-11px;left:16px;font-size:10.5px;font-weight:800;letter-spacing:.07em;
+      text-transform:uppercase;color:#fff;background:var(--grad);padding:4px 11px;border-radius:999px;box-shadow:0 4px 12px rgba(214,0,107,.3)}
+    .tier.loved{border-color:var(--magenta)}
+    .tier.max .badge{background:linear-gradient(135deg,#5a1e9e,#D6006B)}
+    .seva-note{max-width:540px;margin:18px auto 0;text-align:center;color:var(--muted);font-size:14px}
 
-    /* ── How it works ── */
-    .steps{display:grid;gap:14px;max-width:560px;margin:0 auto}
-    .step{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-    .step .n{flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),var(--gold));color:#3a1a00;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif}
+    /* How it works */
+    .steps{display:grid;gap:14px;max-width:580px;margin:0 auto}
+    .step{display:flex;gap:16px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-sm)}
+    .step .n{flex:0 0 auto;width:38px;height:38px;border-radius:50%;background:var(--grad);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif}
     .step h3{font-size:18px;margin-bottom:2px}
-    .step p{color:var(--brown);font-size:15px}
+    .step p{color:var(--muted);font-size:15px}
 
-    /* ── Why gau seva ── */
-    .why{background:linear-gradient(180deg,var(--maroon),var(--deep));color:var(--cream-2)}
-    .why h2{color:var(--marigold)}
-    .why .section-head p{color:var(--cream-2);opacity:.92}
-    .why blockquote{max-width:560px;margin:6px auto 0;font-family:'Fraunces',serif;font-style:italic;font-size:19px;color:#fff;text-align:center;line-height:1.5}
-    .why .shlok{display:block;font-size:16px;color:var(--marigold);margin-bottom:8px;font-style:normal}
+    /* Why */
+    .why{background:var(--grad-soft)}
+    .why blockquote{max-width:580px;margin:6px auto 0;font-family:'Fraunces',serif;font-style:italic;font-size:19px;color:var(--ink);text-align:center;line-height:1.5}
+    .why .shlok{display:block;font-size:18px;color:var(--magenta-d);margin-bottom:8px;font-style:normal;font-weight:600}
 
-    /* ── Trust badges ── */
-    .badges{display:grid;grid-template-columns:1fr;gap:12px;max-width:520px;margin:0 auto}
-    .badge-row{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 15px}
-    .badge-row .ic{font-size:22px;flex:0 0 auto}
-    .badge-row b{color:var(--maroon)}
-    .badge-row span{color:var(--brown);font-size:14px}
+    /* Trust badges */
+    .badges{display:grid;gap:12px;max-width:540px;margin:0 auto}
+    .badge-row{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow-sm)}
+    .badge-row .ic{flex:0 0 auto;width:38px;height:38px;border-radius:50%;background:var(--grad-soft);display:flex;align-items:center;justify-content:center;color:var(--magenta-d)}
+    .badge-row .ic svg{width:20px;height:20px}
+    .badge-row b{color:var(--ink)}
+    .badge-row span{color:var(--muted);font-size:14px}
 
-    /* ── Testimonials ── */
-    .tst{display:grid;gap:14px;max-width:560px;margin:0 auto}
-    .tst .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
-    .tst .stars{color:var(--marigold);font-size:15px;letter-spacing:2px}
+    /* Testimonials */
+    .tst{display:grid;gap:14px;max-width:580px;margin:0 auto}
+    .tst .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow-sm)}
+    .tst .stars{color:var(--gold);font-size:15px;letter-spacing:3px;font-family:Georgia,serif}
     .tst .card p{color:var(--ink);margin:8px 0;font-size:15.5px}
-    .tst .who{color:var(--brown);font-weight:600;font-size:14px}
+    .tst .who{color:var(--muted);font-weight:600;font-size:14px}
 
-    /* ── FAQ ── */
-    .faq{max-width:600px;margin:0 auto}
-    details{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
-    summary{list-style:none;cursor:pointer;padding:15px 16px;font-weight:600;color:var(--maroon);display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:var(--tap)}
+    /* FAQ */
+    .faq{max-width:620px;margin:0 auto}
+    details{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow-sm)}
+    summary{list-style:none;cursor:pointer;padding:16px 18px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:var(--tap)}
     summary::-webkit-details-marker{display:none}
-    summary .chev{transition:transform .2s ease;color:var(--gold);font-size:20px;flex:0 0 auto}
+    summary .chev{transition:transform .2s ease;color:var(--magenta);font-size:22px;flex:0 0 auto;font-family:Georgia,serif}
     details[open] summary .chev{transform:rotate(45deg)}
-    details .a{padding:0 16px 15px;color:var(--brown);font-size:15px}
+    details .a{padding:0 18px 16px;color:var(--muted);font-size:15px}
+    details .a a{font-weight:600}
 
-    /* ── Footer ── */
-    footer{background:var(--deep);color:var(--cream-2);text-align:center;padding:28px 18px 110px}
-    footer a{color:var(--marigold)}
-    footer .small{opacity:.8;font-size:13px;margin-top:10px;line-height:1.7}
+    /* Footer */
+    footer{background:var(--ink);color:#D8CFEC;text-align:center;padding:32px 20px 120px}
+    footer .brand{font-family:'Fraunces',serif;font-size:22px;font-weight:700}
+    footer a{color:var(--violet-l)}
+    footer .small{opacity:.85;font-size:13px;margin-top:10px;line-height:1.9}
 
-    /* ── Sticky mobile contribute bar ── */
-    .sticky-bar{
-      position:fixed;left:0;right:0;bottom:0;z-index:70;
-      background:rgba(255,247,236,.97);backdrop-filter:blur(8px);
-      border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(90,30,18,.12);
-      padding:10px 14px calc(10px + env(safe-area-inset-bottom,0));
-      display:flex;align-items:center;gap:12px;
-    }
-    .sticky-bar .lbl{flex:1 1 auto;min-width:0;line-height:1.2}
-    .sticky-bar .lbl small{display:block;color:var(--brown);font-size:12px;font-weight:600}
-    .sticky-bar .lbl b{font-family:'Fraunces',serif;font-size:20px;color:var(--maroon)}
-    .sticky-bar .btn{flex:0 0 auto}
+    /* Sticky contribute bar */
+    .sticky-bar{position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(255,255,255,.97);
+      backdrop-filter:blur(8px);border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(123,44,191,.12);
+      padding:10px 16px calc(10px + env(safe-area-inset-bottom,0));display:flex;align-items:center;gap:12px}
+    .sticky-bar .lbl{flex:1 1 auto;min-width:0;line-height:1.25}
+    .sticky-bar .lbl small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+    .sticky-bar .lbl b{font-family:'Fraunces',serif;font-size:19px;color:var(--ink)}
+    .sticky-bar .btn{flex:0 0 auto;padding:0 20px}
 
-    .wa-float{position:fixed;right:14px;bottom:88px;z-index:65;width:52px;height:52px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.25);font-size:26px}
+    .wa-float{position:fixed;right:16px;bottom:90px;z-index:65;width:52px;height:52px;border-radius:50%;
+      background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.22)}
+    .wa-float svg{width:28px;height:28px;color:#fff}
 
-    /* larger screens */
     @media(min-width:680px){
-      .hero h1{font-size:42px} .hero h1 .big{font-size:52px}
-      .section-head h2{font-size:32px}
-      .badges{grid-template-columns:1fr}
+      .hero h1{font-size:46px}
+      .section-head h2{font-size:33px}
     }
     @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
   </style>
 </head>
 <body>
 
-  <!-- ══════════ STICKY DEADLINE BANNER ══════════ -->
-  <div class="deadline">🪔 Seva bookings closing soon — <b>last day 31 October 2026</b></div>
+  <!-- Reusable SVG icons (no emojis) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="cowGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#7B2CBF"/><stop offset="1" stop-color="#FF007F"/>
+      </linearGradient>
+      <symbol id="cow" viewBox="0 0 24 24">
+        <g fill="url(#cowGrad)">
+          <path d="M4.4 5.6c1.7-.6 3.1.5 3.7 1.9-1.1.2-2.1.6-2.9 1.2-.8-.9-1.2-2.1-.8-3.1z"/>
+          <path d="M19.6 5.6c-1.7-.6-3.1.5-3.7 1.9 1.1.2 2.1.6 2.9 1.2.8-.9 1.2-2.1.8-3.1z"/>
+          <path d="M12 6.3c4.1 0 7.3 2.5 7.3 6.2 0 3.9-3.3 6.9-7.3 6.9s-7.3-3-7.3-6.9C4.7 8.8 7.9 6.3 12 6.3z"/>
+        </g>
+        <ellipse cx="12" cy="14.7" rx="4.3" ry="3" fill="#fff" opacity=".92"/>
+        <circle cx="9.4" cy="11" r="1" fill="#fff"/><circle cx="14.6" cy="11" r="1" fill="#fff"/>
+        <circle cx="10.4" cy="15" r=".7" fill="url(#cowGrad)"/><circle cx="13.6" cy="15" r=".7" fill="url(#cowGrad)"/>
+      </symbol>
+      <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.4-3 8.3-7 9-4-.7-7-4.6-7-9V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="lotus" viewBox="0 0 24 24"><path d="M12 4c1.6 1.7 2.4 3.6 2.4 5.6 0 1-.2 1.9-.6 2.8-.4-.9-.9-1.7-1.8-2.6-.9.9-1.4 1.7-1.8 2.6-.4-.9-.6-1.8-.6-2.8C9.6 7.6 10.4 5.7 12 4z" fill="currentColor"/><path d="M4 11c2.3.2 4 1 5.3 2.3.6.6 1 1.2 1.4 1.9-1 .2-2 .2-3 0C5.9 14.7 4.6 13.2 4 11zm16 0c-.6 2.2-1.9 3.7-3.7 4.2-1 .2-2 .2-3 0 .4-.7.8-1.3 1.4-1.9C16 12 17.7 11.2 20 11z" fill="currentColor" opacity=".8"/><path d="M12 20c-3.4 0-6.2-1.8-7.4-4.4 2.3-.6 4.6-.3 6.3.9.4.3.8.6 1.1 1 .3-.4.7-.7 1.1-1 1.7-1.2 4-1.5 6.3-.9C18.2 18.2 15.4 20 12 20z" fill="currentColor"/></symbol>
+      <symbol id="wa" viewBox="0 0 24 24"><path fill="currentColor" d="M19.05 4.91A9.82 9.82 0 0 0 12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21h.004c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01zM12.04 20.15a8.23 8.23 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.24-8.24 8.24zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48a.92.92 0 0 0-.66.31c-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29z"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ══════════ BANNER ══════════ -->
+  <div class="banner">Bookings closing soon</div>
 
   <!-- ══════════ HERO ══════════ -->
   <header class="hero">
     <div class="wrap">
-      <div class="om">ॐ गौ माता की जय</div>
-      <div class="eyebrow">Ritham · Gau Seva</div>
-      <h1>Serve <span class="grad-text">Gau Mata</span><span class="big">Earn a lifetime of blessings</span></h1>
-      <p class="lede">Your contribution feeds and cares for cows in your name — a timeless punya (meritorious) act. And you receive a <b>real proof video</b> of your seva being performed, delivered within 7 days.</p>
-      <a class="btn btn-grad" href="#seva">Choose your Seva 🐄</a>
-
-      <!-- REPLACE img/gau-hero.jpg — a warm, sincere photo of cows / gau seva (feeding gau mata).
-           Kept eager (no lazy) as it's the hero above the fold. Provide a ~16:10 image, optimised WebP/JPG. -->
-      <div class="hero-media">
-        <img src="img/gau-hero.jpg" alt="Devotee feeding fodder to cows — Gau Seva" width="520" height="325" />
+      <div class="kicker">
+        <span class="eyebrow">Ritham · Gau Seva</span>
+        <span class="deva">गौ माता की जय</span>
       </div>
-      <div class="cow-strip" aria-hidden="true">🐄🐄🐄🐄🐄</div>
+      <h1>Serve Gau Mata,<span class="big">earn a lifetime of blessings</span></h1>
+      <p class="lede">Book a Gau Seva and cows (gau mata) are fed and cared for in your name — a timeless punya (meritorious) act. You receive a real video of your seva, delivered within 7 days.</p>
+      <a class="btn btn-grad" href="#seva">Choose your Seva</a>
+
+      <!-- REPLACE img/gau-hero.jpg — a warm, sincere photo of gau seva. ~16:9, optimised WebP/JPG. Eager (above the fold). -->
+      <div class="hero-media">
+        <img src="img/gau-hero.jpg" alt="Cows being fed and cared for — Gau Seva" width="560" height="315" />
+      </div>
     </div>
   </header>
 
@@ -233,68 +241,47 @@
   <section id="seva">
     <div class="wrap">
       <div class="section-head">
-        <div class="eyebrow">Choose your contribution</div>
-        <h2>Every rupee is a Seva for Gau Mata</h2>
-        <p>The more you give, the more cows your seva serves. Tap a card to contribute — you go straight to a secure UPI / card payment.</p>
+        <div class="eyebrow">Choose your seva</div>
+        <h2>Every seva feeds Gau Mata</h2>
+        <p>The more you offer, the more cows your seva serves. Tap a seva to book it — you go straight to a secure UPI / card payment.</p>
       </div>
 
       <div class="tiers" id="tiers">
-        <!-- data-amt drives the sticky bar + pixel value; data-link is the hosted payment URL -->
-        <div class="tier" data-amt="11" data-count="1" data-link="PAYMENT_LINK_11" tabindex="0" role="button" aria-label="Contribute 11 rupees for 1 Seva">
-          <div class="cows" aria-hidden="true">🐄</div>
+        <!-- data-amt drives the sticky bar + pixel value; data-count draws the cows; data-link is the hosted payment URL -->
+        <div class="tier" data-amt="11" data-count="1" data-link="PAYMENT_LINK_11" tabindex="0" role="button" aria-label="Book 11 rupee seva, 1 Seva">
+          <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹11</span><span class="cnt">1 Seva</span></div>
-          <span class="go">Donate →</span>
+          <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier" data-amt="51" data-count="5" data-link="PAYMENT_LINK_51" tabindex="0" role="button" aria-label="Contribute 51 rupees for 5 Seva">
-          <div class="cows" aria-hidden="true">🐄🐄🐄🐄🐄</div>
+        <div class="tier" data-amt="51" data-count="5" data-link="PAYMENT_LINK_51" tabindex="0" role="button" aria-label="Book 51 rupee seva, 5 Seva">
+          <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹51</span><span class="cnt">5 Seva</span></div>
-          <span class="go">Donate →</span>
+          <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier loved" data-amt="101" data-count="11" data-link="PAYMENT_LINK_101" tabindex="0" role="button" aria-label="Contribute 101 rupees for 11 Seva, most loved">
-          <span class="badge">❤ Most Loved</span>
-          <div class="cows" aria-hidden="true">🐄🐄🐄🐄🐄🐄🐄🐄🐄🐄🐄</div>
+        <div class="tier loved" data-amt="101" data-count="11" data-link="PAYMENT_LINK_101" tabindex="0" role="button" aria-label="Book 101 rupee seva, 11 Seva, most loved">
+          <span class="badge">Most Loved</span>
+          <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹101</span><span class="cnt">11 Seva</span></div>
-          <span class="go">Donate →</span>
+          <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier" data-amt="251" data-count="31" data-link="PAYMENT_LINK_251" tabindex="0" role="button" aria-label="Contribute 251 rupees for 31 Seva">
-          <div class="cows" aria-hidden="true">🐄🐄🐄🐄🐄🐄🐄🐄🐄🐄 ×31</div>
+        <div class="tier" data-amt="251" data-count="31" data-link="PAYMENT_LINK_251" tabindex="0" role="button" aria-label="Book 251 rupee seva, 31 Seva">
+          <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹251</span><span class="cnt">31 Seva</span></div>
-          <span class="go">Donate →</span>
+          <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier max" data-amt="501" data-count="51" data-link="PAYMENT_LINK_501" tabindex="0" role="button" aria-label="Contribute 501 rupees for 51 Seva, maximum blessing">
-          <span class="badge">✦ Maximum Blessing</span>
-          <div class="cows" aria-hidden="true">🐄🐄🐄🐄🐄🐄🐄🐄🐄🐄 ×51</div>
+        <div class="tier max" data-amt="501" data-count="51" data-link="PAYMENT_LINK_501" tabindex="0" role="button" aria-label="Book 501 rupee seva, 51 Seva, maximum blessing">
+          <span class="badge">Maximum Blessing</span>
+          <div class="cows" aria-hidden="true"></div>
           <div class="info"><span class="amt">₹501</span><span class="cnt">51 Seva</span></div>
-          <span class="go">Donate →</span>
+          <span class="go">Book Seva</span>
         </div>
       </div>
 
-      <p class="seva-note">🎥 Every contributor receives a <b>real video of the seva</b> performed in their name, on WhatsApp — <b>within 7 days</b>. Prepaid only (UPI / card) via a secure payment page.</p>
-    </div>
-  </section>
-
-  <!-- ══════════ PROOF VIDEO ══════════ -->
-  <section class="center">
-    <div class="wrap">
-      <div class="section-head">
-        <div class="eyebrow">Proof, not promises</div>
-        <h2>See the seva with your own eyes</h2>
-        <p>This isn't a donation that disappears into a box. Every contributor gets a genuine video of gau mata being fed and cared for — sent to you within 7 days.</p>
-      </div>
-
-      <!-- REPLACE gau-seva-proof.mp4 with a real proof video.
-           poster is lazy-friendly: small image loads first, video only fetched on play. -->
-      <div class="proof-video">
-        <video controls preload="none" poster="img/video-poster.jpg" playsinline>
-          <source src="gau-seva-proof.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      </div>
-      <div class="proof-tag">🎥 Sample proof video · yours arrives within 7 days</div>
+      <p class="seva-note">With every seva you book, you receive a real video of the seva performed in your name, on WhatsApp — <b>within 7 days</b>. Prepaid only (UPI / card) via a secure payment page.</p>
     </div>
   </section>
 
@@ -306,10 +293,10 @@
         <h2>From your seva to blessings</h2>
       </div>
       <div class="steps">
-        <div class="step"><div class="n">1</div><div><h3>You choose your Seva</h3><p>Pick a contribution that feels right for you. A secure UPI / card payment — that's the only step you take.</p></div></div>
-        <div class="step"><div class="n">2</div><div><h3>The Seva is performed</h3><p>Cows (gau mata) are fed and cared for on your behalf, your seva counted in your name.</p></div></div>
-        <div class="step"><div class="n">3</div><div><h3>You receive a proof video</h3><p>A real video of the seva being performed reaches you on WhatsApp within 7 days — evidence it was truly done.</p></div></div>
-        <div class="step"><div class="n">4</div><div><h3>Blessings & gratitude</h3><p>Receive the blessings of gau mata and a heartfelt thank-you. The punya is yours to keep.</p></div></div>
+        <div class="step"><div class="n">1</div><div><h3>You choose your seva</h3><p>Pick the seva that feels right. A secure UPI / card payment — that's the only step you take.</p></div></div>
+        <div class="step"><div class="n">2</div><div><h3>The seva is performed</h3><p>Cows (gau mata) are fed and cared for in your name, your seva counted.</p></div></div>
+        <div class="step"><div class="n">3</div><div><h3>You receive a video</h3><p>A real video of your seva reaches you on WhatsApp within 7 days — so you see it was truly done.</p></div></div>
+        <div class="step"><div class="n">4</div><div><h3>Blessings &amp; gratitude</h3><p>Receive the blessings of gau mata and a heartfelt thank-you. The punya is yours.</p></div></div>
       </div>
     </div>
   </section>
@@ -318,12 +305,12 @@
   <section class="why">
     <div class="wrap">
       <div class="section-head">
-        <div class="eyebrow" style="color:var(--marigold)">Why Gau Seva</div>
+        <div class="eyebrow">Why Gau Seva</div>
         <h2>The cow is a mother to all</h2>
-        <p>In the Sanatan tradition, the cow — Gau Mata — is revered as a giver of nourishment and life. To feed and protect a cow is among the gentlest and most cherished acts of seva. It asks nothing of you but a little kindness, and it returns blessings that stay with your family.</p>
+        <p>In the Sanatan tradition, the cow — Gau Mata — is revered as a giver of nourishment and life. To feed and protect a cow is among the gentlest and most cherished acts of seva — it asks only a little kindness, and returns blessings that stay with your family.</p>
       </div>
       <blockquote>
-        <span class="shlok">गावो विश्वस्य मातरः</span>
+        <span class="shlok deva">गावो विश्वस्य मातरः</span>
         “The cows are the mothers of the universe.” To serve them is to serve every home they nourish.
       </blockquote>
     </div>
@@ -334,9 +321,9 @@
     <div class="wrap">
       <div class="section-head"><div class="eyebrow">Why you can trust this</div><h2>Sincere seva, honestly done</h2></div>
       <div class="badges">
-        <div class="badge-row"><span class="ic">🎥</span><div><b>A real proof video</b> <span>— every contributor receives genuine video evidence of their seva, within 7 days.</span></div></div>
-        <div class="badge-row"><span class="ic">🔒</span><div><b>Secure UPI / card payment</b> <span>— prepaid through a trusted hosted payment page. No cash, no hidden charges.</span></div></div>
-        <div class="badge-row"><span class="ic">🙏</span><div><b>Blessings, guaranteed</b> <span>— your seva is performed in your name as a punya act for gau mata.</span></div></div>
+        <div class="badge-row"><span class="ic"><svg><use href="#check"/></svg></span><div><b>A real video of your seva</b> <span>— every seva includes genuine video evidence, delivered within 7 days.</span></div></div>
+        <div class="badge-row"><span class="ic"><svg><use href="#shield"/></svg></span><div><b>Secure UPI / card payment</b> <span>— prepaid through a trusted payment page. No cash, no hidden charges.</span></div></div>
+        <div class="badge-row"><span class="ic"><svg><use href="#lotus"/></svg></span><div><b>Performed with devotion</b> <span>— your seva is carried out in your name as a sacred punya act for gau mata.</span></div></div>
       </div>
     </div>
   </section>
@@ -344,14 +331,14 @@
   <!-- ══════════ TESTIMONIALS (PLACEHOLDERS — replace with real ones) ══════════ -->
   <section>
     <div class="wrap">
-      <div class="section-head"><div class="eyebrow">From devotees</div><h2>Contributors who felt the blessing</h2></div>
+      <div class="section-head"><div class="eyebrow">From devotees</div><h2>Those who felt the blessing</h2></div>
       <div class="tst">
-        <!-- PLACEHOLDER TESTIMONIAL 1 — replace with a real contributor quote & name -->
-        <div class="card"><div class="stars">★★★★★</div><p>“I gave a small seva for my mother's health and truly received the video in a few days. It brought tears to my eyes to see gau mata being fed in our name.”</p><div class="who">— [Placeholder Name], [City]</div></div>
+        <!-- PLACEHOLDER TESTIMONIAL 1 — replace with a real quote & name -->
+        <div class="card"><div class="stars">★★★★★</div><p>“I booked a small seva for my mother's health and truly received the video in a few days. It brought tears to my eyes to see gau mata being fed in our name.”</p><div class="who">— [Placeholder Name], [City]</div></div>
         <!-- PLACEHOLDER TESTIMONIAL 2 -->
-        <div class="card"><div class="stars">★★★★★</div><p>“Simple, honest and heartfelt. The proof video made me trust it completely. Will do this every month for my family.”</p><div class="who">— [Placeholder Name], [City]</div></div>
+        <div class="card"><div class="stars">★★★★★</div><p>“Simple, honest and heartfelt. The video made me trust it completely. I'll book a seva every month for my family.”</p><div class="who">— [Placeholder Name], [City]</div></div>
         <!-- PLACEHOLDER TESTIMONIAL 3 -->
-        <div class="card"><div class="stars">★★★★★</div><p>“Doing gau seva was always my wish. Ritham made it so easy from my phone, and I actually saw where my contribution went.”</p><div class="who">— [Placeholder Name], [City]</div></div>
+        <div class="card"><div class="stars">★★★★★</div><p>“Doing gau seva was always my wish. Ritham made it so easy from my phone, and I actually saw the seva that was done.”</p><div class="who">— [Placeholder Name], [City]</div></div>
       </div>
     </div>
   </section>
@@ -361,11 +348,12 @@
     <div class="wrap">
       <div class="section-head"><div class="eyebrow">Questions</div><h2>Frequently asked</h2></div>
       <div class="faq">
-        <details><summary>Will I really get a video? <span class="chev">+</span></summary><div class="a">Yes. Every contributor receives a genuine video of the seva performed in their name, sent on WhatsApp within 7 days of your contribution. This is the heart of Gau Seva — proof, not just a promise.</div></details>
-        <details><summary>How is the seva done? <span class="chev">+</span></summary><div class="a">Your contribution goes toward feeding and caring for cows (gau mata) — fodder, nourishment and upkeep. Larger contributions support more seva, more cows served.</div></details>
-        <details><summary>When is the seva performed? <span class="chev">+</span></summary><div class="a">Seva is performed after your contribution, and your proof video reaches you within 7 days. Bookings for this round close on 31 October 2026.</div></details>
-        <details><summary>Where do the cows live and who cares for them? <span class="chev">+</span></summary><div class="a">The cows are cared for at a goshala (cow shelter) by people devoted to their wellbeing. Your proof video shows the very seva your contribution supported. For any specific question, message us on WhatsApp.</div></details>
-        <details><summary>Is my payment secure? <span class="chev">+</span></summary><div class="a">Yes — payment is prepaid via a secure hosted UPI / card page. We never see or store your card details. No cash-on-delivery.</div></details>
+        <details><summary>Will I really get a video? <span class="chev">+</span></summary><div class="a">Yes. Every seva includes a genuine video of the seva performed in your name, sent on WhatsApp within 7 days of booking.</div></details>
+        <details><summary>How is the seva done? <span class="chev">+</span></summary><div class="a">Your payment funds the feeding and care of cows (gau mata) — fodder, nourishment and upkeep. A larger seva supports more cows.</div></details>
+        <details><summary>When is the seva performed? <span class="chev">+</span></summary><div class="a">The seva is performed after you book, and your video reaches you within 7 days. Bookings for this round are closing soon.</div></details>
+        <details><summary>Where do the cows live and who cares for them? <span class="chev">+</span></summary><div class="a">The cows are cared for at a goshala (cow shelter) by people devoted to their wellbeing. Your video shows the very seva your booking supported. For anything specific, message us on WhatsApp.</div></details>
+        <details><summary>Is this a donation? <span class="chev">+</span></summary><div class="a">No. Gau Seva is a <b>paid seva service</b>: you book a seva, it is performed on your behalf, and you receive a video as proof. It is not a charitable donation and carries no tax-exemption (80G) benefit. See our <a href="terms.html">Gau Seva Terms</a>.</div></details>
+        <details><summary>Is my payment secure? <span class="chev">+</span></summary><div class="a">Yes — payment is prepaid via a secure hosted UPI / card page. We never see or store your card details. No cash on delivery.</div></details>
       </div>
     </div>
   </section>
@@ -373,85 +361,77 @@
   <!-- ══════════ FINAL CTA ══════════ -->
   <section class="center">
     <div class="wrap">
-      <div class="section-head"><div class="eyebrow">🪔 Bookings close 31 October 2026</div><h2>Offer your Seva to Gau Mata today</h2><p>A small kindness, a lasting blessing — and a real video to hold it close.</p></div>
-      <a class="btn btn-grad" href="#seva">Choose your Seva 🐄</a>
+      <div class="section-head"><div class="eyebrow">Bookings closing soon</div><h2>Offer your Seva to Gau Mata today</h2><p>A sacred seva, a lasting blessing — and a real video to hold it close.</p></div>
+      <a class="btn btn-grad" href="#seva">Choose your Seva</a>
       <div style="margin-top:14px">
         <!-- REPLACE WHATSAPP_NUMBER with the full international number, digits only, e.g. 919876543210 -->
-        <a class="btn btn-ghost" href="https://wa.me/WHATSAPP_NUMBER?text=Namaste%2C%20I%20have%20a%20question%20about%20Gau%20Seva" target="_blank" rel="noopener">💬 Ask us on WhatsApp</a>
+        <a class="btn btn-ghost" href="https://wa.me/WHATSAPP_NUMBER?text=Namaste%2C%20I%20have%20a%20question%20about%20Gau%20Seva" target="_blank" rel="noopener"><svg><use href="#wa"/></svg> Ask us on WhatsApp</a>
       </div>
     </div>
   </section>
 
   <footer>
-    <div class="grad-text" style="font-family:'Fraunces',serif;font-size:22px;font-weight:700">Ritham · Gau Seva</div>
+    <div class="brand grad-text">Ritham · Gau Seva</div>
     <p class="small">
-      Serve gau mata, receive a real proof video within 7 days.<br/>
+      A paid seva service — your seva performed in your name, with a real video within 7 days.<br/>
       Questions? <a href="https://wa.me/WHATSAPP_NUMBER" target="_blank" rel="noopener">Message us on WhatsApp</a><br/>
-      <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a> · <a href="../refund.html">Refund &amp; Cancellation</a> · <a href="../index.html">Ritham home</a>
+      <a href="terms.html">Gau Seva Terms</a> · <a href="../privacy.html">Privacy</a> · <a href="../refund.html">Refund &amp; Cancellation</a> · <a href="../index.html">Ritham home</a>
     </p>
   </footer>
 
   <!-- ══════════ FLOATING WHATSAPP ══════════ -->
-  <a class="wa-float" href="https://wa.me/WHATSAPP_NUMBER?text=Namaste%2C%20I%20have%20a%20question%20about%20Gau%20Seva" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">💬</a>
+  <a class="wa-float" href="https://wa.me/WHATSAPP_NUMBER?text=Namaste%2C%20I%20have%20a%20question%20about%20Gau%20Seva" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg><use href="#wa"/></svg></a>
 
   <!-- ══════════ STICKY CONTRIBUTE BAR ══════════ -->
   <div class="sticky-bar">
     <div class="lbl"><small id="sb-sub">Selected seva</small><b id="sb-amt">₹101 · 11 Seva</b></div>
-    <a class="btn btn-grad" id="sb-go" href="PAYMENT_LINK_101">Contribute →</a>
+    <a class="btn btn-grad" id="sb-go" href="PAYMENT_LINK_101">Book Seva</a>
   </div>
 
   <!-- ══════════ MINIMAL VANILLA JS ══════════ -->
   <script>
   (function(){
+    var CAP = 11; // max cow icons drawn before we show a "×N" multiplier
     var tiers = document.querySelectorAll('.tier');
     var sbAmt = document.getElementById('sb-amt');
     var sbGo  = document.getElementById('sb-go');
     var selected = null;
 
-    // Fire Meta Pixel InitiateCheckout with the tier amount as value,
-    // so Ads Manager shows which tier converts. (Purchase must fire on
-    // the Razorpay thank-you page — see the head comment.)
-    function fireIC(amt){
-      if (window.fbq) {
-        try { fbq('track','InitiateCheckout',{value:Number(amt),currency:'INR'}); } catch(e){}
-      }
+    // Draw the cow "value ladder" (SVG, no emojis).
+    function drawCows(el, count){
+      var n = Math.min(count, CAP), html = '';
+      for (var i=0;i<n;i++) html += '<svg><use href="#cow"/></svg>';
+      if (count > CAP) html += '<span class="mult">×'+count+'</span>';
+      el.innerHTML = html;
     }
 
+    function fireIC(amt){
+      if (window.fbq){ try{ fbq('track','InitiateCheckout',{value:Number(amt),currency:'INR'}); }catch(e){} }
+    }
     function select(t){
       if (selected) selected.classList.remove('sel');
       selected = t; t.classList.add('sel');
-      var amt = t.getAttribute('data-amt');
-      var cnt = t.getAttribute('data-count');
-      sbAmt.textContent = '₹' + amt + ' · ' + cnt + ' Seva';
+      sbAmt.textContent = '₹' + t.getAttribute('data-amt') + ' · ' + t.getAttribute('data-count') + ' Seva';
       sbGo.setAttribute('href', t.getAttribute('data-link'));
     }
 
     tiers.forEach(function(t){
+      drawCows(t.querySelector('.cows'), Number(t.getAttribute('data-count')));
       var link = t.getAttribute('data-link');
       var amt  = t.getAttribute('data-amt');
-
-      // Tapping the "Donate" button goes STRAIGHT to payment (minimal friction).
-      var go = t.querySelector('.go');
-      go.addEventListener('click', function(e){
-        e.stopPropagation();
-        fireIC(amt);
-        window.location.href = link;
+      // "Book Seva" goes straight to payment (minimal friction).
+      t.querySelector('.go').addEventListener('click', function(e){
+        e.stopPropagation(); fireIC(amt); window.location.href = link;
       });
-
-      // Tapping anywhere else on the card selects it (updates sticky bar).
+      // Tapping elsewhere selects the tier (updates the sticky bar).
       t.addEventListener('click', function(){ select(t); });
       t.addEventListener('keydown', function(e){
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(t); }
+        if (e.key==='Enter' || e.key===' '){ e.preventDefault(); select(t); }
       });
     });
 
-    // Sticky-bar Contribute button fires the pixel for the selected tier.
-    sbGo.addEventListener('click', function(){
-      var amt = selected ? selected.getAttribute('data-amt') : '101';
-      fireIC(amt);
-    });
+    sbGo.addEventListener('click', function(){ fireIC(selected ? selected.getAttribute('data-amt') : '101'); });
 
-    // Default the sticky bar to the "Most Loved" ₹101 tier.
     var def = document.querySelector('.tier.loved');
     if (def) select(def);
   })();
