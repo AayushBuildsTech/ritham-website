@@ -47,6 +47,11 @@
     .filters{display:flex;gap:6px;flex-wrap:wrap}
     .chip{border:1.5px solid var(--line);background:#fff;color:var(--brown);border-radius:999px;padding:7px 13px;font-size:13.5px;cursor:pointer;font-weight:600}
     .chip.on{background:var(--maroon);color:#fff;border-color:var(--maroon)}
+    .chip.send{border-color:var(--magenta);color:var(--magenta-d)}
+    .chip.send.on{background:var(--magenta);border-color:var(--magenta);color:#fff}
+    .chip .cnt{display:inline-block;margin-left:6px;background:var(--magenta);color:#fff;border-radius:999px;padding:0 6px;font-size:11px;font-weight:800;min-width:18px;text-align:center}
+    .chip.on .cnt{background:#fff;color:var(--maroon)}
+    .chip.send.on .cnt{background:#fff;color:var(--magenta-d)}
 
     .cards{display:grid;gap:12px}
     .bk{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 6px 16px rgba(90,30,18,.06)}
@@ -166,12 +171,15 @@
     function inr(n){ return '₹'+Number(n||0).toLocaleString('en-IN'); }
     function fmtDate(iso){ var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
     function waDigits(p){ return String(p||'').replace(/\D/g,''); }
+    // Proof video is included only from the Rs 101 seva upward; Rs 11 / Rs 51 are
+    // pure seva with no video, so they never need a video sent.
+    function getsVideo(b){ return Number(b.amount_inr) >= 101; }
     // Proof video is promised within 7 days of the seva (see welcome message).
-    // For a paid booking whose video isn't sent yet, compute the delivery
-    // deadline (created_at + 7 days) and how many whole calendar days are left.
+    // For a paid, video-eligible booking whose video isn't sent yet, compute the
+    // delivery deadline (created_at + 7 days) and how many whole calendar days left.
     var VIDEO_DAYS = 7;
     function videoDue(b){
-      if(b.status!=='Payment Successful' || !b.created_at) return null;
+      if(b.status!=='Payment Successful' || !b.created_at || !getsVideo(b)) return null;
       var due = new Date(new Date(b.created_at).getTime() + VIDEO_DAYS*86400000);
       var now = new Date();
       var d1 = new Date(now.getFullYear(),now.getMonth(),now.getDate());
@@ -191,6 +199,15 @@
       var sevaHi = (b.seva_count!=null) ? (b.seva_count + ' सेवा') : 'सेवा';
       var date = b.created_at ? new Date(b.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
       var code = b.booking_code || '';
+      // Proof video is included only from the Rs 101 seva upward; the Rs 11 / Rs 51
+      // tiers are pure seva in the devotee's name with no video.
+      var hasVideo = getsVideo(b);
+      var enBody = hasVideo
+        ? 'On your behalf, green fodder will be lovingly offered to the cows (Gau Mata) at the goshala. The proof video of your seva will be sent to this WhatsApp number within 7 days.'
+        : 'On your behalf, green fodder will be lovingly offered to the cows (Gau Mata) at the goshala. This is a pure seva in your name; a proof video is not sent for this seva.';
+      var hiBody = hasVideo
+        ? 'आपकी ओर से गौशाला में गौ माता को हरा चारा अर्पित किया जाएगा। आपकी सेवा का वीडियो सेवा पूर्ण होने के 7 दिन बाद इसी WhatsApp नंबर पर भेजा जाएगा।'
+        : 'आपकी ओर से गौशाला में गौ माता को हरा चारा अर्पित किया जाएगा। यह आपके नाम से की गई शुद्ध सेवा है; इस सेवा के लिए वीडियो नहीं भेजा जाता।';
       return [
         'Har Har Mahadev','',
         'Namaste '+name+' ji,','',
@@ -200,7 +217,7 @@
         'Gau Seva - '+seva,
         'Booking ID: '+code,
         'Date: '+date,'',
-        'On your behalf, green fodder will be lovingly offered to the cows (Gau Mata) at the goshala. The proof video of your seva will be sent to this WhatsApp number within 7 days.','',
+        enBody,'',
         "May Gau Mata's blessings bring health, prosperity and peace to you and your family.",'',
         "For any questions, just message here - we're at your service.",'',
         '--------------------','',
@@ -212,7 +229,7 @@
         'गौ सेवा - '+sevaHi,
         'बुकिंग आईडी: '+code,
         'तिथि: '+date,'',
-        'आपकी ओर से गौशाला में गौ माता को हरा चारा अर्पित किया जाएगा। आपकी सेवा का वीडियो सेवा पूर्ण होने के 7 दिन बाद इसी WhatsApp नंबर पर भेजा जाएगा।','',
+        hiBody,'',
         'गौ माता का आशीर्वाद आप और आपके परिवार को स्वास्थ्य, समृद्धि और शांति प्रदान करे।','',
         'किसी भी प्रश्न के लिए यहाँ संदेश करें - हम आपकी सेवा में हैं।','',
         '- Team Ritham | टीम Ritham'
@@ -272,9 +289,15 @@
     }
     $('#refresh').addEventListener('click', load);
 
+    function toSendCount(){ return state.rows.filter(function(b){ return videoDue(b); }).length; }
     function buildFilters(){
-      var f = $('#filters'); var items = [{id:'all',label:'All'}].concat(STATUSES.map(function(s){return {id:s,label:s};}));
-      f.innerHTML = items.map(function(it){ return '<span class="chip'+(state.filter===it.id?' on':'')+'" data-f="'+esc(it.id)+'">'+esc(it.label)+'</span>'; }).join('');
+      var f = $('#filters');
+      var items = [{id:'all',label:'All'},{id:'to_send',label:'Videos to send',send:true,count:toSendCount()}]
+        .concat(STATUSES.map(function(s){return {id:s,label:s};}));
+      f.innerHTML = items.map(function(it){
+        var badge = it.send ? ' <span class="cnt">'+it.count+'</span>' : '';
+        return '<span class="chip'+(it.send?' send':'')+(state.filter===it.id?' on':'')+'" data-f="'+esc(it.id)+'">'+esc(it.label)+badge+'</span>';
+      }).join('');
       Array.prototype.forEach.call(f.querySelectorAll('.chip'), function(c){
         c.addEventListener('click', function(){ state.filter = c.getAttribute('data-f'); buildFilters(); render(); });
       });
@@ -283,7 +306,8 @@
 
     function filtered(){
       return state.rows.filter(function(b){
-        if(state.filter!=='all' && b.status!==state.filter) return false;
+        if(state.filter==='to_send'){ if(!videoDue(b)) return false; }
+        else if(state.filter!=='all' && b.status!==state.filter) return false;
         if(state.search){
           var hay = [b.name,b.whatsapp,b.email,b.razorpay_payment_id,b.booking_code].join(' ').toLowerCase();
           if(hay.indexOf(state.search)<0) return false;
@@ -307,12 +331,15 @@
       sDue.textContent = dueRows.length;
       sDue.style.color = overdue>0 ? '#b3261e' : '';
       sDue.nextElementSibling.textContent = overdue>0 ? ('Videos to send · '+overdue+' overdue') : 'Videos to send';
+      // keep the "Videos to send" filter chip count in sync with the data
+      var sendCnt = document.querySelector('#filters .chip[data-f="to_send"] .cnt');
+      if(sendCnt) sendCnt.textContent = dueRows.length;
 
       var wrap = $('#cards'); $('#empty').classList.toggle('hidden', rows.length>0);
       wrap.innerHTML = rows.map(function(b){
         var wd = waDigits(b.whatsapp);
         var wa = wd ? 'WhatsApp: <a href="https://wa.me/'+wd+'" target="_blank" rel="noopener">'+esc(b.whatsapp)+'</a>' : '<span>'+esc(b.whatsapp||'—')+'</span>';
-        var next = b.status==='Payment Successful' ? 'Video Sent' : null;
+        var next = (b.status==='Payment Successful' && getsVideo(b)) ? 'Video Sent' : null;
         var due = videoDue(b);
         return '<div class="bk">'+
           '<div class="r1">'+
@@ -327,7 +354,8 @@
             '<div style="text-align:right"><div class="amt">'+inr(b.amount_inr)+'</div>'+
               '<div style="color:var(--brown);font-size:13px">'+(b.seva_count!=null?b.seva_count+' Seva':'custom')+'</div>'+
               '<div style="margin-top:6px"><span class="pill '+pillClass(b.status)+'">'+esc(b.status)+'</span></div>'+
-              (due?'<div><span class="due '+due.cls+'">'+esc(due.label)+'</span></div>':'')+
+              (due?'<div><span class="due '+due.cls+'">'+esc(due.label)+'</span></div>':
+                (PAID.indexOf(b.status)>=0 && !getsVideo(b)?'<div><span class="due" style="background:#efeaf7;color:#7a728f">Seva only · no video</span></div>':''))+
             '</div>'+
           '</div>'+
           '<div class="meta" style="margin-top:8px;font-size:12px;opacity:.8"><span>'+esc(b.razorpay_payment_id)+'</span></div>'+

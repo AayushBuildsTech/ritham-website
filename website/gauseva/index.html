@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gau Seva · Feed & Serve Gau Mata · Ritham</title>
-  <meta name="description" content="Book a Gau Seva — cows (Gau Mata) are fed and cared for in your name, and you receive a real video of the seva within 7 days. A sacred punya act. A paid seva service, not a donation." />
+  <meta name="description" content="Book a Gau Seva — cows (Gau Mata) are fed and cared for in your name. From the ₹101 seva upward you receive a real proof video within 7 days (₹11 and ₹51 are pure seva, no video). A sacred punya act. A paid seva service, not a donation." />
   <link rel="icon" href="../favicon.png" />
 
   <!-- Open Graph (for Facebook / Instagram / WhatsApp shares) -->
   <meta property="og:title" content="Gau Seva · Serve Gau Mata · Ritham" />
-  <meta property="og:description" content="Book a seva for cows in your name. Receive a real video within 7 days. A sacred punya act." />
+  <meta property="og:description" content="Book a seva for cows in your name. From the ₹101 seva upward, receive a real proof video within 7 days (₹11 & ₹51 are pure seva, no video). A sacred punya act." />
   <meta property="og:type" content="website" />
   <!-- REPLACE with the absolute URL of the OG share image once hosted -->
   <meta property="og:image" content="img/gau-hero.webp" />
@@ -122,7 +122,15 @@
       text-transform:uppercase;color:#fff;background:var(--grad);padding:4px 11px;border-radius:999px;box-shadow:0 4px 12px rgba(214,0,107,.3)}
     .tier.loved{border-color:var(--magenta)}
     .tier.max .badge{background:linear-gradient(135deg,#5a1e9e,#D6006B)}
+    .tier .tag{display:inline-block;margin-top:5px;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;letter-spacing:.02em}
+    .tier .tag.novid{background:#FDE7E7;color:#B3261E}
+    .tier .tag.vid{background:#E4F3EA;color:#177a4e}
     .seva-note{max-width:540px;margin:18px auto 0;text-align:center;color:var(--muted);font-size:14px}
+    /* Red notice — video only from the ₹101 tier upward */
+    .notice-red{max-width:540px;margin:0 auto 20px;background:#FFF3F3;border:1.5px solid #E5484D;
+      border-left-width:5px;border-radius:14px;padding:14px 16px;color:#7d1a1d;font-size:14.5px;line-height:1.55;
+      box-shadow:0 4px 14px rgba(229,72,77,.10)}
+    .notice-red b{color:#B3261E}
 
     /* How it works */
     .steps{display:grid;gap:14px;max-width:580px;margin:0 auto}
@@ -242,7 +250,7 @@
         <span class="deva">गौ माता की जय</span>
       </div>
       <h1>Serve Gau Mata,<span class="big">earn a lifetime of blessings</span></h1>
-      <p class="lede">Book a Gau Seva and cows (gau mata) are fed and cared for in your name — a timeless punya (meritorious) act. You receive a real video of your seva, delivered within 7 days.</p>
+      <p class="lede">Book a Gau Seva and cows (gau mata) are fed and cared for in your name — a timeless punya (meritorious) act. From the ₹101 seva upward, you receive a real video of your seva within 7 days.</p>
       <a class="btn btn-grad" href="#seva">Choose your Seva</a>
 
       <div class="hero-media">
@@ -260,37 +268,44 @@
         <p>The more you offer, the more cows your seva serves. Tap a seva to book it — you go straight to a secure UPI / card payment.</p>
       </div>
 
+      <div class="notice-red">
+        <b>Proof video — please note:</b> The <b>₹11</b> and <b>₹51</b> sevas are offered as
+        <b>pure seva in your name</b> — no proof video is sent for these tiers. From <b>₹101</b> onwards,
+        you receive a real proof video of your seva on WhatsApp <b>within 7 days</b>.
+      </div>
+
       <div class="tiers" id="tiers">
-        <!-- data-amt = tier amount (sticky bar + pixel value); data-count = seva count shown in the card + checkout -->
-        <div class="tier" data-amt="11" data-count="1" tabindex="0" role="button" aria-label="Book 11 rupee seva, 1 Seva">
-          <div class="info"><span class="amt">₹11</span><span class="cnt">1 Seva</span></div>
+        <!-- data-amt = tier amount (sticky bar + pixel value); data-count = seva count shown in the card + checkout.
+             data-video = whether this tier includes the proof video (₹101 and above). -->
+        <div class="tier" data-amt="11" data-count="1" data-video="0" tabindex="0" role="button" aria-label="Book 11 rupee seva, 1 Seva, pure seva without video">
+          <div class="info"><span class="amt">₹11</span><span class="cnt">1 Seva</span><span class="tag novid">Seva only · no video</span></div>
           <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier" data-amt="51" data-count="5" tabindex="0" role="button" aria-label="Book 51 rupee seva, 5 Seva">
-          <div class="info"><span class="amt">₹51</span><span class="cnt">5 Seva</span></div>
+        <div class="tier" data-amt="51" data-count="5" data-video="0" tabindex="0" role="button" aria-label="Book 51 rupee seva, 5 Seva, pure seva without video">
+          <div class="info"><span class="amt">₹51</span><span class="cnt">5 Seva</span><span class="tag novid">Seva only · no video</span></div>
           <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier loved" data-amt="101" data-count="11" tabindex="0" role="button" aria-label="Book 101 rupee seva, 11 Seva, most loved">
+        <div class="tier loved" data-amt="101" data-count="11" data-video="1" tabindex="0" role="button" aria-label="Book 101 rupee seva, 11 Seva, most loved, includes proof video">
           <span class="badge">Most Loved</span>
-          <div class="info"><span class="amt">₹101</span><span class="cnt">11 Seva</span></div>
+          <div class="info"><span class="amt">₹101</span><span class="cnt">11 Seva</span><span class="tag vid">Includes proof video</span></div>
           <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier" data-amt="251" data-count="31" tabindex="0" role="button" aria-label="Book 251 rupee seva, 31 Seva">
-          <div class="info"><span class="amt">₹251</span><span class="cnt">31 Seva</span></div>
+        <div class="tier" data-amt="251" data-count="31" data-video="1" tabindex="0" role="button" aria-label="Book 251 rupee seva, 31 Seva, includes proof video">
+          <div class="info"><span class="amt">₹251</span><span class="cnt">31 Seva</span><span class="tag vid">Includes proof video</span></div>
           <span class="go">Book Seva</span>
         </div>
 
-        <div class="tier max" data-amt="501" data-count="51" tabindex="0" role="button" aria-label="Book 501 rupee seva, 51 Seva, maximum blessing">
+        <div class="tier max" data-amt="501" data-count="51" data-video="1" tabindex="0" role="button" aria-label="Book 501 rupee seva, 51 Seva, maximum blessing, includes proof video">
           <span class="badge">Maximum Blessing</span>
-          <div class="info"><span class="amt">₹501</span><span class="cnt">51 Seva</span></div>
+          <div class="info"><span class="amt">₹501</span><span class="cnt">51 Seva</span><span class="tag vid">Includes proof video</span></div>
           <span class="go">Book Seva</span>
         </div>
       </div>
 
-      <p class="seva-note">With every seva you book, you receive a real video of the seva performed in your name, on WhatsApp — <b>within 7 days</b>. Prepaid only (UPI / card) via a secure payment page.</p>
+      <p class="seva-note">From the <b>₹101</b> seva upward, you receive a real video of the seva performed in your name, on WhatsApp — <b>within 7 days</b>. The ₹11 and ₹51 sevas are performed as pure seva in your name (no video). Prepaid only (UPI / card) via a secure payment page.</p>
     </div>
   </section>
 
@@ -304,7 +319,7 @@
       <div class="steps">
         <div class="step"><div class="n">1</div><div><h3>You choose your seva</h3><p>Pick the seva that feels right. A secure UPI / card payment — that's the only step you take.</p></div></div>
         <div class="step"><div class="n">2</div><div><h3>The seva is performed</h3><p>Cows (gau mata) are fed and cared for in your name, your seva counted.</p></div></div>
-        <div class="step"><div class="n">3</div><div><h3>You receive a video</h3><p>A real video of your seva reaches you on WhatsApp within 7 days — so you see it was truly done.</p></div></div>
+        <div class="step"><div class="n">3</div><div><h3>You receive a video</h3><p>From the ₹101 seva upward, a real video of your seva reaches you on WhatsApp within 7 days — so you see it was truly done. (The ₹11 and ₹51 sevas are pure seva in your name, without a video.)</p></div></div>
         <div class="step"><div class="n">4</div><div><h3>Blessings &amp; gratitude</h3><p>Receive the blessings of gau mata and a heartfelt thank-you. The punya is yours.</p></div></div>
       </div>
     </div>
@@ -330,7 +345,7 @@
     <div class="wrap">
       <div class="section-head"><div class="eyebrow">Why you can trust this</div><h2>Sincere seva, honestly done</h2></div>
       <div class="badges">
-        <div class="badge-row"><span class="ic"><svg><use href="#check"/></svg></span><div><b>A real video of your seva</b> <span>— every seva includes genuine video evidence, delivered within 7 days.</span></div></div>
+        <div class="badge-row"><span class="ic"><svg><use href="#check"/></svg></span><div><b>A real video of your seva</b> <span>— from the ₹101 seva upward, genuine video evidence is delivered within 7 days.</span></div></div>
         <div class="badge-row"><span class="ic"><svg><use href="#shield"/></svg></span><div><b>Secure UPI / card payment</b> <span>— prepaid through a trusted payment page. No cash, no hidden charges.</span></div></div>
         <div class="badge-row"><span class="ic"><svg><use href="#lotus"/></svg></span><div><b>Performed with devotion</b> <span>— your seva is carried out in your name as a sacred punya act for gau mata.</span></div></div>
       </div>
@@ -357,7 +372,8 @@
     <div class="wrap">
       <div class="section-head"><div class="eyebrow">Questions</div><h2>Frequently asked</h2></div>
       <div class="faq">
-        <details><summary>Will I really get a video? <span class="chev">+</span></summary><div class="a">Yes. Every seva includes a genuine video of the seva performed in your name, sent on WhatsApp within 7 days of booking.</div></details>
+        <details><summary>Will I get a proof video? <span class="chev">+</span></summary><div class="a">From the <b>₹101 seva upward</b>, yes — you receive a genuine video of the seva performed in your name, sent on WhatsApp within 7 days of booking. The <b>₹11</b> and <b>₹51</b> sevas are offered as <b>pure seva in your name</b> and do not include a video.</div></details>
+        <details><summary>Why is there no video for the ₹11 and ₹51 sevas? <span class="chev">+</span></summary><div class="a">These smaller sevas are performed as a pure seva in your name — the fodder and care are still offered to the cows, but individually filming and delivering a video for every small booking isn't feasible. If you would like a proof video, please choose the ₹101 seva or above.</div></details>
         <details><summary>How is the seva done? <span class="chev">+</span></summary><div class="a">Your payment funds the feeding and care of cows (gau mata) — fodder, nourishment and upkeep. A larger seva supports more cows.</div></details>
         <details><summary>When is the seva performed? <span class="chev">+</span></summary><div class="a">The seva is performed after you book, and your video reaches you within 7 days. Bookings for this round are closing soon.</div></details>
         <details><summary>Where do the cows live and who cares for them? <span class="chev">+</span></summary><div class="a">The cows are cared for at a goshala (cow shelter) by people devoted to their wellbeing. Your video shows the very seva your booking supported. For anything specific, message us on WhatsApp.</div></details>
@@ -370,7 +386,7 @@
   <!-- ══════════ FINAL CTA ══════════ -->
   <section class="center">
     <div class="wrap">
-      <div class="section-head"><div class="eyebrow">Bookings closing soon</div><h2>Offer your Seva to Gau Mata today</h2><p>A sacred seva, a lasting blessing — and a real video to hold it close.</p></div>
+      <div class="section-head"><div class="eyebrow">Bookings closing soon</div><h2>Offer your Seva to Gau Mata today</h2><p>A sacred seva, a lasting blessing — and, from the ₹101 seva upward, a real video to hold it close.</p></div>
       <a class="btn btn-grad" href="#seva">Choose your Seva</a>
     </div>
   </section>
@@ -378,7 +394,7 @@
   <footer>
     <div class="brand grad-text">Ritham · Gau Seva</div>
     <p class="small">
-      A paid seva service — your seva performed in your name, with a real video within 7 days.<br/>
+      A paid seva service — your seva performed in your name; a real proof video within 7 days from the ₹101 seva upward.<br/>
       Questions? <a href="https://wa.me/WHATSAPP_NUMBER" target="_blank" rel="noopener">Message us on WhatsApp</a><br/>
       <a href="terms.html">Gau Seva Terms</a> · <a href="../privacy.html">Privacy</a> · <a href="../refund.html">Refund &amp; Cancellation</a> · <a href="../index.html">Ritham home</a>
     </p>
@@ -405,7 +421,7 @@
         <input class="ck-in" id="ck-name" type="text" placeholder="Name for the sankalp" autocomplete="name" maxlength="80" />
         <label class="ck-l" for="ck-wa">WhatsApp number</label>
         <div class="ck-phone"><span>+91</span><input id="ck-wa" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit number" autocomplete="tel-national" /></div>
-        <p class="ck-note">Your proof video is delivered here on WhatsApp within 7 days.</p>
+        <p class="ck-note" id="ck-note">Your proof video is delivered here on WhatsApp within 7 days.</p>
         <p class="ck-err" id="ck-err"></p>
         <button class="btn btn-grad btn-block" id="ck-pay" type="button">Proceed to Pay</button>
         <p class="ck-secure">Secure UPI / card payment · powered by Razorpay</p>
@@ -419,7 +435,7 @@
       <div id="ck-success" class="ck-center" style="display:none">
         <div class="ck-tick"><svg><use href="#check"/></svg></div>
         <h3>Seva booked</h3>
-        <p>Your Gau Seva is confirmed. Your proof video will be delivered on WhatsApp <b>within 7 days</b>. Gau Mata ki jai.</p>
+        <p id="ck-succ-msg">Your Gau Seva is confirmed. Your proof video will be delivered on WhatsApp <b>within 7 days</b>. Gau Mata ki jai.</p>
         <p class="ck-code" id="ck-code"></p>
         <button class="btn btn-ghost" id="ck-done" type="button">Done</button>
       </div>
@@ -464,9 +480,13 @@
 
     function showPane(w){ elForm.style.display=(w==='form'?'block':'none'); elProc.style.display=(w==='proc'?'block':'none'); elSucc.style.display=(w==='succ'?'block':'none'); }
     function openCheckout(amount, count){
-      current = { amount:amount, count:count };
+      var hasVideo = Number(amount) >= 101;
+      current = { amount:amount, count:count, hasVideo:hasVideo };
       document.getElementById('ck-amt').textContent = '₹'+amount;
       document.getElementById('ck-count').textContent = count;
+      document.getElementById('ck-note').innerHTML = hasVideo
+        ? 'Your proof video is delivered here on WhatsApp within 7 days.'
+        : 'This is a <b>pure seva in your name</b> — no proof video is sent for this tier. For a proof video, choose the ₹101 seva or above.';
       elErr.textContent=''; elPay.disabled=false; showPane('form');
       modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
       setTimeout(function(){ elName.focus(); }, 60);
@@ -521,6 +541,9 @@
             razorpay_signature: resp.razorpay_signature
           }).then(function(v){
             if (!v.data || !v.data.ok) throw new Error('verify_failed');
+            document.getElementById('ck-succ-msg').innerHTML = current.hasVideo
+              ? 'Your Gau Seva is confirmed. Your proof video will be delivered on WhatsApp <b>within 7 days</b>. Gau Mata ki jai.'
+              : 'Your Gau Seva is confirmed and will be performed as a <b>pure seva in your name</b>. Gau Mata ki jai.';
             document.getElementById('ck-code').textContent = 'Booking ref: ' + (v.data.bookingCode||'');
             showPane('succ');
           });
