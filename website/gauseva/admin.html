@@ -38,7 +38,7 @@
 
     /* Dashboard */
     main{padding:20px 0 60px}
-    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
     .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
     .stat b{font-family:'Fraunces',serif;font-size:24px;color:var(--maroon);display:block}
     .stat span{color:var(--brown);font-size:13px}
@@ -61,6 +61,11 @@
     .pill.sent{background:#dcf3e4;color:var(--ok)}
     .pill.ref{background:#f3dcdc;color:#b3261e}
     .pill.pend{background:#ece7f5;color:#7a728f}
+    /* Video-delivery countdown (proof video promised within 7 days) */
+    .due{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;margin-top:6px;letter-spacing:.02em;white-space:nowrap}
+    .due.ok{background:#e4f0ff;color:#2563a8}
+    .due.warn{background:#fff3d6;color:var(--warn)}
+    .due.over{background:#f8d7d7;color:#b3261e}
     .wa-badge{font-size:11.5px;color:var(--ok);font-weight:600}
     .wa-no{font-size:11.5px;color:var(--warn);font-weight:600}
     .bk .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
@@ -112,6 +117,7 @@
         <div class="stat"><b id="s-count">0</b><span>Contributions</span></div>
         <div class="stat"><b id="s-total">₹0</b><span>Total received</span></div>
         <div class="stat"><b id="s-seva">0</b><span>Total Seva</span></div>
+        <div class="stat"><b id="s-due">0</b><span>Videos to send</span></div>
       </div>
       <div class="toolbar">
         <input class="input" id="search" placeholder="Search name / phone / payment id…" />
@@ -160,6 +166,23 @@
     function inr(n){ return '₹'+Number(n||0).toLocaleString('en-IN'); }
     function fmtDate(iso){ var d=new Date(iso); return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'2-digit'})+' · '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}); }
     function waDigits(p){ return String(p||'').replace(/\D/g,''); }
+    // Proof video is promised within 7 days of the seva (see welcome message).
+    // For a paid booking whose video isn't sent yet, compute the delivery
+    // deadline (created_at + 7 days) and how many whole calendar days are left.
+    var VIDEO_DAYS = 7;
+    function videoDue(b){
+      if(b.status!=='Payment Successful' || !b.created_at) return null;
+      var due = new Date(new Date(b.created_at).getTime() + VIDEO_DAYS*86400000);
+      var now = new Date();
+      var d1 = new Date(now.getFullYear(),now.getMonth(),now.getDate());
+      var d2 = new Date(due.getFullYear(),due.getMonth(),due.getDate());
+      var daysLeft = Math.round((d2 - d1)/86400000);
+      var label, cls;
+      if(daysLeft < 0){ label = 'Video overdue by '+(-daysLeft)+' day'+(daysLeft===-1?'':'s'); cls='over'; }
+      else if(daysLeft === 0){ label = 'Video due today'; cls='warn'; }
+      else { label = 'Video due in '+daysLeft+' day'+(daysLeft===1?'':'s'); cls = daysLeft<=2?'warn':'ok'; }
+      return { daysLeft: daysLeft, label: label, cls: cls };
+    }
     // Prefilled bilingual onboarding message the owner sends manually.
     // Name / seva tier / date / booking id auto-filled from the booking.
     function welcomeMsg(b){
@@ -277,12 +300,20 @@
       $('#s-count').textContent = paid.length;
       $('#s-total').textContent = inr(paid.reduce(function(a,b){return a+(Number(b.amount_inr)||0);},0));
       $('#s-seva').textContent  = paid.reduce(function(a,b){return a+(Number(b.seva_count)||0);},0);
+      // Videos still to send (paid, not yet marked 'Video Sent'); flag overdue count.
+      var dueRows = state.rows.map(videoDue).filter(Boolean);
+      var overdue = dueRows.filter(function(d){return d.daysLeft<0;}).length;
+      var sDue = $('#s-due');
+      sDue.textContent = dueRows.length;
+      sDue.style.color = overdue>0 ? '#b3261e' : '';
+      sDue.nextElementSibling.textContent = overdue>0 ? ('Videos to send · '+overdue+' overdue') : 'Videos to send';
 
       var wrap = $('#cards'); $('#empty').classList.toggle('hidden', rows.length>0);
       wrap.innerHTML = rows.map(function(b){
         var wd = waDigits(b.whatsapp);
         var wa = wd ? 'WhatsApp: <a href="https://wa.me/'+wd+'" target="_blank" rel="noopener">'+esc(b.whatsapp)+'</a>' : '<span>'+esc(b.whatsapp||'—')+'</span>';
         var next = b.status==='Payment Successful' ? 'Video Sent' : null;
+        var due = videoDue(b);
         return '<div class="bk">'+
           '<div class="r1">'+
             '<div><div class="name">'+esc(b.name||'Anonymous')+'</div>'+
@@ -296,6 +327,7 @@
             '<div style="text-align:right"><div class="amt">'+inr(b.amount_inr)+'</div>'+
               '<div style="color:var(--brown);font-size:13px">'+(b.seva_count!=null?b.seva_count+' Seva':'custom')+'</div>'+
               '<div style="margin-top:6px"><span class="pill '+pillClass(b.status)+'">'+esc(b.status)+'</span></div>'+
+              (due?'<div><span class="due '+due.cls+'">'+esc(due.label)+'</span></div>':'')+
             '</div>'+
           '</div>'+
           '<div class="meta" style="margin-top:8px;font-size:12px;opacity:.8"><span>'+esc(b.razorpay_payment_id)+'</span></div>'+
