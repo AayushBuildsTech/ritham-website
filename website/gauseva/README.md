@@ -4,6 +4,36 @@ A static landing page (`index.html`) for the Gau Seva seva campaign, with an
 **on-site Razorpay checkout** wired to Supabase edge functions — exactly like the
 Sawan puja flow (no hosted payment links). Lives at **ritham.co.in/gauseva/**.
 
+## Language — Hindi-first, one-tap English toggle
+
+The page **loads in Hindi (Devanagari) by default** — our ads and audience are
+mostly Hindi-speaking. A small, unobtrusive sticky toggle in the **top-right
+corner** ("हिंदी | English") flips **all** visible copy instantly with **no page
+reload**. The choice is kept in a plain in-memory JS variable (`LANG`) — no
+`localStorage`/`sessionStorage`; every fresh load starts in Hindi.
+
+**Where the copy lives (how to edit wording later):** every translatable element
+carries both languages inline as **`data-hi="…"` (Hindi)** and **`data-en="…"`
+(English)** attributes; the visible default text between the tags is the Hindi
+copy. To change wording, edit the matching `data-hi` / `data-en` (and, for the
+Hindi default, the inline text too) on that element. A tiny vanilla-JS
+`applyLang()` reads those attributes and rewrites `innerHTML` on toggle — no
+frameworks, no external libs, stays fast on slow 4G.
+
+- **Input placeholders** use `data-ph-hi` / `data-ph-en` (name + WhatsApp
+  fields).
+- **JS-generated strings** — the sticky bar's seva label, the checkout note,
+  success message, booking-ref label and all error messages — are **not** in the
+  markup; they live in the **`STR` object** near the top of the page `<script>`
+  (keyed `hi` / `en`). Edit those there.
+- **Kept in English in both languages** (deliberately, so payment is never
+  ambiguous): `WhatsApp`, `UPI`, `Ritham` (brand), the `₹` symbol, and all
+  prices/numbers as digits (`₹11`, `₹51`, `₹101`, `₹251`, `₹501`). "Seva" reads
+  as **सेवा** in Hindi and **Seva** in English.
+
+Fonts: **Noto Sans Devanagari** (Hindi) is loaded alongside Fraunces + Inter,
+with a slightly larger line-height in Hindi mode for comfortable reading.
+
 ## How payment works (same pattern as the Sawan puja)
 
 1. The visitor taps **Book Seva** on a tier → a small modal collects **name +

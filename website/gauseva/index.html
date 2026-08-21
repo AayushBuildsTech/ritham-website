@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -39,10 +39,10 @@
     src="https://www.facebook.com/tr?id=PIXEL_ID&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel Code -->
 
-  <!-- Brand fonts: Fraunces (display) + Inter (body) + Noto Sans Devanagari. -->
+  <!-- Brand fonts: Fraunces (display) + Inter (body) + Noto Sans Devanagari (Hindi). -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <!-- ══════════ CRITICAL CSS (inline — light brand theme, fast first paint) ══════════ -->
   <style>
@@ -60,8 +60,8 @@
     *{box-sizing:border-box;margin:0;padding:0}
     html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
     body{
-      font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-      color:var(--ink);background:var(--bg);line-height:1.7;font-size:16px;overflow-x:hidden;
+      font-family:'Inter','Noto Sans Devanagari',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      color:var(--ink);background:var(--bg);line-height:1.75;font-size:16px;overflow-x:hidden;
       -webkit-font-smoothing:antialiased;
     }
     body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
@@ -69,10 +69,12 @@
         radial-gradient(ellipse 46% 40% at 8% 4%, rgba(255,0,127,.06), transparent 60%),
         radial-gradient(ellipse 50% 44% at 94% 26%, rgba(123,44,191,.07), transparent 60%),
         radial-gradient(ellipse 44% 40% at 40% 100%, rgba(232,163,61,.06), transparent 60%);}
-    h1,h2,h3,.display{font-family:'Fraunces',Georgia,serif;line-height:1.14;color:var(--ink);font-weight:600}
+    h1,h2,h3,.display{font-family:'Fraunces','Noto Sans Devanagari',Georgia,serif;line-height:1.18;color:var(--ink);font-weight:600}
     a{color:var(--violet);text-decoration:none}
     img{max-width:100%;display:block}
     .deva{font-family:'Noto Sans Devanagari','Inter',sans-serif}
+    /* Hindi mode gets a touch more line-height for comfortable Devanagari reading */
+    html[lang="hi"] body{line-height:1.85}
     .wrap{width:100%;max-width:780px;margin:0 auto;padding:0 20px}
     .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
     .eyebrow{font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:var(--magenta-d)}
@@ -82,13 +84,23 @@
     .section-head h2{font-size:28px;margin:8px 0 8px;letter-spacing:-.01em}
     .section-head p{color:var(--muted)}
 
+    /* ── Language toggle (small, sticky, top-right, unobtrusive) ── */
+    .lang-toggle{position:fixed;top:7px;right:10px;z-index:90;display:inline-flex;align-items:center;gap:1px;
+      background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border:1px solid rgba(244,130,11,.55);
+      border-radius:999px;padding:3px 4px;box-shadow:0 2px 9px rgba(30,21,51,.18)}
+    .lang-toggle button{border:0;background:none;cursor:pointer;font-size:12px;font-weight:700;line-height:1;
+      padding:4px 9px;border-radius:999px;color:var(--saffron);font-family:'Inter',sans-serif}
+    .lang-toggle button.deva{font-family:'Noto Sans Devanagari','Inter',sans-serif}
+    .lang-toggle button.active{background:var(--saffron);color:#fff}
+    .lang-toggle .sep{color:rgba(244,130,11,.5);font-size:12px;font-weight:600}
+
     /* Banner */
     .banner{position:sticky;top:0;z-index:60;background:var(--grad);color:#fff;text-align:center;
-      font-size:13px;font-weight:600;letter-spacing:.04em;padding:9px 14px;text-transform:uppercase}
+      font-size:13px;font-weight:600;letter-spacing:.04em;padding:9px 90px 9px 14px;text-transform:uppercase}
 
     /* Buttons */
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--tap);
-      padding:0 26px;border-radius:999px;font-weight:700;font-family:'Inter',sans-serif;font-size:16px;
+      padding:0 26px;border-radius:999px;font-weight:700;font-family:'Inter','Noto Sans Devanagari',sans-serif;font-size:16px;
       cursor:pointer;border:0;transition:transform .12s ease,box-shadow .12s ease;line-height:1}
     .btn:active{transform:translateY(1px) scale(.99)}
     .btn-grad{background:var(--grad);color:#fff;box-shadow:0 10px 24px rgba(214,0,107,.28)}
@@ -97,7 +109,7 @@
 
     /* Hero */
     .hero{padding:36px 0 6px;text-align:center}
-    .hero .kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px}
+    .hero .kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;justify-content:center}
     .hero .kicker .deva{font-size:15px;color:var(--magenta-d);font-weight:600}
     .hero h1{font-size:36px;margin:6px 0 12px;letter-spacing:-.02em}
     .hero h1 .big{display:block;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -136,7 +148,7 @@
 
     /* Why */
     .why{background:var(--grad-soft)}
-    .why blockquote{max-width:580px;margin:6px auto 0;font-family:'Fraunces',serif;font-style:italic;font-size:19px;color:var(--ink);text-align:center;line-height:1.5}
+    .why blockquote{max-width:580px;margin:6px auto 0;font-family:'Fraunces','Noto Sans Devanagari',serif;font-style:italic;font-size:19px;color:var(--ink);text-align:center;line-height:1.6}
     .why .shlok{display:block;font-size:18px;color:var(--magenta-d);margin-bottom:8px;font-style:normal;font-weight:600}
 
     /* Trust badges */
@@ -176,7 +188,7 @@
       padding:10px 16px calc(10px + env(safe-area-inset-bottom,0));display:flex;align-items:center;gap:12px}
     .sticky-bar .lbl{flex:1 1 auto;min-width:0;line-height:1.25}
     .sticky-bar .lbl small{display:block;color:var(--muted);font-size:12px;font-weight:600}
-    .sticky-bar .lbl b{font-family:'Fraunces',serif;font-size:19px;color:var(--ink)}
+    .sticky-bar .lbl b{font-family:'Fraunces','Noto Sans Devanagari',serif;font-size:19px;color:var(--ink)}
     .sticky-bar .btn{flex:0 0 auto;padding:0 20px}
 
     .wa-float{position:fixed;right:16px;bottom:90px;z-index:65;width:52px;height:52px;border-radius:50%;
@@ -191,10 +203,10 @@
       padding:26px 22px 22px;box-shadow:0 24px 60px rgba(30,21,51,.35);animation:pop .18s ease}
     @keyframes pop{from{transform:translateY(10px) scale(.98);opacity:.6}to{transform:none;opacity:1}}
     .modal-x{position:absolute;top:10px;right:12px;background:none;border:0;font-size:26px;line-height:1;color:var(--dim);cursor:pointer}
-    .ck-amt{font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--ink);margin:4px 0 16px}
+    .ck-amt{font-family:'Fraunces','Noto Sans Devanagari',serif;font-size:26px;font-weight:700;color:var(--ink);margin:4px 0 16px}
     .ck-l{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:10px 0 5px}
     .ck-in,.ck-phone{width:100%;min-height:50px;border:1.5px solid var(--line);border-radius:12px;
-      font-size:16px;font-family:'Inter',sans-serif;background:#fff;color:var(--ink)}
+      font-size:16px;font-family:'Inter','Noto Sans Devanagari',sans-serif;background:#fff;color:var(--ink)}
     .ck-in{padding:0 14px}
     .ck-in:focus,.ck-phone:focus-within{outline:none;border-color:var(--magenta)}
     .ck-phone{display:flex;align-items:center;overflow:hidden}
@@ -208,7 +220,7 @@
     .ck-center{text-align:center;padding:12px 4px}
     .ck-center h3{font-size:22px;margin:14px 0 6px}
     .ck-center p{color:var(--muted);font-size:15px}
-    .ck-code{font-family:'Fraunces',serif;color:var(--ink);font-weight:600;margin-top:10px!important}
+    .ck-code{font-family:'Fraunces','Noto Sans Devanagari',serif;color:var(--ink);font-weight:600;margin-top:10px!important}
     .ck-tick{width:64px;height:64px;border-radius:50%;background:var(--grad-soft);color:var(--ok);display:flex;align-items:center;justify-content:center;margin:0 auto}
     .ck-tick svg{width:32px;height:32px}
     #ck-done{margin-top:16px}
@@ -234,19 +246,29 @@
     </defs>
   </svg>
 
+  <!-- ══════════ LANGUAGE TOGGLE (Hindi default · one tap to English) ══════════ -->
+  <div class="lang-toggle" id="langToggle" role="group" aria-label="Language / भाषा">
+    <button type="button" data-lang="hi" class="deva active" aria-label="हिंदी में देखें">हिंदी</button>
+    <span class="sep" aria-hidden="true">|</span>
+    <button type="button" data-lang="en" aria-label="View in English">English</button>
+  </div>
+
   <!-- ══════════ BANNER ══════════ -->
-  <div class="banner">Bookings closing soon</div>
+  <div class="banner" data-hi="बुकिंग जल्द बंद हो रही है" data-en="Bookings closing soon">बुकिंग जल्द बंद हो रही है</div>
 
   <!-- ══════════ HERO ══════════ -->
   <header class="hero">
     <div class="wrap">
       <div class="kicker">
-        <span class="eyebrow">Ritham · Gau Seva</span>
-        <span class="deva">गौ माता की जय</span>
+        <span class="eyebrow" data-hi="Ritham · गौ सेवा" data-en="Ritham · Gau Seva">Ritham · गौ सेवा</span>
+        <span class="deva" data-hi="गौ माता की जय" data-en="Gau Mata ki Jai">गौ माता की जय</span>
       </div>
-      <h1>Serve Gau Mata,<span class="big">earn a lifetime of blessings</span></h1>
-      <p class="lede">Book a Gau Seva and cows (gau mata) are fed and cared for in your name — a timeless punya (meritorious) act. From the ₹101 seva upward, you receive a real video of your seva within 7 days.</p>
-      <a class="btn btn-grad" href="#seva">Choose your Seva</a>
+      <h1>
+        <span data-hi="गौ माता की सेवा करें," data-en="Serve Gau Mata,">गौ माता की सेवा करें,</span>
+        <span class="big" data-hi="जीवन भर आशीर्वाद पाएं" data-en="earn a lifetime of blessings">जीवन भर आशीर्वाद पाएं</span>
+      </h1>
+      <p class="lede" data-hi="गौ सेवा बुक करें और आपके नाम से गौ माता को चारा खिलाया व उनकी सेवा की जाती है — एक अक्षय पुण्य कार्य। ₹101 की सेवा से ऊपर, आपको 7 दिनों के भीतर अपनी सेवा का असली वीडियो मिलता है।" data-en="Book a Gau Seva and cows (gau mata) are fed and cared for in your name — a timeless punya (meritorious) act. From the ₹101 seva upward, you receive a real video of your seva within 7 days.">गौ सेवा बुक करें और आपके नाम से गौ माता को चारा खिलाया व उनकी सेवा की जाती है — एक अक्षय पुण्य कार्य। ₹101 की सेवा से ऊपर, आपको 7 दिनों के भीतर अपनी सेवा का असली वीडियो मिलता है।</p>
+      <a class="btn btn-grad" href="#seva" data-hi="अपनी सेवा चुनें" data-en="Choose your Seva">अपनी सेवा चुनें</a>
 
       <div class="hero-media">
         <img src="img/gau-hero.webp" alt="Cows being fed and cared for — Gau Seva" width="560" height="315" />
@@ -258,43 +280,44 @@
   <section id="seva">
     <div class="wrap">
       <div class="section-head">
-        <div class="eyebrow">Choose your seva</div>
-        <h2>Every seva feeds Gau Mata</h2>
-        <p>The more you offer, the more cows your seva serves. Tap a seva to book it — you go straight to a secure UPI / card payment.</p>
+        <div class="eyebrow" data-hi="अपनी सेवा चुनें" data-en="Choose your seva">अपनी सेवा चुनें</div>
+        <h2 data-hi="हर सेवा गौ माता को भोजन देती है" data-en="Every seva feeds Gau Mata">हर सेवा गौ माता को भोजन देती है</h2>
+        <p data-hi="आप जितना अधिक अर्पित करते हैं, आपकी सेवा उतनी ही अधिक गायों तक पहुँचती है। बुक करने के लिए किसी सेवा पर टैप करें — आप सीधे सुरक्षित UPI / कार्ड भुगतान पर पहुँचते हैं।" data-en="The more you offer, the more cows your seva serves. Tap a seva to book it — you go straight to a secure UPI / card payment.">आप जितना अधिक अर्पित करते हैं, आपकी सेवा उतनी ही अधिक गायों तक पहुँचती है। बुक करने के लिए किसी सेवा पर टैप करें — आप सीधे सुरक्षित UPI / कार्ड भुगतान पर पहुँचते हैं।</p>
       </div>
 
       <div class="tiers" id="tiers">
         <!-- data-amt = tier amount (sticky bar + pixel value); data-count = seva count shown in the card + checkout.
-             data-video = whether this tier includes the proof video (₹101 and above). -->
+             data-video = whether this tier includes the proof video (₹101 and above).
+             The visible seva label + tag are translated via data-hi / data-en. -->
         <div class="tier" data-amt="11" data-count="1" data-video="0" tabindex="0" role="button" aria-label="Book 11 rupee seva, 1 Seva, pure seva without video">
-          <div class="info"><span class="amt">₹11</span><span class="cnt">1 Seva</span><span class="tag novid">Seva only · no video</span></div>
-          <span class="go">Book Seva</span>
+          <div class="info"><span class="amt">₹11</span><span class="cnt" data-hi="1 सेवा" data-en="1 Seva">1 सेवा</span><span class="tag novid" data-hi="केवल सेवा · कोई वीडियो नहीं" data-en="Seva only · no video">केवल सेवा · कोई वीडियो नहीं</span></div>
+          <span class="go" data-hi="सेवा बुक करें" data-en="Book Seva">सेवा बुक करें</span>
         </div>
 
         <div class="tier" data-amt="51" data-count="5" data-video="0" tabindex="0" role="button" aria-label="Book 51 rupee seva, 5 Seva, pure seva without video">
-          <div class="info"><span class="amt">₹51</span><span class="cnt">5 Seva</span><span class="tag novid">Seva only · no video</span></div>
-          <span class="go">Book Seva</span>
+          <div class="info"><span class="amt">₹51</span><span class="cnt" data-hi="5 सेवा" data-en="5 Seva">5 सेवा</span><span class="tag novid" data-hi="केवल सेवा · कोई वीडियो नहीं" data-en="Seva only · no video">केवल सेवा · कोई वीडियो नहीं</span></div>
+          <span class="go" data-hi="सेवा बुक करें" data-en="Book Seva">सेवा बुक करें</span>
         </div>
 
         <div class="tier loved" data-amt="101" data-count="11" data-video="1" tabindex="0" role="button" aria-label="Book 101 rupee seva, 11 Seva, most loved, includes proof video">
-          <span class="badge">Most Loved</span>
-          <div class="info"><span class="amt">₹101</span><span class="cnt">11 Seva</span><span class="tag vid">Includes proof video</span></div>
-          <span class="go">Book Seva</span>
+          <span class="badge" data-hi="सबसे पसंदीदा" data-en="Most Loved">सबसे पसंदीदा</span>
+          <div class="info"><span class="amt">₹101</span><span class="cnt" data-hi="11 सेवा" data-en="11 Seva">11 सेवा</span><span class="tag vid" data-hi="प्रूफ वीडियो शामिल" data-en="Includes proof video">प्रूफ वीडियो शामिल</span></div>
+          <span class="go" data-hi="सेवा बुक करें" data-en="Book Seva">सेवा बुक करें</span>
         </div>
 
         <div class="tier" data-amt="251" data-count="31" data-video="1" tabindex="0" role="button" aria-label="Book 251 rupee seva, 31 Seva, includes proof video">
-          <div class="info"><span class="amt">₹251</span><span class="cnt">31 Seva</span><span class="tag vid">Includes proof video</span></div>
-          <span class="go">Book Seva</span>
+          <div class="info"><span class="amt">₹251</span><span class="cnt" data-hi="31 सेवा" data-en="31 Seva">31 सेवा</span><span class="tag vid" data-hi="प्रूफ वीडियो शामिल" data-en="Includes proof video">प्रूफ वीडियो शामिल</span></div>
+          <span class="go" data-hi="सेवा बुक करें" data-en="Book Seva">सेवा बुक करें</span>
         </div>
 
         <div class="tier max" data-amt="501" data-count="51" data-video="1" tabindex="0" role="button" aria-label="Book 501 rupee seva, 51 Seva, maximum blessing, includes proof video">
-          <span class="badge">Maximum Blessing</span>
-          <div class="info"><span class="amt">₹501</span><span class="cnt">51 Seva</span><span class="tag vid">Includes proof video</span></div>
-          <span class="go">Book Seva</span>
+          <span class="badge" data-hi="सर्वाधिक आशीर्वाद" data-en="Maximum Blessing">सर्वाधिक आशीर्वाद</span>
+          <div class="info"><span class="amt">₹501</span><span class="cnt" data-hi="51 सेवा" data-en="51 Seva">51 सेवा</span><span class="tag vid" data-hi="प्रूफ वीडियो शामिल" data-en="Includes proof video">प्रूफ वीडियो शामिल</span></div>
+          <span class="go" data-hi="सेवा बुक करें" data-en="Book Seva">सेवा बुक करें</span>
         </div>
       </div>
 
-      <p class="seva-note">From the <b>₹101</b> seva upward, you receive a real video of the seva performed in your name, on WhatsApp — <b>within 7 days</b>. The ₹11 and ₹51 sevas are performed as pure seva in your name (no video). Prepaid only (UPI / card) via a secure payment page.</p>
+      <p class="seva-note" data-hi="<b>₹101</b> की सेवा से ऊपर, आपके नाम से की गई सेवा का असली वीडियो WhatsApp पर — <b>7 दिनों के भीतर</b> — मिलता है। ₹11 और ₹51 की सेवाएँ आपके नाम से शुद्ध सेवा के रूप में की जाती हैं (कोई वीडियो नहीं)। केवल प्रीपेड (UPI / कार्ड) एक सुरक्षित भुगतान पेज के माध्यम से।" data-en="From the <b>₹101</b> seva upward, you receive a real video of the seva performed in your name, on WhatsApp — <b>within 7 days</b>. The ₹11 and ₹51 sevas are performed as pure seva in your name (no video). Prepaid only (UPI / card) via a secure payment page."><b>₹101</b> की सेवा से ऊपर, आपके नाम से की गई सेवा का असली वीडियो WhatsApp पर — <b>7 दिनों के भीतर</b> — मिलता है। ₹11 और ₹51 की सेवाएँ आपके नाम से शुद्ध सेवा के रूप में की जाती हैं (कोई वीडियो नहीं)। केवल प्रीपेड (UPI / कार्ड) एक सुरक्षित भुगतान पेज के माध्यम से।</p>
     </div>
   </section>
 
@@ -302,14 +325,14 @@
   <section>
     <div class="wrap">
       <div class="section-head">
-        <div class="eyebrow">How it works</div>
-        <h2>From your seva to blessings</h2>
+        <div class="eyebrow" data-hi="यह कैसे काम करता है" data-en="How it works">यह कैसे काम करता है</div>
+        <h2 data-hi="आपकी सेवा से आशीर्वाद तक" data-en="From your seva to blessings">आपकी सेवा से आशीर्वाद तक</h2>
       </div>
       <div class="steps">
-        <div class="step"><div class="n">1</div><div><h3>You choose your seva</h3><p>Pick the seva that feels right. A secure UPI / card payment — that's the only step you take.</p></div></div>
-        <div class="step"><div class="n">2</div><div><h3>The seva is performed</h3><p>Cows (gau mata) are fed and cared for in your name, your seva counted.</p></div></div>
-        <div class="step"><div class="n">3</div><div><h3>You receive a video</h3><p>From the ₹101 seva upward, a real video of your seva reaches you on WhatsApp within 7 days — so you see it was truly done. (The ₹11 and ₹51 sevas are pure seva in your name, without a video.)</p></div></div>
-        <div class="step"><div class="n">4</div><div><h3>Blessings &amp; gratitude</h3><p>Receive the blessings of gau mata and a heartfelt thank-you. The punya is yours.</p></div></div>
+        <div class="step"><div class="n">1</div><div><h3 data-hi="आप अपनी सेवा चुनते हैं" data-en="You choose your seva">आप अपनी सेवा चुनते हैं</h3><p data-hi="जो सेवा सही लगे उसे चुनें। एक सुरक्षित UPI / कार्ड भुगतान — बस इतना ही आपको करना है।" data-en="Pick the seva that feels right. A secure UPI / card payment — that's the only step you take.">जो सेवा सही लगे उसे चुनें। एक सुरक्षित UPI / कार्ड भुगतान — बस इतना ही आपको करना है।</p></div></div>
+        <div class="step"><div class="n">2</div><div><h3 data-hi="सेवा की जाती है" data-en="The seva is performed">सेवा की जाती है</h3><p data-hi="आपके नाम से गौ माता को चारा खिलाया व उनकी सेवा की जाती है, और आपकी सेवा गिनी जाती है।" data-en="Cows (gau mata) are fed and cared for in your name, your seva counted.">आपके नाम से गौ माता को चारा खिलाया व उनकी सेवा की जाती है, और आपकी सेवा गिनी जाती है।</p></div></div>
+        <div class="step"><div class="n">3</div><div><h3 data-hi="आपको वीडियो मिलता है" data-en="You receive a video">आपको वीडियो मिलता है</h3><p data-hi="₹101 की सेवा से ऊपर, आपकी सेवा का असली वीडियो 7 दिनों के भीतर WhatsApp पर आप तक पहुँचता है — ताकि आप देख सकें कि यह सचमुच हुई। (₹11 और ₹51 की सेवाएँ आपके नाम से शुद्ध सेवा हैं, बिना वीडियो के।)" data-en="From the ₹101 seva upward, a real video of your seva reaches you on WhatsApp within 7 days — so you see it was truly done. (The ₹11 and ₹51 sevas are pure seva in your name, without a video.)">₹101 की सेवा से ऊपर, आपकी सेवा का असली वीडियो 7 दिनों के भीतर WhatsApp पर आप तक पहुँचता है — ताकि आप देख सकें कि यह सचमुच हुई। (₹11 और ₹51 की सेवाएँ आपके नाम से शुद्ध सेवा हैं, बिना वीडियो के।)</p></div></div>
+        <div class="step"><div class="n">4</div><div><h3 data-hi="आशीर्वाद और आभार" data-en="Blessings and gratitude">आशीर्वाद और आभार</h3><p data-hi="गौ माता का आशीर्वाद और हृदय से धन्यवाद पाएं। पुण्य आपका है।" data-en="Receive the blessings of gau mata and a heartfelt thank-you. The punya is yours.">गौ माता का आशीर्वाद और हृदय से धन्यवाद पाएं। पुण्य आपका है।</p></div></div>
       </div>
     </div>
   </section>
@@ -318,13 +341,13 @@
   <section class="why">
     <div class="wrap">
       <div class="section-head">
-        <div class="eyebrow">Why Gau Seva</div>
-        <h2>The cow is a mother to all</h2>
-        <p>In the Sanatan tradition, the cow — Gau Mata — is revered as a giver of nourishment and life. To feed and protect a cow is among the gentlest and most cherished acts of seva — it asks only a little kindness, and returns blessings that stay with your family.</p>
+        <div class="eyebrow" data-hi="गौ सेवा क्यों" data-en="Why Gau Seva">गौ सेवा क्यों</div>
+        <h2 data-hi="गाय सबकी माता है" data-en="The cow is a mother to all">गाय सबकी माता है</h2>
+        <p data-hi="सनातन परंपरा में गाय — गौ माता — को पोषण और जीवन देने वाली के रूप में पूजा जाता है। गाय को भोजन देना और उसकी रक्षा करना सेवा के सबसे कोमल और प्रिय कार्यों में से एक है — यह केवल थोड़ी करुणा माँगता है, और ऐसा आशीर्वाद लौटाता है जो आपके परिवार के साथ रहता है।" data-en="In the Sanatan tradition, the cow — Gau Mata — is revered as a giver of nourishment and life. To feed and protect a cow is among the gentlest and most cherished acts of seva — it asks only a little kindness, and returns blessings that stay with your family.">सनातन परंपरा में गाय — गौ माता — को पोषण और जीवन देने वाली के रूप में पूजा जाता है। गाय को भोजन देना और उसकी रक्षा करना सेवा के सबसे कोमल और प्रिय कार्यों में से एक है — यह केवल थोड़ी करुणा माँगता है, और ऐसा आशीर्वाद लौटाता है जो आपके परिवार के साथ रहता है।</p>
       </div>
       <blockquote>
         <span class="shlok deva">गावो विश्वस्य मातरः</span>
-        “The cows are the mothers of the universe.” To serve them is to serve every home they nourish.
+        <span data-hi="“गावें विश्व की माता हैं।” उनकी सेवा करना उन सब घरों की सेवा है जिन्हें वे पोषित करती हैं।" data-en="“The cows are the mothers of the universe.” To serve them is to serve every home they nourish.">“गावें विश्व की माता हैं।” उनकी सेवा करना उन सब घरों की सेवा है जिन्हें वे पोषित करती हैं।</span>
       </blockquote>
     </div>
   </section>
@@ -332,11 +355,11 @@
   <!-- ══════════ TRUST BADGES ══════════ -->
   <section>
     <div class="wrap">
-      <div class="section-head"><div class="eyebrow">Why you can trust this</div><h2>Sincere seva, honestly done</h2></div>
+      <div class="section-head"><div class="eyebrow" data-hi="आप इस पर भरोसा क्यों कर सकते हैं" data-en="Why you can trust this">आप इस पर भरोसा क्यों कर सकते हैं</div><h2 data-hi="सच्ची सेवा, ईमानदारी से की गई" data-en="Sincere seva, honestly done">सच्ची सेवा, ईमानदारी से की गई</h2></div>
       <div class="badges">
-        <div class="badge-row"><span class="ic"><svg><use href="#check"/></svg></span><div><b>A real video of your seva</b> <span>— from the ₹101 seva upward, genuine video evidence is delivered within 7 days.</span></div></div>
-        <div class="badge-row"><span class="ic"><svg><use href="#shield"/></svg></span><div><b>Secure UPI / card payment</b> <span>— prepaid through a trusted payment page. No cash, no hidden charges.</span></div></div>
-        <div class="badge-row"><span class="ic"><svg><use href="#lotus"/></svg></span><div><b>Performed with devotion</b> <span>— your seva is carried out in your name as a sacred punya act for gau mata.</span></div></div>
+        <div class="badge-row"><span class="ic"><svg><use href="#check"/></svg></span><div data-hi="<b>आपकी सेवा का असली वीडियो</b> <span>— ₹101 की सेवा से ऊपर, असली वीडियो प्रमाण 7 दिनों के भीतर दिया जाता है।</span>" data-en="<b>A real video of your seva</b> <span>— from the ₹101 seva upward, genuine video evidence is delivered within 7 days.</span>"><b>आपकी सेवा का असली वीडियो</b> <span>— ₹101 की सेवा से ऊपर, असली वीडियो प्रमाण 7 दिनों के भीतर दिया जाता है।</span></div></div>
+        <div class="badge-row"><span class="ic"><svg><use href="#shield"/></svg></span><div data-hi="<b>सुरक्षित UPI / कार्ड भुगतान</b> <span>— एक भरोसेमंद भुगतान पेज के माध्यम से प्रीपेड। न नकद, न कोई छिपा शुल्क।</span>" data-en="<b>Secure UPI / card payment</b> <span>— prepaid through a trusted payment page. No cash, no hidden charges.</span>"><b>सुरक्षित UPI / कार्ड भुगतान</b> <span>— एक भरोसेमंद भुगतान पेज के माध्यम से प्रीपेड। न नकद, न कोई छिपा शुल्क।</span></div></div>
+        <div class="badge-row"><span class="ic"><svg><use href="#lotus"/></svg></span><div data-hi="<b>श्रद्धा के साथ की गई</b> <span>— आपकी सेवा आपके नाम से गौ माता के लिए एक पवित्र पुण्य कार्य के रूप में की जाती है।</span>" data-en="<b>Performed with devotion</b> <span>— your seva is carried out in your name as a sacred punya act for gau mata.</span>"><b>श्रद्धा के साथ की गई</b> <span>— आपकी सेवा आपके नाम से गौ माता के लिए एक पवित्र पुण्य कार्य के रूप में की जाती है।</span></div></div>
       </div>
     </div>
   </section>
@@ -344,14 +367,14 @@
   <!-- ══════════ TESTIMONIALS (PLACEHOLDERS — replace with real ones) ══════════ -->
   <section>
     <div class="wrap">
-      <div class="section-head"><div class="eyebrow">From devotees</div><h2>Those who felt the blessing</h2></div>
+      <div class="section-head"><div class="eyebrow" data-hi="भक्तों से" data-en="From devotees">भक्तों से</div><h2 data-hi="जिन्होंने आशीर्वाद महसूस किया" data-en="Those who felt the blessing">जिन्होंने आशीर्वाद महसूस किया</h2></div>
       <div class="tst">
-        <!-- Genuine review (Krishna Shukla) -->
-        <div class="card"><div class="stars">★★★★★</div><p class="deva">“आप पूर्ण विश्वास के साथ कर रहे हैं तो हमारा भी अटूट विश्वास महादेव पर है। आप पूर्ण निष्ठा के साथ बहुत सुंदर कार्य कर रहे हैं। धन्यवाद भाई।”</p><div class="who">— Krishna Shukla</div></div>
-        <!-- Illustrative review (English) -->
-        <div class="card"><div class="stars">★★★★★</div><p>“I booked a seva for my parents and received the video within a few days. Seeing the cows being fed in our name was deeply moving. Thank you, Ritham.”</p><div class="who">— Ananya Iyer</div></div>
-        <!-- Illustrative review (Hinglish) -->
-        <div class="card"><div class="stars">★★★★★</div><p>“Bahut hi sundar seva hai. Payment ke kuch hi din baad video mil gaya, dekh kar mann prasann ho gaya. Gau seva ka mauka dene ke liye dhanyavaad.”</p><div class="who">— Rohit Verma</div></div>
+        <!-- Genuine review (Krishna Shukla) — original Hindi kept; English is a faithful translation -->
+        <div class="card"><div class="stars">★★★★★</div><p data-hi="“आप पूर्ण विश्वास के साथ कर रहे हैं तो हमारा भी अटूट विश्वास महादेव पर है। आप पूर्ण निष्ठा के साथ बहुत सुंदर कार्य कर रहे हैं। धन्यवाद भाई।”" data-en="“You are doing this with complete faith, and our faith in Mahadev is unshakeable too. You are doing a truly beautiful work with full devotion. Thank you, brother.”">“आप पूर्ण विश्वास के साथ कर रहे हैं तो हमारा भी अटूट विश्वास महादेव पर है। आप पूर्ण निष्ठा के साथ बहुत सुंदर कार्य कर रहे हैं। धन्यवाद भाई।”</p><div class="who">— Krishna Shukla</div></div>
+        <!-- Illustrative review -->
+        <div class="card"><div class="stars">★★★★★</div><p data-hi="“मैंने अपने माता-पिता के लिए एक सेवा बुक की और कुछ ही दिनों में वीडियो मिल गया। हमारे नाम से गायों को चारा खिलते देखना बहुत भावुक कर देने वाला था। धन्यवाद, Ritham।”" data-en="“I booked a seva for my parents and received the video within a few days. Seeing the cows being fed in our name was deeply moving. Thank you, Ritham.”">“मैंने अपने माता-पिता के लिए एक सेवा बुक की और कुछ ही दिनों में वीडियो मिल गया। हमारे नाम से गायों को चारा खिलते देखना बहुत भावुक कर देने वाला था। धन्यवाद, Ritham।”</p><div class="who">— Ananya Iyer</div></div>
+        <!-- Illustrative review -->
+        <div class="card"><div class="stars">★★★★★</div><p data-hi="“बहुत ही सुंदर सेवा है। भुगतान के कुछ ही दिनों बाद वीडियो मिल गया, देखकर मन प्रसन्न हो गया। गौ सेवा का मौका देने के लिए धन्यवाद।”" data-en="“This is a truly beautiful seva. I got the video just a few days after paying — seeing it filled my heart with joy. Thank you for the chance to do gau seva.”">“बहुत ही सुंदर सेवा है। भुगतान के कुछ ही दिनों बाद वीडियो मिल गया, देखकर मन प्रसन्न हो गया। गौ सेवा का मौका देने के लिए धन्यवाद।”</p><div class="who">— Rohit Verma</div></div>
       </div>
     </div>
   </section>
@@ -359,15 +382,15 @@
   <!-- ══════════ FAQ ══════════ -->
   <section>
     <div class="wrap">
-      <div class="section-head"><div class="eyebrow">Questions</div><h2>Frequently asked</h2></div>
+      <div class="section-head"><div class="eyebrow" data-hi="प्रश्न" data-en="Questions">प्रश्न</div><h2 data-hi="अक्सर पूछे जाने वाले प्रश्न" data-en="Frequently asked">अक्सर पूछे जाने वाले प्रश्न</h2></div>
       <div class="faq">
-        <details><summary>Will I get a proof video? <span class="chev">+</span></summary><div class="a">From the <b>₹101 seva upward</b>, yes — you receive a genuine video of the seva performed in your name, sent on WhatsApp within 7 days of booking. The <b>₹11</b> and <b>₹51</b> sevas are offered as <b>pure seva in your name</b> and do not include a video.</div></details>
-        <details><summary>Why is there no video for the ₹11 and ₹51 sevas? <span class="chev">+</span></summary><div class="a">These smaller sevas are performed as a pure seva in your name — the fodder and care are still offered to the cows, but individually filming and delivering a video for every small booking isn't feasible. If you would like a proof video, please choose the ₹101 seva or above.</div></details>
-        <details><summary>How is the seva done? <span class="chev">+</span></summary><div class="a">Your payment funds the feeding and care of cows (gau mata) — fodder, nourishment and upkeep. A larger seva supports more cows.</div></details>
-        <details><summary>When is the seva performed? <span class="chev">+</span></summary><div class="a">The seva is performed after you book, and your video reaches you within 7 days. Bookings for this round are closing soon.</div></details>
-        <details><summary>Where do the cows live and who cares for them? <span class="chev">+</span></summary><div class="a">The cows are cared for at a goshala (cow shelter) by people devoted to their wellbeing. Your video shows the very seva your booking supported. For anything specific, message us on WhatsApp.</div></details>
-        <details><summary>Is this a donation? <span class="chev">+</span></summary><div class="a">No. Gau Seva is a <b>paid seva service</b>: you book a seva, it is performed on your behalf, and you receive a video as proof. Your payment is a service fee — a portion funds the fodder and care offered to the cows, and the rest covers our service and operating costs. It is not a charitable donation and carries no tax-exemption (80G) benefit. See our <a href="terms.html">Gau Seva Terms</a>.</div></details>
-        <details><summary>Is my payment secure? <span class="chev">+</span></summary><div class="a">Yes — payment is prepaid via a secure hosted UPI / card page. We never see or store your card details. No cash on delivery.</div></details>
+        <details><summary><span data-hi="क्या मुझे प्रूफ वीडियो मिलेगा?" data-en="Will I get a proof video?">क्या मुझे प्रूफ वीडियो मिलेगा?</span> <span class="chev">+</span></summary><div class="a" data-hi="<b>₹101 की सेवा से ऊपर</b>, हाँ — आपको आपके नाम से की गई सेवा का असली वीडियो मिलता है, जो बुकिंग के 7 दिनों के भीतर WhatsApp पर भेजा जाता है। <b>₹11</b> और <b>₹51</b> की सेवाएँ <b>आपके नाम से शुद्ध सेवा</b> के रूप में की जाती हैं और उनमें वीडियो शामिल नहीं है।" data-en="From the <b>₹101 seva upward</b>, yes — you receive a genuine video of the seva performed in your name, sent on WhatsApp within 7 days of booking. The <b>₹11</b> and <b>₹51</b> sevas are offered as <b>pure seva in your name</b> and do not include a video."><b>₹101 की सेवा से ऊपर</b>, हाँ — आपको आपके नाम से की गई सेवा का असली वीडियो मिलता है, जो बुकिंग के 7 दिनों के भीतर WhatsApp पर भेजा जाता है। <b>₹11</b> और <b>₹51</b> की सेवाएँ <b>आपके नाम से शुद्ध सेवा</b> के रूप में की जाती हैं और उनमें वीडियो शामिल नहीं है।</div></details>
+        <details><summary><span data-hi="₹11 और ₹51 की सेवाओं के लिए वीडियो क्यों नहीं है?" data-en="Why is there no video for the ₹11 and ₹51 sevas?">₹11 और ₹51 की सेवाओं के लिए वीडियो क्यों नहीं है?</span> <span class="chev">+</span></summary><div class="a" data-hi="ये छोटी सेवाएँ आपके नाम से शुद्ध सेवा के रूप में की जाती हैं — चारा और देखभाल फिर भी गायों को अर्पित की जाती है, पर हर छोटी बुकिंग के लिए अलग से वीडियो बनाना और भेजना संभव नहीं है। यदि आप प्रूफ वीडियो चाहते हैं, तो कृपया ₹101 या उससे ऊपर की सेवा चुनें।" data-en="These smaller sevas are performed as a pure seva in your name — the fodder and care are still offered to the cows, but individually filming and delivering a video for every small booking isn't feasible. If you would like a proof video, please choose the ₹101 seva or above.">ये छोटी सेवाएँ आपके नाम से शुद्ध सेवा के रूप में की जाती हैं — चारा और देखभाल फिर भी गायों को अर्पित की जाती है, पर हर छोटी बुकिंग के लिए अलग से वीडियो बनाना और भेजना संभव नहीं है। यदि आप प्रूफ वीडियो चाहते हैं, तो कृपया ₹101 या उससे ऊपर की सेवा चुनें।</div></details>
+        <details><summary><span data-hi="सेवा कैसे की जाती है?" data-en="How is the seva done?">सेवा कैसे की जाती है?</span> <span class="chev">+</span></summary><div class="a" data-hi="आपका भुगतान गौ माता के भोजन और देखभाल में लगता है — चारा, पोषण और रखरखाव। बड़ी सेवा अधिक गायों की मदद करती है।" data-en="Your payment funds the feeding and care of cows (gau mata) — fodder, nourishment and upkeep. A larger seva supports more cows.">आपका भुगतान गौ माता के भोजन और देखभाल में लगता है — चारा, पोषण और रखरखाव। बड़ी सेवा अधिक गायों की मदद करती है।</div></details>
+        <details><summary><span data-hi="सेवा कब की जाती है?" data-en="When is the seva performed?">सेवा कब की जाती है?</span> <span class="chev">+</span></summary><div class="a" data-hi="बुकिंग के बाद सेवा की जाती है, और आपका वीडियो 7 दिनों के भीतर आप तक पहुँचता है। इस दौर की बुकिंग जल्द बंद हो रही है।" data-en="The seva is performed after you book, and your video reaches you within 7 days. Bookings for this round are closing soon.">बुकिंग के बाद सेवा की जाती है, और आपका वीडियो 7 दिनों के भीतर आप तक पहुँचता है। इस दौर की बुकिंग जल्द बंद हो रही है।</div></details>
+        <details><summary><span data-hi="गायें कहाँ रहती हैं और उनकी देखभाल कौन करता है?" data-en="Where do the cows live and who cares for them?">गायें कहाँ रहती हैं और उनकी देखभाल कौन करता है?</span> <span class="chev">+</span></summary><div class="a" data-hi="गायों की देखभाल एक गोशाला में उन लोगों द्वारा की जाती है जो उनके कल्याण के लिए समर्पित हैं। आपका वीडियो वही सेवा दिखाता है जिसे आपकी बुकिंग ने सहारा दिया। किसी भी विशेष बात के लिए, हमें WhatsApp पर संदेश करें।" data-en="The cows are cared for at a goshala (cow shelter) by people devoted to their wellbeing. Your video shows the very seva your booking supported. For anything specific, message us on WhatsApp.">गायों की देखभाल एक गोशाला में उन लोगों द्वारा की जाती है जो उनके कल्याण के लिए समर्पित हैं। आपका वीडियो वही सेवा दिखाता है जिसे आपकी बुकिंग ने सहारा दिया। किसी भी विशेष बात के लिए, हमें WhatsApp पर संदेश करें।</div></details>
+        <details><summary><span data-hi="क्या यह दान है?" data-en="Is this a donation?">क्या यह दान है?</span> <span class="chev">+</span></summary><div class="a" data-hi="नहीं। गौ सेवा एक <b>सशुल्क सेवा</b> है: आप एक सेवा बुक करते हैं, वह आपकी ओर से की जाती है, और आपको प्रमाण के रूप में वीडियो मिलता है। आपका भुगतान एक सेवा शुल्क है — इसका एक हिस्सा गायों को अर्पित चारे और देखभाल में लगता है, और बाकी हमारी सेवा व संचालन लागत को कवर करता है। यह कोई धर्मार्थ दान नहीं है और इस पर कर-छूट (80G) लाभ नहीं है। हमारी <a href=&quot;terms.html&quot;>गौ सेवा शर्तें</a> देखें।" data-en="No. Gau Seva is a <b>paid seva service</b>: you book a seva, it is performed on your behalf, and you receive a video as proof. Your payment is a service fee — a portion funds the fodder and care offered to the cows, and the rest covers our service and operating costs. It is not a charitable donation and carries no tax-exemption (80G) benefit. See our <a href=&quot;terms.html&quot;>Gau Seva Terms</a>.">नहीं। गौ सेवा एक <b>सशुल्क सेवा</b> है: आप एक सेवा बुक करते हैं, वह आपकी ओर से की जाती है, और आपको प्रमाण के रूप में वीडियो मिलता है। आपका भुगतान एक सेवा शुल्क है — इसका एक हिस्सा गायों को अर्पित चारे और देखभाल में लगता है, और बाकी हमारी सेवा व संचालन लागत को कवर करता है। यह कोई धर्मार्थ दान नहीं है और इस पर कर-छूट (80G) लाभ नहीं है। हमारी <a href="terms.html">गौ सेवा शर्तें</a> देखें।</div></details>
+        <details><summary><span data-hi="क्या मेरा भुगतान सुरक्षित है?" data-en="Is my payment secure?">क्या मेरा भुगतान सुरक्षित है?</span> <span class="chev">+</span></summary><div class="a" data-hi="हाँ — भुगतान एक सुरक्षित UPI / कार्ड पेज के माध्यम से प्रीपेड है। हम आपके कार्ड विवरण कभी नहीं देखते या संग्रहीत नहीं करते। कोई कैश ऑन डिलीवरी नहीं।" data-en="Yes — payment is prepaid via a secure hosted UPI / card page. We never see or store your card details. No cash on delivery.">हाँ — भुगतान एक सुरक्षित UPI / कार्ड पेज के माध्यम से प्रीपेड है। हम आपके कार्ड विवरण कभी नहीं देखते या संग्रहीत नहीं करते। कोई कैश ऑन डिलीवरी नहीं।</div></details>
       </div>
     </div>
   </section>
@@ -375,17 +398,17 @@
   <!-- ══════════ FINAL CTA ══════════ -->
   <section class="center">
     <div class="wrap">
-      <div class="section-head"><div class="eyebrow">Bookings closing soon</div><h2>Offer your Seva to Gau Mata today</h2><p>A sacred seva, a lasting blessing — and, from the ₹101 seva upward, a real video to hold it close.</p></div>
-      <a class="btn btn-grad" href="#seva">Choose your Seva</a>
+      <div class="section-head"><div class="eyebrow" data-hi="बुकिंग जल्द बंद हो रही है" data-en="Bookings closing soon">बुकिंग जल्द बंद हो रही है</div><h2 data-hi="आज गौ माता को अपनी सेवा अर्पित करें" data-en="Offer your Seva to Gau Mata today">आज गौ माता को अपनी सेवा अर्पित करें</h2><p data-hi="एक पवित्र सेवा, एक चिरस्थायी आशीर्वाद — और, ₹101 की सेवा से ऊपर, उसे संजोने के लिए एक असली वीडियो।" data-en="A sacred seva, a lasting blessing — and, from the ₹101 seva upward, a real video to hold it close.">एक पवित्र सेवा, एक चिरस्थायी आशीर्वाद — और, ₹101 की सेवा से ऊपर, उसे संजोने के लिए एक असली वीडियो।</p></div>
+      <a class="btn btn-grad" href="#seva" data-hi="अपनी सेवा चुनें" data-en="Choose your Seva">अपनी सेवा चुनें</a>
     </div>
   </section>
 
   <footer>
     <div class="brand grad-text">Ritham · Gau Seva</div>
     <p class="small">
-      A paid seva service — your seva performed in your name; a real proof video within 7 days from the ₹101 seva upward.<br/>
-      Questions? <a href="https://wa.me/WHATSAPP_NUMBER" target="_blank" rel="noopener">Message us on WhatsApp</a><br/>
-      <a href="terms.html">Gau Seva Terms</a> · <a href="../privacy.html">Privacy</a> · <a href="../refund.html">Refund &amp; Cancellation</a> · <a href="../index.html">Ritham home</a>
+      <span data-hi="एक सशुल्क सेवा — आपके नाम से की गई आपकी सेवा; ₹101 की सेवा से ऊपर 7 दिनों के भीतर एक असली प्रूफ वीडियो।" data-en="A paid seva service — your seva performed in your name; a real proof video within 7 days from the ₹101 seva upward.">एक सशुल्क सेवा — आपके नाम से की गई आपकी सेवा; ₹101 की सेवा से ऊपर 7 दिनों के भीतर एक असली प्रूफ वीडियो।</span><br/>
+      <span data-hi="प्रश्न?" data-en="Questions?">प्रश्न?</span> <a href="https://wa.me/WHATSAPP_NUMBER" target="_blank" rel="noopener"><span data-hi="हमें WhatsApp पर संदेश करें" data-en="Message us on WhatsApp">हमें WhatsApp पर संदेश करें</span></a><br/>
+      <a href="terms.html"><span data-hi="गौ सेवा शर्तें" data-en="Gau Seva Terms">गौ सेवा शर्तें</span></a> · <a href="../privacy.html"><span data-hi="गोपनीयता" data-en="Privacy">गोपनीयता</span></a> · <a href="../refund.html"><span data-hi="रिफंड और रद्दीकरण" data-en="Refund and Cancellation">रिफंड और रद्दीकरण</span></a> · <a href="../index.html"><span data-hi="Ritham होम" data-en="Ritham home">Ritham होम</span></a>
     </p>
   </footer>
 
@@ -394,8 +417,8 @@
 
   <!-- ══════════ STICKY CONTRIBUTE BAR ══════════ -->
   <div class="sticky-bar">
-    <div class="lbl"><small id="sb-sub">Selected seva</small><b id="sb-amt">₹101 · 11 Seva</b></div>
-    <button class="btn btn-grad" id="sb-go" type="button">Book Seva</button>
+    <div class="lbl"><small id="sb-sub" data-hi="चुनी गई सेवा" data-en="Selected seva">चुनी गई सेवा</small><b id="sb-amt">₹101 · 11 सेवा</b></div>
+    <button class="btn btn-grad" id="sb-go" type="button" data-hi="सेवा बुक करें" data-en="Book Seva">सेवा बुक करें</button>
   </div>
 
   <!-- ══════════ CHECKOUT MODAL (on-site Razorpay, like the Sawan puja) ══════════ -->
@@ -404,29 +427,29 @@
       <button class="modal-x" id="ck-close" type="button" aria-label="Close">&times;</button>
 
       <div id="ck-form">
-        <div class="eyebrow">Book your Seva</div>
-        <div class="ck-amt"><span id="ck-amt">₹101</span> · <span id="ck-count">11</span> Seva</div>
-        <label class="ck-l" for="ck-name">Your name</label>
-        <input class="ck-in" id="ck-name" type="text" placeholder="Name for the sankalp" autocomplete="name" maxlength="80" />
-        <label class="ck-l" for="ck-wa">WhatsApp number</label>
-        <div class="ck-phone"><span>+91</span><input id="ck-wa" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit number" autocomplete="tel-national" /></div>
-        <p class="ck-note" id="ck-note">Your proof video is delivered here on WhatsApp within 7 days.</p>
+        <div class="eyebrow" data-hi="अपनी सेवा बुक करें" data-en="Book your Seva">अपनी सेवा बुक करें</div>
+        <div class="ck-amt"><span id="ck-amt">₹101</span> · <span id="ck-count">11</span> <span data-hi="सेवा" data-en="Seva">सेवा</span></div>
+        <label class="ck-l" for="ck-name" data-hi="आपका नाम" data-en="Your name">आपका नाम</label>
+        <input class="ck-in" id="ck-name" type="text" placeholder="संकल्प के लिए नाम" data-ph-hi="संकल्प के लिए नाम" data-ph-en="Name for the sankalp" autocomplete="name" maxlength="80" />
+        <label class="ck-l" for="ck-wa" data-hi="WhatsApp नंबर" data-en="WhatsApp number">WhatsApp नंबर</label>
+        <div class="ck-phone"><span>+91</span><input id="ck-wa" type="tel" inputmode="numeric" maxlength="10" placeholder="10-अंकों का नंबर" data-ph-hi="10-अंकों का नंबर" data-ph-en="10-digit number" autocomplete="tel-national" /></div>
+        <p class="ck-note" id="ck-note">आपका प्रूफ वीडियो यहाँ WhatsApp पर 7 दिनों के भीतर पहुँचाया जाता है।</p>
         <p class="ck-err" id="ck-err"></p>
-        <button class="btn btn-grad btn-block" id="ck-pay" type="button">Proceed to Pay</button>
-        <p class="ck-secure">Secure UPI / card payment · powered by Razorpay</p>
+        <button class="btn btn-grad btn-block" id="ck-pay" type="button" data-hi="भुगतान के लिए आगे बढ़ें" data-en="Proceed to Pay">भुगतान के लिए आगे बढ़ें</button>
+        <p class="ck-secure" data-hi="सुरक्षित UPI / कार्ड भुगतान · Razorpay द्वारा संचालित" data-en="Secure UPI / card payment · powered by Razorpay">सुरक्षित UPI / कार्ड भुगतान · Razorpay द्वारा संचालित</p>
       </div>
 
       <div id="ck-processing" class="ck-center" style="display:none">
         <div class="spinner" aria-hidden="true"></div>
-        <p>Opening secure payment…</p>
+        <p data-hi="सुरक्षित भुगतान खोला जा रहा है…" data-en="Opening secure payment…">सुरक्षित भुगतान खोला जा रहा है…</p>
       </div>
 
       <div id="ck-success" class="ck-center" style="display:none">
         <div class="ck-tick"><svg><use href="#check"/></svg></div>
-        <h3>Seva booked</h3>
-        <p id="ck-succ-msg">Your Gau Seva is confirmed. Your proof video will be delivered on WhatsApp <b>within 7 days</b>. Gau Mata ki jai.</p>
+        <h3 data-hi="सेवा बुक हो गई" data-en="Seva booked">सेवा बुक हो गई</h3>
+        <p id="ck-succ-msg">आपकी गौ सेवा पक्की हो गई है। आपका प्रूफ वीडियो WhatsApp पर <b>7 दिनों के भीतर</b> पहुँचाया जाएगा। गौ माता की जय।</p>
         <p class="ck-code" id="ck-code"></p>
-        <button class="btn btn-ghost" id="ck-done" type="button">Done</button>
+        <button class="btn btn-ghost" id="ck-done" type="button" data-hi="हो गया" data-en="Done">हो गया</button>
       </div>
     </div>
   </div>
@@ -439,10 +462,57 @@
     var SB_URL  = 'https://eaxdqizerkuqkujxacru.supabase.co';
     var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVheGRxaXplcmt1cWt1anhhY3J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MTU2MjksImV4cCI6MjA5ODQ5MTYyOX0.TB2A8e_7sl1rhH7aRi3QVJ5Q-QMgNlHnygK9TAiSFzI';
 
+    // ── i18n: default HINDI, one tap to English. All copy also lives inline in
+    //    data-hi / data-en attributes on the markup; these are the JS-generated
+    //    strings (sticky bar, modal notes, success + error messages). ──────────
+    var LANG = 'hi';
+    var STR = {
+      seva:        { hi:'सेवा', en:'Seva' },
+      noteVideo:   { hi:'आपका प्रूफ वीडियो यहाँ WhatsApp पर 7 दिनों के भीतर पहुँचाया जाता है।',
+                     en:'Your proof video is delivered here on WhatsApp within 7 days.' },
+      noteNoVideo: { hi:'यह <b>आपके नाम से शुद्ध सेवा</b> है — इस श्रेणी के लिए कोई प्रूफ वीडियो नहीं भेजा जाता। प्रूफ वीडियो के लिए ₹101 या उससे ऊपर की सेवा चुनें।',
+                     en:'This is a <b>pure seva in your name</b> — no proof video is sent for this tier. For a proof video, choose the ₹101 seva or above.' },
+      succVideo:   { hi:'आपकी गौ सेवा पक्की हो गई है। आपका प्रूफ वीडियो WhatsApp पर <b>7 दिनों के भीतर</b> पहुँचाया जाएगा। गौ माता की जय।',
+                     en:'Your Gau Seva is confirmed. Your proof video will be delivered on WhatsApp <b>within 7 days</b>. Gau Mata ki jai.' },
+      succNoVideo: { hi:'आपकी गौ सेवा पक्की हो गई है और <b>आपके नाम से शुद्ध सेवा</b> के रूप में की जाएगी। गौ माता की जय।',
+                     en:'Your Gau Seva is confirmed and will be performed as a <b>pure seva in your name</b>. Gau Mata ki jai.' },
+      ref:         { hi:'बुकिंग रेफ: ', en:'Booking ref: ' },
+      errName:     { hi:'कृपया अपना नाम दर्ज करें।', en:'Please enter your name.' },
+      errWa:       { hi:'एक मान्य 10-अंकों का WhatsApp नंबर दर्ज करें।', en:'Enter a valid 10-digit WhatsApp number.' },
+      errCancel:   { hi:'भुगतान रद्द हो गया — आप फिर से प्रयास कर सकते हैं।', en:'Payment cancelled — you can try again.' },
+      errClosed:   { hi:'इस दौर की बुकिंग बंद हो चुकी है।', en:'Bookings for this round are closed.' },
+      errFailed:   { hi:'भुगतान नहीं हो सका। कृपया फिर से प्रयास करें।', en:'The payment did not go through. Please try again.' },
+      errGeneric:  { hi:'कुछ गड़बड़ हो गई। कृपया फिर से प्रयास करें।', en:'Something went wrong. Please try again.' }
+    };
+    function tr(k){ return (STR[k] && STR[k][LANG]) || ''; }
+
     var tiers = document.querySelectorAll('.tier');
     var sbAmt = document.getElementById('sb-amt');
     var sbGo  = document.getElementById('sb-go');
     var selected = null;
+
+    // Apply a language: swap every data-hi/data-en element + placeholders, then
+    // refresh the JS-driven strings. No reload, no storage — a simple JS state var.
+    function applyLang(lang){
+      LANG = (lang === 'en') ? 'en' : 'hi';
+      document.documentElement.setAttribute('lang', LANG);
+      var els = document.querySelectorAll('[data-'+LANG+']');
+      for (var i=0;i<els.length;i++){ els[i].innerHTML = els[i].getAttribute('data-'+LANG); }
+      var phs = document.querySelectorAll('[data-ph-'+LANG+']');
+      for (var j=0;j<phs.length;j++){ phs[j].setAttribute('placeholder', phs[j].getAttribute('data-ph-'+LANG)); }
+      var btns = document.querySelectorAll('#langToggle button');
+      for (var k=0;k<btns.length;k++){ btns[k].classList.toggle('active', btns[k].getAttribute('data-lang')===LANG); }
+      refreshDynamic();
+    }
+    function refreshDynamic(){
+      if (selected){
+        sbAmt.textContent = '₹'+selected.getAttribute('data-amt')+' · '+selected.getAttribute('data-count')+' '+tr('seva');
+      }
+      if (modal && modal.classList.contains('open')){
+        var note = document.getElementById('ck-note');
+        if (note) note.innerHTML = current.hasVideo ? tr('noteVideo') : tr('noteNoVideo');
+      }
+    }
 
     function invokeFn(name, body){
       return fetch(SB_URL + '/functions/v1/' + name, {
@@ -458,14 +528,14 @@
     function select(t){
       if (selected) selected.classList.remove('sel');
       selected = t; t.classList.add('sel');
-      sbAmt.textContent = '₹' + t.getAttribute('data-amt') + ' · ' + t.getAttribute('data-count') + ' Seva';
+      sbAmt.textContent = '₹' + t.getAttribute('data-amt') + ' · ' + t.getAttribute('data-count') + ' ' + tr('seva');
     }
 
     // ── Checkout modal ──────────────────────────────────────
     var modal = document.getElementById('checkout');
     var elForm = document.getElementById('ck-form'), elProc = document.getElementById('ck-processing'), elSucc = document.getElementById('ck-success');
     var elErr = document.getElementById('ck-err'), elName = document.getElementById('ck-name'), elWa = document.getElementById('ck-wa');
-    var elPay = document.getElementById('ck-pay'), current = { amount:101, count:11 };
+    var elPay = document.getElementById('ck-pay'), current = { amount:101, count:11, hasVideo:true };
 
     function showPane(w){ elForm.style.display=(w==='form'?'block':'none'); elProc.style.display=(w==='proc'?'block':'none'); elSucc.style.display=(w==='succ'?'block':'none'); }
     function openCheckout(amount, count){
@@ -473,9 +543,7 @@
       current = { amount:amount, count:count, hasVideo:hasVideo };
       document.getElementById('ck-amt').textContent = '₹'+amount;
       document.getElementById('ck-count').textContent = count;
-      document.getElementById('ck-note').innerHTML = hasVideo
-        ? 'Your proof video is delivered here on WhatsApp within 7 days.'
-        : 'This is a <b>pure seva in your name</b> — no proof video is sent for this tier. For a proof video, choose the ₹101 seva or above.';
+      document.getElementById('ck-note').innerHTML = hasVideo ? tr('noteVideo') : tr('noteNoVideo');
       elErr.textContent=''; elPay.disabled=false; showPane('form');
       modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
       setTimeout(function(){ elName.focus(); }, 60);
@@ -498,7 +566,7 @@
       return new Promise(function(resolve, reject){
         var rzp = new window.Razorpay({
           key: ctx.keyId, amount: ctx.amountPaise, currency:'INR',
-          name:'Ritham · Gau Seva', description: current.count+' Seva',
+          name:'Ritham · Gau Seva', description: current.count+' '+tr('seva'),
           order_id: ctx.orderId, theme:{ color:'#7B2CBF' },
           prefill:{ name:name, contact: whatsapp.replace('+91','') },
           handler:function(resp){ resolve(resp); },
@@ -511,8 +579,8 @@
     function pay(){
       var name = elName.value.trim();
       var digits = elWa.value.replace(/\D/g,'');
-      if (name.length < 2){ elErr.textContent='Please enter your name.'; elName.focus(); return; }
-      if (!/^[6-9]\d{9}$/.test(digits)){ elErr.textContent='Enter a valid 10-digit WhatsApp number.'; elWa.focus(); return; }
+      if (name.length < 2){ elErr.textContent=tr('errName'); elName.focus(); return; }
+      if (!/^[6-9]\d{9}$/.test(digits)){ elErr.textContent=tr('errWa'); elWa.focus(); return; }
       elErr.textContent=''; elPay.disabled=true;
       var whatsapp = '+91'+digits, icId = uuid();
       fireIC(current.amount, icId);
@@ -530,20 +598,18 @@
             razorpay_signature: resp.razorpay_signature
           }).then(function(v){
             if (!v.data || !v.data.ok) throw new Error('verify_failed');
-            document.getElementById('ck-succ-msg').innerHTML = current.hasVideo
-              ? 'Your Gau Seva is confirmed. Your proof video will be delivered on WhatsApp <b>within 7 days</b>. Gau Mata ki jai.'
-              : 'Your Gau Seva is confirmed and will be performed as a <b>pure seva in your name</b>. Gau Mata ki jai.';
-            document.getElementById('ck-code').textContent = 'Booking ref: ' + (v.data.bookingCode||'');
+            document.getElementById('ck-succ-msg').innerHTML = current.hasVideo ? tr('succVideo') : tr('succNoVideo');
+            document.getElementById('ck-code').textContent = tr('ref') + (v.data.bookingCode||'');
             showPane('succ');
           });
         })
         .catch(function(err){
           elPay.disabled=false; showPane('form');
           var m = String(err && err.message || err);
-          if (m==='cancelled') elErr.textContent='Payment cancelled — you can try again.';
-          else if (m==='bookings_closed') elErr.textContent='Bookings for this round are closed.';
-          else if (m==='payment_failed') elErr.textContent='The payment did not go through. Please try again.';
-          else elErr.textContent='Something went wrong. Please try again.';
+          if (m==='cancelled') elErr.textContent=tr('errCancel');
+          else if (m==='bookings_closed') elErr.textContent=tr('errClosed');
+          else if (m==='payment_failed') elErr.textContent=tr('errFailed');
+          else elErr.textContent=tr('errGeneric');
         });
     }
     elPay.addEventListener('click', pay);
@@ -563,8 +629,16 @@
       openCheckout(Number(t.getAttribute('data-amt')), Number(t.getAttribute('data-count')));
     });
 
+    // ── Wire language toggle ────────────────────────────────
+    document.querySelectorAll('#langToggle button').forEach(function(b){
+      b.addEventListener('click', function(){ applyLang(b.getAttribute('data-lang')); });
+    });
+
     var def = document.querySelector('.tier.loved');
     if (def) select(def);
+
+    // Load in Hindi by default (markup is already Hindi; this keeps state in sync).
+    applyLang('hi');
   })();
   </script>
 </body>
