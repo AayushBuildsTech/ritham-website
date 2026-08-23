@@ -32,7 +32,7 @@
   t.src=v;s=b.getElementsByTagName(e)[0];
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1001713839547879');
+  fbq('init', '1658457675609940');   // Ritam OG pixel (owned by rithamastro business → CAPI-capable)
   fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
@@ -521,9 +521,9 @@
     // Browser-side Purchase — the payment completes ON this page (on-site Razorpay
     // Checkout), so there is no redirect/thank-you page to fire it from; we fire it
     // here the moment the server confirms the signature is valid. Page-scoped guard
-    // = fires at most once per load. eventID = razorpay_payment_id so it dedupes
-    // against the server-side CAPI Purchase (verify/webhook) once META_CAPI_TOKEN is
-    // set — just have that server Purchase reuse the same razorpay_payment_id.
+    // = fires at most once per load. eventID = "purchase_" + razorpay_order_id so it
+    // dedupes against the server-side CAPI Purchase (verify/webhook), which uses the
+    // exact same event_id, once META_CAPI_TOKEN is set. BOTH SIDES MUST MATCH.
     var purchaseFired = false;
     function firePurchase(amt, eventId){
       if (purchaseFired) return;
@@ -605,7 +605,8 @@
           }).then(function(v){
             if (!v.data || !v.data.ok) throw new Error('verify_failed');
             // Payment is verified server-side → fire the browser Purchase now.
-            firePurchase(current.amount, resp.razorpay_payment_id);
+            // event_id = "purchase_" + razorpay_order_id → matches the server CAPI Purchase for dedup.
+            firePurchase(current.amount, 'purchase_' + resp.razorpay_order_id);
             document.getElementById('ck-succ-msg').innerHTML = current.hasVideo ? tr('succVideo') : tr('succNoVideo');
             document.getElementById('ck-code').textContent = tr('ref') + (v.data.bookingCode||'');
             showPane('succ');
