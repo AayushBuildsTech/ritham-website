@@ -15,7 +15,7 @@
   <meta property="og:image" content="img/gau-hero.webp" />
 
   <!-- ════════════════════════════════════════════════════════════
-       META PIXEL  —  REPLACE  PIXEL_ID  with your real pixel id.
+       META PIXEL  —  Ritham pixel id 1001713839547879 (set below).
        • PageView on load.  • 'InitiateCheckout' on every tier tap
          (value = tier amount, currency INR) so Ads Manager shows which
          tier converts.
@@ -32,11 +32,11 @@
   t.src=v;s=b.getElementsByTagName(e)[0];
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', 'PIXEL_ID');
+  fbq('init', '1001713839547879');
   fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=PIXEL_ID&ev=PageView&noscript=1" /></noscript>
+    src="https://www.facebook.com/tr?id=1001713839547879&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel Code -->
 
   <!-- Brand fonts: Fraunces (display) + Inter (body) + Noto Sans Devanagari (Hindi). -->
@@ -518,6 +518,18 @@
     function fireIC(amt, eventId){
       if (window.fbq){ try{ fbq('track','InitiateCheckout',{value:Number(amt),currency:'INR'}, eventId?{eventID:eventId}:undefined); }catch(e){} }
     }
+    // Browser-side Purchase — the payment completes ON this page (on-site Razorpay
+    // Checkout), so there is no redirect/thank-you page to fire it from; we fire it
+    // here the moment the server confirms the signature is valid. Page-scoped guard
+    // = fires at most once per load. eventID = razorpay_payment_id so it dedupes
+    // against the server-side CAPI Purchase (verify/webhook) once META_CAPI_TOKEN is
+    // set — just have that server Purchase reuse the same razorpay_payment_id.
+    var purchaseFired = false;
+    function firePurchase(amt, eventId){
+      if (purchaseFired) return;
+      purchaseFired = true;
+      if (window.fbq){ try{ fbq('track','Purchase',{value:Number(amt),currency:'INR'}, eventId?{eventID:eventId}:undefined); }catch(e){} }
+    }
     function uuid(){ return 'ic-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10); }
     function select(t){
       if (selected) selected.classList.remove('sel');
@@ -592,6 +604,8 @@
             razorpay_signature: resp.razorpay_signature
           }).then(function(v){
             if (!v.data || !v.data.ok) throw new Error('verify_failed');
+            // Payment is verified server-side → fire the browser Purchase now.
+            firePurchase(current.amount, resp.razorpay_payment_id);
             document.getElementById('ck-succ-msg').innerHTML = current.hasVideo ? tr('succVideo') : tr('succNoVideo');
             document.getElementById('ck-code').textContent = tr('ref') + (v.data.bookingCode||'');
             showPane('succ');

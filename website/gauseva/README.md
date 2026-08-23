@@ -90,13 +90,35 @@ access is enforced server-side).
 
 | Placeholder | Where | What to put |
 |---|---|---|
-| `PIXEL_ID` | `<head>` Meta Pixel (4 spots) | Your Meta Pixel id (Ritham ad pixel: `1001713839547879`) |
+| ~~`PIXEL_ID`~~ ✅ done | `<head>` Meta Pixel | Set to the Ritham ad pixel `1001713839547879` (2026-08-23) — `fbq('init')` + `<noscript>` img. |
 | `WHATSAPP_NUMBER` | footer, final CTA, floating button (support chat) | Full international number, digits only — e.g. `919876543210` |
 
-> The browser pixel fires `InitiateCheckout` (with the tier amount + an
-> `eventID`) when checkout opens, and the server fires the deduped copy. The
-> reliable **`Purchase`** is fired server-side from verify/webhook — no thank-you
-> page needed (unlike hosted links).
+> **Meta Pixel events (on-site flow — no thank-you page):**
+> - **PageView** — base pixel in `<head>`.
+> - **InitiateCheckout** — browser fires it (tier amount + an `eventID`) when the
+>   checkout modal opens; the server fires the deduped copy via CAPI.
+> - **Purchase** — fired **two ways, deduped by `razorpay_payment_id`**:
+>   1. **Browser** (`firePurchase()` in the checkout `<script>`) the instant
+>      `gau-seva-verify-payment` confirms the signature. This works with **only
+>      `PIXEL_ID` set** — no CAPI token needed — so it's what makes Purchase show
+>      up immediately.
+>   2. **Server (CAPI)** from verify/webhook, once `META_CAPI_TOKEN` is set (more
+>      reliable when the browser is torn down during the UPI hop).
+>
+>   Because payment happens **on this page** (on-site Razorpay Checkout, not a
+>   hosted link), **there is no redirect and no `thankyou.html`** — a thank-you
+>   page would never be reached and must not be relied on for Purchase.
+>
+> **If Purchase is still not recording, check in this order:**
+> 1. ~~`PIXEL_ID` placeholder~~ — done (set to `1001713839547879`). Confirm the
+>    deployed `ritham-website` copy also has it (this repo is the source, not the
+>    live deploy).
+> 2. For the server CAPI copy: `META_CAPI_TOKEN` is unset on the edge functions →
+>    set it + redeploy (in the `ritham` repo). The browser Purchase above does not
+>    depend on this.
+> 3. When you enable the server CAPI Purchase, make it send
+>    `event_id = razorpay_payment_id` so it dedupes against the browser event
+>    (otherwise Meta counts the purchase twice).
 
 ## Images to add (in `gauseva/img/` and `gauseva/`)
 
