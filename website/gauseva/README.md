@@ -39,10 +39,10 @@ with a slightly larger line-height in Hindi mode for comfortable reading.
 1. The visitor taps **Book Seva** on a tier → a small modal collects **name +
    WhatsApp number**.
 2. The page calls **`gau-seva-create-order`** (Supabase edge fn) with the tier
-   amount. The server **recomputes the amount** from the fixed seva ladder
-   (₹11→1, ₹51→5, ₹101→11, ₹251→31, ₹501→51 — the client price is never
-   trusted), creates a Razorpay order, and writes a `pending_payment` row in
-   `gau_seva_bookings`.
+   amount **and an `addon` boolean**. The server **recomputes the amount** from
+   the fixed seva ladder (**₹11, ₹51, ₹101, ₹251, ₹501** — the client price is
+   never trusted) **and adds ₹51 when `addon` is true**, creates a Razorpay
+   order, and writes a `pending_payment` row in `gau_seva_bookings`.
 3. **Razorpay Checkout** opens on the page (UPI / cards).
 4. On success the page calls **`gau-seva-verify-payment`**, which verifies the
    HMAC signature, flips the booking to **`Payment Successful`**, sends the
@@ -86,12 +86,50 @@ access is enforced server-side).
 6. **Meta CAPI** (optional) — set `META_CAPI_TOKEN` to activate the server-side
    `Purchase` / `InitiateCheckout`.
 
+## Seva tiers (2026-08-26 restructure)
+
+The tier section now shows **five selectable cards** with a real description of
+what the cows receive (honest, act-focused copy — no personal-reward promises,
+to stay ad-policy compliant):
+
+| Amount | Card title | What the cows get | 🎥 Proof video |
+|---|---|---|---|
+| ₹11  | 1 Cow Seva | A day's meal for one cow | — |
+| ₹51  | 5 Cows Seva | A day's meal for five cows | — |
+| ₹101 | 11 Cows Seva | A day's meal for eleven cows | ✅ |
+| ₹251 | 5 Cows Sampoorna Seva *(premium card)* | A **complete** day: dry fodder, green fodder, roti — for five cows | ✅ |
+| ₹501 | 11 Cows Sampoorna Seva **· Most Popular** | A **complete** day: dry fodder, green fodder, roti — for eleven cows | ✅ |
+
+- **₹251 and ₹501 are visually highlighted** (`.tier.premium` gradient cards);
+  **₹501** additionally carries the **"Most Popular"** ribbon + gradient ring
+  (`.tier.popular`) and is the default-selected tier in the sticky bar.
+- The **🎥 proof-video badge shows on ₹101 and above only** (driven by
+  `data-video` / `base >= 101`). ₹11 and ₹51 are pure seva, no video.
+- **Add-on:** a checkbox under the tiers — *"Add a meal for one more cow — ₹51"*.
+  When ticked it folds **+₹51** into the total shown in the modal and the pixel
+  value, and passes `addon:true` to `gau-seva-create-order`.
+  ✅ **Backend (deployed 2026-08-26):** `gau-seva-create-order` adds ₹51 to the
+  recomputed amount **and** the stored `amount_inr` when `addon` is true, so the
+  charge matches the modal's "+₹51" preview. `verify`/`webhook` read the stored
+  `amount_inr`, so they needed no change.
+- **Note on payment-link placeholders:** this build uses the **on-site Razorpay
+  Checkout modal** (name/WhatsApp capture → edge functions → on-page Purchase),
+  **not hosted payment links**, so there are **no `PAYMENT_LINK_*` placeholders**
+  in `index.html` — nothing to paste. Amounts are fixed server-side by the tier
+  ladder above. (If you ever switch to hosted links, that would replace the whole
+  modal/edge-function flow and lose the on-page name+WhatsApp capture and admin
+  wiring.)
+- **Meta Pixel:** `InitiateCheckout` (modal open) and `Purchase` (after verify)
+  now fire with the **add-on-inclusive total** as `value` for each of the five
+  tiers — unchanged wiring, just the new amounts.
+
 ## Placeholders still to replace in `index.html`
 
 | Placeholder | Where | What to put |
 |---|---|---|
 | ~~`PIXEL_ID`~~ ✅ done | `<head>` Meta Pixel | Set to the Ritham ad pixel `1001713839547879` (2026-08-23) — `fbq('init')` + `<noscript>` img. |
 | `WHATSAPP_NUMBER` | footer, final CTA, floating button (support chat) | Full international number, digits only — e.g. `919876543210` |
+| `GOSHALA_LOCATION` | tier note under the cards + the "Where do the cows live?" FAQ | Your real goshala / city (e.g. `Barsana, UP`). Do **not** hardcode "Mathura". Appears twice — find/replace all. |
 
 > **Meta Pixel events (on-site flow — no thank-you page):**
 > - **PageView** — base pixel in `<head>`.
