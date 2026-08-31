@@ -15,15 +15,21 @@
   <meta property="og:image" content="img/gau-hero.webp" />
 
   <!-- ════════════════════════════════════════════════════════════
-       META PIXEL  —  Ritham pixel id 1001713839547879 (set below).
+       META PIXEL  —  single source of truth is META_PIXEL_ID below.
        • PageView on load.  • 'InitiateCheckout' on every tier tap
          (value = tier amount, currency INR) so Ads Manager shows which
          tier converts.
-       • The ad algorithm optimises on 'Purchase' — that event CANNOT
-         fire on this static page (the buyer leaves for Razorpay). Add a
-         Purchase pixel on the Razorpay thank-you page.
+       • The ad algorithm optimises on 'Purchase', fired on-page the
+         moment the server confirms payment (see firePurchase). The
+         server also sends a deduped CAPI Purchase (shared event_id).
        ════════════════════════════════════════════════════════════ -->
   <script>
+  // ── SINGLE SOURCE OF TRUTH for the browser Meta Pixel id ─────────────────────
+  // Set this to the Ritham Ads account's pixel id. The EXACT same id must be set
+  // as the Supabase secret META_PIXEL_ID (used by the server-side CAPI in
+  // gau-seva-webhook / gau-seva-verify-payment / gau-seva-create-order).
+  // If the two ever differ, events split across pixels again — do NOT let them.
+  var META_PIXEL_ID = '1658457675609940';   // Ritam OG pixel (Ritham Ads account)
   !function(f,b,e,v,n,t,s)
   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
   n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -32,11 +38,13 @@
   t.src=v;s=b.getElementsByTagName(e)[0];
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1001713839547879');   // "Puja service" — the pixel the Pooja Singh campaign optimizes on; CAPI must target THIS same id
+  fbq('init', META_PIXEL_ID);
   fbq('track', 'PageView');
   </script>
-  <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1001713839547879&ev=PageView&noscript=1" /></noscript>
+  <!-- No <noscript> beacon on purpose: it would require a SECOND hardcoded pixel id
+       (the exact divergence risk we're eliminating), and no-JS visitors can't fire
+       fbq events or complete Razorpay checkout anyway. META_PIXEL_ID stays the only
+       place the pixel id appears in this file. -->
   <!-- End Meta Pixel Code -->
 
   <!-- Brand fonts: Fraunces (display) + Inter (body) + Noto Sans Devanagari (Hindi). -->

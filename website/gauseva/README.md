@@ -127,7 +127,7 @@ to stay ad-policy compliant):
 
 | Placeholder | Where | What to put |
 |---|---|---|
-| ~~`PIXEL_ID`~~ ✅ done | `<head>` Meta Pixel | Set to the Ritham ad pixel `1001713839547879` (2026-08-23) — `fbq('init')` + `<noscript>` img. |
+| `META_PIXEL_ID` | `<head>` Meta Pixel (`var META_PIXEL_ID`) | **Single source of truth** for the browser pixel id. Set to the **Ritham Ads** account's pixel id (placeholder `RITHAM_ADS_PIXEL_ID` for now). The SAME id must be the Supabase secret `META_PIXEL_ID` used by the CAPI (create-order / verify / webhook). No `<noscript>` beacon — one literal only, so browser + server can never diverge. |
 | `WHATSAPP_NUMBER` | footer, final CTA, floating button (support chat) | Full international number, digits only — e.g. `919876543210` |
 | `GOSHALA_LOCATION` | tier note under the cards + the "Where do the cows live?" FAQ | Your real goshala / city (e.g. `Barsana, UP`). Do **not** hardcode "Mathura". Appears twice — find/replace all. |
 
@@ -135,7 +135,7 @@ to stay ad-policy compliant):
 > - **PageView** — base pixel in `<head>`.
 > - **InitiateCheckout** — browser fires it (tier amount + an `eventID`) when the
 >   checkout modal opens; the server fires the deduped copy via CAPI.
-> - **Purchase** — fired **two ways, deduped by `razorpay_payment_id`**:
+> - **Purchase** — fired **two ways, deduped by shared `event_id = "purchase_" + razorpay_order_id`**:
 >   1. **Browser** (`firePurchase()` in the checkout `<script>`) the instant
 >      `gau-seva-verify-payment` confirms the signature. This works with **only
 >      `PIXEL_ID` set** — no CAPI token needed — so it's what makes Purchase show
@@ -148,15 +148,16 @@ to stay ad-policy compliant):
 >   page would never be reached and must not be relied on for Purchase.
 >
 > **If Purchase is still not recording, check in this order:**
-> 1. ~~`PIXEL_ID` placeholder~~ — done (set to `1001713839547879`). Confirm the
+> 1. `META_PIXEL_ID` must be the **Ritham Ads** pixel in BOTH places (the `<head>`
+>    `var META_PIXEL_ID` here AND the Supabase secret `META_PIXEL_ID`). Confirm the
 >    deployed `ritham-website` copy also has it (this repo is the source, not the
 >    live deploy).
 > 2. For the server CAPI copy: `META_CAPI_TOKEN` is unset on the edge functions →
 >    set it + redeploy (in the `ritham` repo). The browser Purchase above does not
 >    depend on this.
-> 3. When you enable the server CAPI Purchase, make it send
->    `event_id = razorpay_payment_id` so it dedupes against the browser event
->    (otherwise Meta counts the purchase twice).
+> 3. The server CAPI Purchase already sends
+>    `event_id = "purchase_" + razorpay_order_id`, matching the browser event, so
+>    Meta dedupes the pair into one Purchase (not two).
 
 ## Images to add (in `gauseva/img/` and `gauseva/`)
 
