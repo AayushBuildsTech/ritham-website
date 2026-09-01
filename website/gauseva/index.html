@@ -285,20 +285,29 @@
     .live-dot::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--ok);
       box-shadow:0 0 0 0 rgba(26,157,106,.55);animation:pulse 1.8s infinite}
     @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(26,157,106,.5)}70%{box-shadow:0 0 0 8px rgba(26,157,106,0)}100%{box-shadow:0 0 0 0 rgba(26,157,106,0)}}
-    .donor-list{display:grid;gap:10px;max-width:560px;margin:0 auto}
-    .donor-item{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--line);
-      border-radius:14px;padding:12px 15px;box-shadow:var(--shadow-sm)}
-    .donor-item .av{flex:0 0 auto;width:42px;height:42px;border-radius:50%;background:var(--grad);color:#fff;
-      display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;font-family:'Inter',sans-serif}
-    .donor-item .nm{flex:1 1 auto;min-width:0;line-height:1.3}
-    .donor-item .nm b{display:block;color:var(--ink);font-size:15px;font-weight:600}
-    .donor-item .nm small{color:var(--muted);font-size:12.5px}
-    .donor-item .amt2{flex:0 0 auto;font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:#fff;
-      background:var(--grad);padding:5px 13px;border-radius:999px;box-shadow:0 6px 15px rgba(214,0,107,.22)}
-    .donor-more{max-width:560px;margin:14px auto 0;text-align:center;color:var(--muted);font-size:13.5px}
+    /* Fast-moving contributor carousel — two rows scrolling opposite ways, edges faded.
+       Each row's track holds the chip set TWICE so a translateX(-50%) loops seamlessly. */
+    .marquee{display:grid;gap:11px;
+      -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%);
+      mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%)}
+    .mq-row{overflow:hidden}
+    .mq-track{display:flex;gap:11px;width:max-content;will-change:transform}
+    .mq-track.a{animation:mq-left 26s linear infinite}
+    .mq-track.b{animation:mq-right 32s linear infinite}
+    .marquee:hover .mq-track{animation-play-state:paused}
+    @keyframes mq-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    @keyframes mq-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+    .donor-chip{flex:0 0 auto;display:flex;align-items:center;gap:9px;background:var(--surface);
+      border:1px solid var(--line);border-radius:999px;padding:5px 15px 5px 5px;box-shadow:var(--shadow-sm);white-space:nowrap}
+    .donor-chip .cav{width:30px;height:30px;border-radius:50%;background:var(--grad);color:#fff;flex:0 0 auto;
+      display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:'Inter',sans-serif}
+    .donor-chip .cnm{font-size:13.5px;font-weight:600;color:var(--ink)}
+    .donor-chip .camt{font-family:'Fraunces',serif;font-weight:700;font-size:13.5px;color:var(--magenta-d)}
+    .donor-more{max-width:560px;margin:16px auto 0;text-align:center;color:var(--muted);font-size:13.5px}
 
     @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}
-      .live-dot::before{animation:none!important}}
+      .live-dot::before{animation:none!important}
+      .mq-track{animation:none!important}}
   </style>
 </head>
 <body>
@@ -439,17 +448,11 @@
         <p data-hi="अभी-अभी अपने नाम से गौ सेवा बुक करने वाले कुछ श्रद्धालु। आप भी उनके साथ जुड़ें।" data-en="A few devotees who just booked their Gau Seva. Join them today.">अभी-अभी अपने नाम से गौ सेवा बुक करने वाले कुछ श्रद्धालु। आप भी उनके साथ जुड़ें।</p>
         <div class="live-dot" data-hi="अभी लाइव" data-en="Live now">अभी लाइव</div>
       </div>
-      <div class="donor-list">
-        <div class="donor-item"><span class="av">RK</span><div class="nm"><b>Rajesh Kumar</b><small data-hi="दिल्ली · कुछ मिनट पहले" data-en="Delhi · a few minutes ago">दिल्ली · कुछ मिनट पहले</small></div><span class="amt2">₹501</span></div>
-        <div class="donor-item"><span class="av">SD</span><div class="nm"><b>Sunita Devi</b><small data-hi="कानपुर · 8 मिनट पहले" data-en="Kanpur · 8 minutes ago">कानपुर · 8 मिनट पहले</small></div><span class="amt2">₹251</span></div>
-        <div class="donor-item"><span class="av">AP</span><div class="nm"><b>Amit Patel</b><small data-hi="अहमदाबाद · 12 मिनट पहले" data-en="Ahmedabad · 12 minutes ago">अहमदाबाद · 12 मिनट पहले</small></div><span class="amt2">₹501</span></div>
-        <div class="donor-item"><span class="av">NM</span><div class="nm"><b>Nikhil Mondal</b><small data-hi="कोलकाता · 19 मिनट पहले" data-en="Kolkata · 19 minutes ago">कोलकाता · 19 मिनट पहले</small></div><span class="amt2">₹501</span></div>
-        <div class="donor-item"><span class="av">VS</span><div class="nm"><b>Vikram Singh</b><small data-hi="लखनऊ · 24 मिनट पहले" data-en="Lucknow · 24 minutes ago">लखनऊ · 24 मिनट पहले</small></div><span class="amt2">₹1,100</span></div>
-        <div class="donor-item"><span class="av">AG</span><div class="nm"><b>Anjali Gupta</b><small data-hi="पुणे · 31 मिनट पहले" data-en="Pune · 31 minutes ago">पुणे · 31 मिनट पहले</small></div><span class="amt2">₹501</span></div>
-        <div class="donor-item"><span class="av">RY</span><div class="nm"><b>Ramesh Yadav</b><small data-hi="पटना · 38 मिनट पहले" data-en="Patna · 38 minutes ago">पटना · 38 मिनट पहले</small></div><span class="amt2">₹251</span></div>
-        <div class="donor-item"><span class="av">DV</span><div class="nm"><b>Deepak Verma</b><small data-hi="इंदौर · 46 मिनट पहले" data-en="Indore · 46 minutes ago">इंदौर · 46 मिनट पहले</small></div><span class="amt2">₹501</span></div>
-        <div class="donor-item"><span class="av">SR</span><div class="nm"><b>Suresh Reddy</b><small data-hi="हैदराबाद · 52 मिनट पहले" data-en="Hyderabad · 52 minutes ago">हैदराबाद · 52 मिनट पहले</small></div><span class="amt2">₹2,100</span></div>
-        <div class="donor-item"><span class="av">MA</span><div class="nm"><b>Meena Agarwal</b><small data-hi="भोपाल · 1 घंटा पहले" data-en="Bhopal · 1 hour ago">भोपाल · 1 घंटा पहले</small></div><span class="amt2">₹501</span></div>
+      <!-- Two fast-scrolling rows of contributor chips, built by JS (buildMarquee).
+           Names are illustrative; amounts skew to ₹251 / ₹501 to nudge upscaling. -->
+      <div class="marquee" id="donorMarquee" aria-hidden="true">
+        <div class="mq-row"><div class="mq-track a" id="mqTrackA"></div></div>
+        <div class="mq-row"><div class="mq-track b" id="mqTrackB"></div></div>
       </div>
       <p class="donor-more" data-hi="…और आज सैकड़ों भक्तों ने गौ माता की सेवा अर्पित की।" data-en="…and hundreds more devotees offered their seva to Gau Mata today.">…और आज सैकड़ों भक्तों ने गौ माता की सेवा अर्पित की।</p>
     </div>
@@ -850,6 +853,36 @@
     }
     // Re-render the on-screen toast when the language flips.
     langRefreshers.push(function(){ if (toastCur && toastEl.classList.contains('show')) renderToast(toastCur); });
+
+    // ── Fast-moving contributor carousel (dense social proof) ──
+    // Big pool of illustrative names; amounts skew hard to ₹251 / ₹501 so the
+    // wall of peers giving those tiers nudges visitors to match or upscale.
+    var MARQUEE = [
+      {n:'Rajesh Kumar',a:501},{n:'Sunita Devi',a:251},{n:'Amit Patel',a:501},{n:'Nikhil Mondal',a:501},
+      {n:'Vikram Singh',a:1100},{n:'Anjali Gupta',a:251},{n:'Ramesh Yadav',a:501},{n:'Deepak Verma',a:501},
+      {n:'Suresh Reddy',a:2100},{n:'Meena Agarwal',a:501},{n:'Pooja Sharma',a:251},{n:'Arjun Mehta',a:501},
+      {n:'Kavita Joshi',a:501},{n:'Manoj Tiwari',a:251},{n:'Sneha Nair',a:501},{n:'Kiran Rao',a:501},
+      {n:'Divya Menon',a:251},{n:'Sanjay Gupta',a:501},{n:'Ritu Malhotra',a:501},{n:'Harish Chandra',a:251},
+      {n:'Neha Agarwal',a:501},{n:'Priya Sharma',a:501},{n:'Rohit Verma',a:251},{n:'Ananya Iyer',a:501},
+      {n:'Gaurav Bhatt',a:501},{n:'Shweta Rai',a:251},{n:'Alok Mishra',a:501},{n:'Rekha Pillai',a:501},
+      {n:'Vijay Kumar',a:251},{n:'Nisha Kapoor',a:501},{n:'Prakash Jha',a:1100},{n:'Lata Deshmukh',a:501},
+      {n:'Mohit Saxena',a:251},{n:'Aarti Singh',a:501},{n:'Karan Malhotra',a:501},{n:'Geeta Nanda',a:251},
+      {n:'Tarun Bose',a:501},{n:'Sarita Kulkarni',a:501},{n:'Yogesh Patil',a:251},{n:'Bhavna Shah',a:501}
+    ];
+    function chipHTML(d){
+      return '<span class="donor-chip"><span class="cav">'+initials(d.n)+'</span>'+
+        '<span class="cnm">'+d.n+'</span><span class="camt">₹'+inr(d.a)+'</span></span>';
+    }
+    function buildTrack(el, list){
+      if (!el) return;
+      var half = list.map(chipHTML).join('');
+      el.innerHTML = half + half;   // duplicated set → seamless -50% loop
+    }
+    (function buildMarquee(){
+      var a = MARQUEE.slice(0, 20), b = MARQUEE.slice(20);
+      buildTrack(document.getElementById('mqTrackA'), a);
+      buildTrack(document.getElementById('mqTrackB'), b.concat(a.slice(0,4)));
+    })();
 
     // Load in Hindi by default (markup is already Hindi; this keeps state in sync).
     applyLang('hi');
