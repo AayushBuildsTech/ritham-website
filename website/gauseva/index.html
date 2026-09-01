@@ -292,17 +292,17 @@
       mask-image:linear-gradient(90deg,transparent 0,#000 7%,#000 93%,transparent 100%)}
     .mq-row{overflow:hidden}
     .mq-track{display:flex;gap:11px;width:max-content;will-change:transform}
-    .mq-track.a{animation:mq-left 26s linear infinite}
-    .mq-track.b{animation:mq-right 32s linear infinite}
+    .mq-track.a{animation:mq-left 60s linear infinite}
+    .mq-track.b{animation:mq-right 74s linear infinite}
     .marquee:hover .mq-track{animation-play-state:paused}
     @keyframes mq-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     @keyframes mq-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
-    .donor-chip{flex:0 0 auto;display:flex;align-items:center;gap:9px;background:var(--surface);
-      border:1px solid var(--line);border-radius:999px;padding:5px 15px 5px 5px;box-shadow:var(--shadow-sm);white-space:nowrap}
-    .donor-chip .cav{width:30px;height:30px;border-radius:50%;background:var(--grad);color:#fff;flex:0 0 auto;
-      display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:'Inter',sans-serif}
-    .donor-chip .cnm{font-size:13.5px;font-weight:600;color:var(--ink)}
-    .donor-chip .camt{font-family:'Fraunces',serif;font-weight:700;font-size:13.5px;color:var(--magenta-d)}
+    .donor-chip{flex:0 0 auto;display:flex;align-items:center;gap:10px;background:var(--surface);
+      border:1px solid var(--line);border-radius:999px;padding:6px 18px 6px 6px;box-shadow:var(--shadow-sm);white-space:nowrap}
+    .donor-chip .cav{width:36px;height:36px;border-radius:50%;background:var(--grad);color:#fff;flex:0 0 auto;
+      display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;font-family:'Inter',sans-serif}
+    .donor-chip .cnm{font-size:16px;font-weight:700;color:var(--ink)}
+    .donor-chip .camt{font-family:'Fraunces',serif;font-weight:700;font-size:16px;color:var(--magenta-d)}
     .donor-more{max-width:560px;margin:16px auto 0;text-align:center;color:var(--muted);font-size:13.5px}
 
     @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}
@@ -821,9 +821,9 @@
       {n:'Nikhil Mondal',a:501},{n:'Priya Sharma',a:251},{n:'Rajesh Kumar',a:501},
       {n:'Sunita Devi',a:251},{n:'Amit Patel',a:501},{n:'Anjali Gupta',a:501},
       {n:'Deepak Verma',a:251},{n:'Kavita Joshi',a:501},{n:'Ramesh Yadav',a:251},
-      {n:'Pooja Reddy',a:501},{n:'Vikram Singh',a:1100},{n:'Sneha Nair',a:501},
+      {n:'Pooja Reddy',a:501},{n:'Vikram Singh',a:552},{n:'Sneha Nair',a:501},
       {n:'Manoj Tiwari',a:251},{n:'Neha Agarwal',a:501},{n:'Arjun Mehta',a:501},
-      {n:'Kiran Rao',a:251},{n:'Suresh Reddy',a:2100},{n:'Divya Menon',a:501},
+      {n:'Kiran Rao',a:251},{n:'Suresh Reddy',a:302},{n:'Divya Menon',a:501},
       {n:'Sanjay Gupta',a:251},{n:'Ritu Malhotra',a:501}
     ];
     // Fisher–Yates shuffle so each visit shows a different order.
@@ -855,19 +855,26 @@
     langRefreshers.push(function(){ if (toastCur && toastEl.classList.contains('show')) renderToast(toastCur); });
 
     // ── Fast-moving contributor carousel (dense social proof) ──
-    // Big pool of illustrative names; amounts skew hard to ₹251 / ₹501 so the
-    // wall of peers giving those tiers nudges visitors to match or upscale.
+    // Large pool of illustrative names. Amounts are ONLY values a visitor can
+    // actually pay on this page — the tiers ₹101 / ₹251 / ₹501 and the ₹51
+    // add-on totals ₹302 / ₹552 — skewed hard to ₹251 / ₹501 to nudge upscaling.
     var MARQUEE = [
       {n:'Rajesh Kumar',a:501},{n:'Sunita Devi',a:251},{n:'Amit Patel',a:501},{n:'Nikhil Mondal',a:501},
-      {n:'Vikram Singh',a:1100},{n:'Anjali Gupta',a:251},{n:'Ramesh Yadav',a:501},{n:'Deepak Verma',a:501},
-      {n:'Suresh Reddy',a:2100},{n:'Meena Agarwal',a:501},{n:'Pooja Sharma',a:251},{n:'Arjun Mehta',a:501},
+      {n:'Vikram Singh',a:251},{n:'Anjali Gupta',a:251},{n:'Ramesh Yadav',a:501},{n:'Deepak Verma',a:501},
+      {n:'Suresh Reddy',a:552},{n:'Meena Agarwal',a:501},{n:'Pooja Sharma',a:251},{n:'Arjun Mehta',a:501},
       {n:'Kavita Joshi',a:501},{n:'Manoj Tiwari',a:251},{n:'Sneha Nair',a:501},{n:'Kiran Rao',a:501},
-      {n:'Divya Menon',a:251},{n:'Sanjay Gupta',a:501},{n:'Ritu Malhotra',a:501},{n:'Harish Chandra',a:251},
+      {n:'Divya Menon',a:251},{n:'Sanjay Gupta',a:501},{n:'Ritu Malhotra',a:501},{n:'Harish Chandra',a:101},
       {n:'Neha Agarwal',a:501},{n:'Priya Sharma',a:501},{n:'Rohit Verma',a:251},{n:'Ananya Iyer',a:501},
       {n:'Gaurav Bhatt',a:501},{n:'Shweta Rai',a:251},{n:'Alok Mishra',a:501},{n:'Rekha Pillai',a:501},
-      {n:'Vijay Kumar',a:251},{n:'Nisha Kapoor',a:501},{n:'Prakash Jha',a:1100},{n:'Lata Deshmukh',a:501},
+      {n:'Vijay Kumar',a:251},{n:'Nisha Kapoor',a:501},{n:'Prakash Jha',a:302},{n:'Lata Deshmukh',a:501},
       {n:'Mohit Saxena',a:251},{n:'Aarti Singh',a:501},{n:'Karan Malhotra',a:501},{n:'Geeta Nanda',a:251},
-      {n:'Tarun Bose',a:501},{n:'Sarita Kulkarni',a:501},{n:'Yogesh Patil',a:251},{n:'Bhavna Shah',a:501}
+      {n:'Tarun Bose',a:501},{n:'Sarita Kulkarni',a:501},{n:'Yogesh Patil',a:251},{n:'Bhavna Shah',a:501},
+      {n:'Rahul Chauhan',a:501},{n:'Swati Naik',a:251},{n:'Devendra Rao',a:501},{n:'Komal Jain',a:501},
+      {n:'Ajay Pandey',a:251},{n:'Preeti Kohli',a:501},{n:'Naveen Kumar',a:101},{n:'Madhuri Sethi',a:501},
+      {n:'Sachin More',a:251},{n:'Payal Grover',a:501},{n:'Ravi Shankar',a:552},{n:'Deepika Rana',a:501},
+      {n:'Ashok Kulkarni',a:251},{n:'Snehal Desai',a:501},{n:'Imran Sheikh',a:501},{n:'Farah Khan',a:251},
+      {n:'Vinod Chawla',a:501},{n:'Ruchi Bansal',a:501},{n:'Sameer Ali',a:251},{n:'Trisha Das',a:501},
+      {n:'Girish Hegde',a:501},{n:'Meghna Roy',a:251},{n:'Ashwin Kamath',a:501},{n:'Poonam Yadav',a:501}
     ];
     function chipHTML(d){
       return '<span class="donor-chip"><span class="cav">'+initials(d.n)+'</span>'+
@@ -879,9 +886,9 @@
       el.innerHTML = half + half;   // duplicated set → seamless -50% loop
     }
     (function buildMarquee(){
-      var a = MARQUEE.slice(0, 20), b = MARQUEE.slice(20);
-      buildTrack(document.getElementById('mqTrackA'), a);
-      buildTrack(document.getElementById('mqTrackB'), b.concat(a.slice(0,4)));
+      var mid = Math.ceil(MARQUEE.length/2);
+      buildTrack(document.getElementById('mqTrackA'), MARQUEE.slice(0, mid));
+      buildTrack(document.getElementById('mqTrackB'), MARQUEE.slice(mid));
     })();
 
     // Load in Hindi by default (markup is already Hindi; this keeps state in sync).
