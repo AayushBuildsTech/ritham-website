@@ -42,6 +42,18 @@
     .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
     .stat b{font-family:'Fraunces',serif;font-size:24px;color:var(--maroon);display:block}
     .stat span{color:var(--brown);font-size:13px}
+    /* Profit panel: total received − fixed cost − FB ad spend */
+    .profit{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:18px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 14px}
+    .profit .pcol{display:flex;flex-direction:column;gap:3px;min-width:96px}
+    .profit .pcol span{color:var(--brown);font-size:12.5px;font-weight:600}
+    .profit .pcol b{font-family:'Fraunces',serif;font-size:22px;color:var(--maroon)}
+    .profit .pop{font-family:'Fraunces',serif;font-size:22px;color:var(--brown);padding-bottom:2px}
+    .profit .pinput{max-width:130px;min-height:38px;font-family:'Fraunces',serif;font-size:18px;color:var(--maroon)}
+    .profit .pout b{font-size:26px}
+    .profit .pout.pos b{color:var(--ok)}
+    .profit .pout.neg b{color:#b3261e}
+    .profit .phint{flex-basis:100%;color:var(--brown);font-size:12px;margin-top:2px}
+    @media(max-width:560px){.profit .pop{display:none}.profit .pcol{min-width:calc(50% - 7px)}}
     .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
     .toolbar .input{flex:1 1 200px;max-width:320px}
     .filters{display:flex;gap:6px;flex-wrap:wrap}
@@ -124,6 +136,16 @@
         <div class="stat"><b id="s-seva">0</b><span>Total Seva</span></div>
         <div class="stat"><b id="s-due">0</b><span>Videos to send</span></div>
       </div>
+      <div class="profit" id="profit">
+        <div class="pcol"><span>Total received</span><b id="p-recv">₹0</b></div>
+        <div class="pop">−</div>
+        <div class="pcol"><span>Fixed cost</span><b>₹1,188</b></div>
+        <div class="pop">−</div>
+        <div class="pcol"><span>Facebook ad spend</span><input class="input pinput" id="p-ads" type="number" min="0" step="1" inputmode="decimal" placeholder="0" /></div>
+        <div class="pop">=</div>
+        <div class="pcol pout" id="p-out"><span>Profit</span><b id="p-profit">₹0</b></div>
+        <p class="phint">Ad spend = Gau Seva campaign spend from the Ritham ads account (Ads Manager). Update it here as the campaign runs — saved on this device.</p>
+      </div>
       <div class="toolbar">
         <input class="input" id="search" placeholder="Search name / phone / payment id…" />
         <div class="filters" id="filters"></div>
@@ -161,6 +183,11 @@
     var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVheGRxaXplcmt1cWt1anhhY3J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MTU2MjksImV4cCI6MjA5ODQ5MTYyOX0.TB2A8e_7sl1rhH7aRi3QVJ5Q-QMgNlHnygK9TAiSFzI';
     var STATUSES = ['Payment Successful','Video Sent','Refunded'];
     var PAID = ['Payment Successful','Video Sent']; // count toward money/seva totals
+    // Profit = total received − fixed cost − Facebook ad spend.
+    // Fixed cost is a flat overhead; ad spend is entered manually (Gau Seva
+    // campaign spend from the Ritham ads account) and saved per-device.
+    var FIXED_COST = 1188;
+    var AD_SPEND_KEY = 'gau_ad_spend';
     var client = window.supabase.createClient(SB_URL, SB_ANON);
 
     var $ = function(s){ return document.querySelector(s); };
@@ -289,6 +316,29 @@
     }
     $('#refresh').addEventListener('click', load);
 
+    // ── Profit panel ──
+    function getAdSpend(){ var v = parseFloat($('#p-ads').value); return isFinite(v) && v >= 0 ? v : 0; }
+    function fmtSigned(n){ var r = Math.round(n); return (r < 0 ? '-₹' : '₹') + Math.abs(r).toLocaleString('en-IN'); }
+    function renderProfit(totalRecv){
+      if(typeof totalRecv !== 'number'){
+        totalRecv = state.rows.filter(function(b){ return PAID.indexOf(b.status)>=0; })
+                              .reduce(function(a,b){ return a+(Number(b.amount_inr)||0); },0);
+      }
+      var profit = totalRecv - FIXED_COST - getAdSpend();
+      $('#p-recv').textContent = inr(totalRecv);
+      $('#p-profit').textContent = fmtSigned(profit);
+      var out = $('#p-out'); out.classList.toggle('pos', profit >= 0); out.classList.toggle('neg', profit < 0);
+    }
+    (function initProfit(){
+      var saved = localStorage.getItem(AD_SPEND_KEY);
+      $('#p-ads').value = (saved != null && saved !== '') ? saved : '170.17';
+      $('#p-ads').addEventListener('input', function(){
+        localStorage.setItem(AD_SPEND_KEY, $('#p-ads').value);
+        renderProfit();
+      });
+      renderProfit();
+    })();
+
     function toSendCount(){ return state.rows.filter(function(b){ return videoDue(b); }).length; }
     function buildFilters(){
       var f = $('#filters');
@@ -321,9 +371,11 @@
       var rows = filtered();
       // money / seva totals count only genuinely paid rows (exclude pending, failed, refunded)
       var paid = state.rows.filter(function(b){ return PAID.indexOf(b.status)>=0; });
+      var totalRecv = paid.reduce(function(a,b){return a+(Number(b.amount_inr)||0);},0);
       $('#s-count').textContent = paid.length;
-      $('#s-total').textContent = inr(paid.reduce(function(a,b){return a+(Number(b.amount_inr)||0);},0));
+      $('#s-total').textContent = inr(totalRecv);
       $('#s-seva').textContent  = paid.reduce(function(a,b){return a+(Number(b.seva_count)||0);},0);
+      renderProfit(totalRecv);
       // Videos still to send (paid, not yet marked 'Video Sent'); flag overdue count.
       var dueRows = state.rows.map(videoDue).filter(Boolean);
       var overdue = dueRows.filter(function(d){return d.daysLeft<0;}).length;
