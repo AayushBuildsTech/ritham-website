@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ops · Ritham</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{--magenta:#FF007F;--magenta-d:#D6006B;--violet:#7B2CBF;--violet-l:#9D4EDD;--gold:#E8A33D;
+      --grad:linear-gradient(135deg,#7B2CBF 0%,#FF007F 100%);
+      --cream:#FBF7FF;--surface:#FFFFFF;--maroon:#1E1533;--brown:#6B6382;
+      --ink:#1E1533;--line:rgba(123,44,191,.16);--ok:#1a9d6a;--warn:#b8791a;--bad:#b3261e}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Mukta',system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.5}
+    h1,h2,h3{font-family:'Fraunces',serif;color:var(--maroon)}
+    a{color:var(--violet)}
+    .wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+    header.top{background:var(--grad);color:#fff;padding:14px 0}
+    header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    header.top .brand{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:#fff}
+    header.top .brand img{width:26px;height:26px;border-radius:6px}
+    header.top .who{font-size:13px;opacity:.9}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 16px;border-radius:10px;font-weight:600;font-family:'Mukta',sans-serif;font-size:15px;cursor:pointer;border:0;text-decoration:none}
+    .btn-grad{background:var(--grad);color:#fff}
+    .btn-ghost{background:#fff;border:1.5px solid var(--gold);color:var(--maroon)}
+    .btn-sm{min-height:34px;padding:0 12px;font-size:13.5px;border-radius:8px}
+    .input{width:100%;min-height:44px;padding:0 12px;border:1.5px solid var(--line);border-radius:10px;font-size:15px;font-family:'Mukta',sans-serif;background:#fff;color:var(--ink)}
+
+    /* Gate */
+    .gate{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .gate .card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(90,30,18,.14);padding:26px;max-width:380px;width:100%}
+    .gate h2{font-size:22px;margin-bottom:6px}
+    .gate p{color:var(--brown);font-size:14px;margin-bottom:16px}
+    .gate .input{margin-bottom:10px}
+    .err{color:var(--bad);font-size:13.5px;min-height:18px;margin:2px 0 8px}
+
+    main{padding:20px 0 60px}
+    .sechead{font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--brown);margin:22px 0 10px;font-weight:700}
+    .sechead:first-child{margin-top:4px}
+
+    /* Overall banner */
+    .banner{border-radius:14px;padding:14px 16px;margin-bottom:6px;display:flex;align-items:flex-start;gap:12px;border:1px solid var(--line)}
+    .banner.ok{background:#e7f6ee;border-color:#bfe6d1}
+    .banner.bad{background:#fdeceb;border-color:#f6cfcb}
+    .banner .dot{width:14px;height:14px;border-radius:50%;margin-top:5px;flex:none}
+    .banner.ok .dot{background:var(--ok)} .banner.bad .dot{background:var(--bad)}
+    .banner h3{font-size:19px}
+    .banner ul{margin:6px 0 0 2px;padding-left:16px;color:var(--maroon);font-size:14px}
+    .banner li{margin:2px 0}
+
+    /* Health stat tiles */
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+    .stat b{font-family:'Fraunces',serif;font-size:26px;color:var(--maroon);display:block;line-height:1.1}
+    .stat b.warn{color:var(--warn)} .stat b.bad{color:var(--bad)} .stat b.ok{color:var(--ok)}
+    .stat span{color:var(--brown);font-size:13px}
+    @media(max-width:640px){.stats{grid-template-columns:1fr 1fr}}
+
+    /* Vendor cards */
+    .vgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    @media(max-width:640px){.vgrid{grid-template-columns:1fr}}
+    .vcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+    .vcard .vtop{display:flex;align-items:center;gap:9px}
+    .vdot{width:12px;height:12px;border-radius:50%;flex:none}
+    .vdot.ok{background:var(--ok)} .vdot.bad{background:var(--bad)} .vdot.warn{background:var(--warn)} .vdot.na{background:#c7c0d6}
+    .vcard .vname{font-family:'Fraunces',serif;font-size:17px;color:var(--maroon);font-weight:600;flex:1}
+    .vcard .vtag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#ece7f5;color:#7a728f}
+    .vcard .vnote{color:var(--brown);font-size:13.5px;min-height:20px}
+    .vcard .vlinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+
+    /* Renewals */
+    .rentbl{background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px 16px}
+    .renrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+    .renrow:last-child{border-bottom:0}
+    .renrow .rlabel{font-weight:600;color:var(--maroon);flex:1 1 160px}
+    .renrow input[type=date]{min-height:38px;border:1.5px solid var(--line);border-radius:8px;padding:0 10px;font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+    .renrow .rdays{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+    .rdays.ok{background:#e4f0ff;color:#2563a8} .rdays.warn{background:#fff3d6;color:var(--warn)} .rdays.over{background:#f8d7d7;color:var(--bad)} .rdays.none{background:#efeaf7;color:#7a728f}
+
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:6px}
+    .toolbar .grow{flex:1}
+    .muted{color:var(--brown);font-size:12.5px}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--maroon);color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .hidden{display:none!important}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="brand"><img src="logo.png" alt="Ritham" /> Ops · Ritham</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="who hidden" id="who"></span>
+        <button class="btn btn-ghost btn-sm hidden" id="signout">Sign out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- GATE -->
+  <div class="gate" id="gate">
+    <div class="card">
+      <h2>Operations Login</h2>
+      <p>Sign in with your Ritham owner account. Access is enforced server-side (Supabase RLS + owner check).</p>
+      <input class="input" id="email" type="email" placeholder="Owner email" autocomplete="username" />
+      <input class="input" id="pass" type="password" placeholder="Password" autocomplete="current-password" />
+      <p class="err" id="gerr"></p>
+      <button class="btn btn-grad" style="width:100%" id="signin">Sign in</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <main id="dash" class="hidden">
+    <div class="wrap">
+      <div class="toolbar">
+        <div class="grow"><span class="muted" id="updated">—</span></div>
+        <button class="btn btn-ghost btn-sm" id="refresh">Refresh</button>
+      </div>
+
+      <div class="banner ok" id="banner">
+        <div class="dot"></div>
+        <div><h3 id="bannerTitle">Checking…</h3><ul id="bannerList" class="hidden"></ul></div>
+      </div>
+
+      <div class="sechead">Live health (last 24 hours)</div>
+      <div class="stats" id="healthStats"></div>
+
+      <div class="sechead">Services &amp; recharge</div>
+      <p class="muted" style="margin:-4px 0 10px">A green dot means we verified it works right now. Tap a card's button to open that vendor's console and top it up. Turn on <b>auto-reload</b> wherever the vendor offers it.</p>
+      <div class="vgrid" id="vendors"></div>
+
+      <div class="sechead">Renewals &amp; top-up reminders</div>
+      <p class="muted" style="margin:-4px 0 10px">Set each date once; the countdown warns you before it lapses. Saved on this device.</p>
+      <div class="rentbl" id="renewals"></div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  (function(){
+    'use strict';
+    // Public anon key — safe to ship; all data access is enforced by RLS + the owner
+    // check inside the ops-status function.
+    var SB_URL = 'https://eaxdqizerkuqkujxacru.supabase.co';
+    var SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVheGRxaXplcmt1cWt1anhhY3J1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MTU2MjksImV4cCI6MjA5ODQ5MTYyOX0.TB2A8e_7sl1rhH7aRi3QVJ5Q-QMgNlHnygK9TAiSFzI';
+    var client = window.supabase.createClient(SB_URL, SB_ANON);
+
+    var $ = function(s){ return document.querySelector(s); };
+    var toastTimer;
+    function toast(m){ var t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove('show');},2600); }
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+    function inr(n){ return '₹'+Number(n||0).toLocaleString('en-IN'); }
+
+    // ── Vendor display metadata: label, console link, and what breaks if it lapses ──
+    // Keyed to match the `vendors` object returned by ops-status.
+    var VMETA = {
+      anthropic:  { label:'Claude API (Anthropic)', tag:'Reports · Chat · Calls', url:'https://console.anthropic.com/settings/billing', cta:'Billing & auto-reload' },
+      vapi:       { label:'Vapi (voice calls)',     tag:'Calls',                 url:'https://dashboard.vapi.ai',                         cta:'Open Vapi console' },
+      elevenlabs: { label:'ElevenLabs (call voice)',tag:'Calls · via Vapi',      url:'https://elevenlabs.io/app/subscription',            cta:'Check balance' },
+      deepgram:   { label:'Deepgram (call STT)',    tag:'Calls · via Vapi',      url:'https://console.deepgram.com',                      cta:'Check balance' },
+      vedastro:   { label:'VedAstro (charts)',      tag:'Kundli · Panchang',     url:'https://vedastro.org/APIBuilder',                   cta:'API plan / key' },
+      razorpay:   { label:'Razorpay (payments)',    tag:'Money in',              url:'https://dashboard.razorpay.com',                    cta:'Open Razorpay' },
+      supabase:   { label:'Supabase (backend)',     tag:'Database · Functions',  url:'https://supabase.com/dashboard/project/eaxdqizerkuqkujxacru/settings/billing', cta:'Usage & billing' }
+    };
+    var VORDER = ['anthropic','vedastro','razorpay','vapi','elevenlabs','deepgram','supabase'];
+
+    // ── Renewals: label + localStorage key + suggested cadence hint ──
+    var RENEWALS = [
+      { key:'ren_domain',    label:'Domain — ritham.co.in',        hint:'annual' },
+      { key:'ren_vedastro',  label:'VedAstro paid plan',           hint:'monthly/annual' },
+      { key:'ren_anthropic', label:'Anthropic credit top-up check',hint:'when low' },
+      { key:'ren_vapi',      label:'Vapi / voice balance top-up',  hint:'when low' },
+      { key:'ren_playcert',  label:'Play app signing / account',   hint:'yearly review' }
+    ];
+
+    // ── Auth gate (same owner check as the Gau Seva admin) ──
+    function checkAdmin(){ return client.rpc('is_web_puja_admin').then(function(r){ return !r.error && !!r.data; }); }
+    function showDash(user){
+      $('#gate').classList.add('hidden'); $('#dash').classList.remove('hidden');
+      $('#who').textContent = user.email; $('#who').classList.remove('hidden');
+      $('#signout').classList.remove('hidden');
+      buildRenewals(); load(); startAuto();
+    }
+    function gateErr(m){ $('#gerr').textContent = m || ''; }
+    function signIn(){
+      gateErr('');
+      var email = $('#email').value.trim(), pass = $('#pass').value;
+      if(!email || !pass){ gateErr('Enter email and password.'); return; }
+      $('#signin').disabled = true;
+      client.auth.signInWithPassword({ email: email, password: pass }).then(function(r){
+        if(r.error){ gateErr('Incorrect credentials.'); $('#signin').disabled=false; return; }
+        return checkAdmin().then(function(ok){
+          if(!ok){ gateErr('This account is not an authorised owner.'); client.auth.signOut(); $('#signin').disabled=false; return; }
+          showDash(r.data.user);
+        });
+      }).catch(function(){ gateErr('Sign-in failed.'); $('#signin').disabled=false; });
+    }
+    $('#signin').addEventListener('click', signIn);
+    $('#pass').addEventListener('keydown', function(e){ if(e.key==='Enter') signIn(); });
+    $('#signout').addEventListener('click', function(){ client.auth.signOut().then(function(){ location.reload(); }); });
+    client.auth.getUser().then(function(r){
+      var u = r && r.data && r.data.user; if(!u) return;
+      checkAdmin().then(function(ok){ if(ok) showDash(u); });
+    });
+
+    // ── Load status from the ops-status edge function ──
+    var loading = false;
+    function load(){
+      if(loading) return; loading = true;
+      $('#refresh').disabled = true;
+      client.functions.invoke('ops-status', { body:{} }).then(function(r){
+        loading = false; $('#refresh').disabled = false;
+        if(r.error || !r.data || !r.data.ok){
+          toast('Could not load status: ' + ((r.data && r.data.error) || (r.error && r.error.message) || 'unknown'));
+          return;
+        }
+        render(r.data);
+      }).catch(function(e){ loading=false; $('#refresh').disabled=false; toast('Load failed: '+e.message); });
+    }
+    $('#refresh').addEventListener('click', load);
+    var autoTimer;
+    function startAuto(){ clearInterval(autoTimer); autoTimer = setInterval(load, 60000); }
+
+    // ── Render ──
+    function render(d){
+      $('#updated').textContent = 'Updated ' + new Date(d.generated_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}) + ' · auto-refresh 60s';
+
+      // Banner
+      var issues = d.issues || [];
+      var b = $('#banner'), title = $('#bannerTitle'), list = $('#bannerList');
+      if(issues.length === 0){
+        b.className = 'banner ok'; title.textContent = 'All systems OK'; list.classList.add('hidden'); list.innerHTML='';
+      } else {
+        b.className = 'banner bad';
+        title.textContent = issues.length + (issues.length===1?' thing needs attention':' things need attention');
+        list.classList.remove('hidden');
+        list.innerHTML = issues.map(function(i){ return '<li>'+esc(i)+'</li>'; }).join('');
+      }
+
+      // Health tiles
+      var h = d.health || {};
+      var rep = h.reports||{}, pay = h.payments||{}, cl = h.calls||{}, ved = h.vedastro||{};
+      var tiles = [
+        { v: inr(pay.revenue_today_inr), s:'Revenue today (app)', cls:'ok' },
+        { v: pay.paid_today||0,          s:'Paid orders today' },
+        { v: inr(h.other_today_inr),     s:'Puja + Gau Seva today' },
+        { v: pay.failed_24h||0,          s:'Failed payments (24h)', cls:(pay.failed_24h>0?'warn':'') },
+        { v: rep.ready24h||0,            s:'Reports delivered (24h)', cls:'ok' },
+        { v: rep.failed24h||0,           s:'Reports failed (24h)', cls:(rep.failed24h>0?'bad':'') },
+        { v: rep.stuckPaid||0,           s:'PAID & undelivered', cls:(rep.stuckPaid>0?'bad':'ok') },
+        { v: (ved.today||0),             s:'VedAstro calls today' },
+        { v: cl.today||0,                s:'Voice calls today' },
+        { v: Math.round((cl.seconds_today||0)/60)+'m', s:'Call minutes today' },
+        { v: cl.stuck_active||0,         s:'Calls stuck open', cls:(cl.stuck_active>0?'warn':'') },
+        { v: rep.generatingNow||0,       s:'Reports generating now' }
+      ];
+      $('#healthStats').innerHTML = tiles.map(function(t){
+        return '<div class="stat"><b class="'+(t.cls||'')+'">'+esc(t.v)+'</b><span>'+esc(t.s)+'</span></div>';
+      }).join('');
+
+      // Vendor cards
+      var vs = d.vendors || {};
+      $('#vendors').innerHTML = VORDER.map(function(k){
+        var v = vs[k] || {}; var m = VMETA[k] || { label:k, url:'#', cta:'Open' };
+        var dot = !v.configured ? 'bad' : (v.ok ? 'ok' : 'bad');
+        // ElevenLabs/Deepgram/Supabase are informational (managed elsewhere) → neutral if ok
+        if((k==='elevenlabs'||k==='deepgram'||k==='supabase') && v.ok) dot = 'warn';
+        var mode = v.mode ? ' <span class="vtag">'+esc(v.mode)+'</span>' : '';
+        return '<div class="vcard">'+
+          '<div class="vtop"><span class="vdot '+dot+'"></span>'+
+            '<span class="vname">'+esc(m.label)+'</span>'+
+            '<span class="vtag">'+esc(m.tag)+'</span>'+mode+'</div>'+
+          '<div class="vnote">'+esc(v.note||'')+'</div>'+
+          '<div class="vlinks"><a class="btn btn-ghost btn-sm" href="'+esc(m.url)+'" target="_blank" rel="noopener">'+esc(m.cta)+'</a></div>'+
+        '</div>';
+      }).join('');
+    }
+
+    // ── Renewals (localStorage; countdown badges) ──
+    function daysLeft(iso){ if(!iso) return null; var due=new Date(iso+'T00:00:00'); var now=new Date(); var d1=new Date(now.getFullYear(),now.getMonth(),now.getDate()); return Math.round((due-d1)/86400000); }
+    function badge(iso){
+      var dl = daysLeft(iso);
+      if(dl===null) return '<span class="rdays none">not set</span>';
+      if(dl<0) return '<span class="rdays over">overdue '+(-dl)+'d</span>';
+      if(dl===0) return '<span class="rdays over">due today</span>';
+      if(dl<=14) return '<span class="rdays warn">'+dl+'d left</span>';
+      return '<span class="rdays ok">'+dl+'d left</span>';
+    }
+    function buildRenewals(){
+      var host = $('#renewals');
+      host.innerHTML = RENEWALS.map(function(r){
+        var saved = localStorage.getItem(r.key) || '';
+        return '<div class="renrow">'+
+          '<span class="rlabel">'+esc(r.label)+' <span class="muted">· '+esc(r.hint)+'</span></span>'+
+          '<input type="date" data-key="'+esc(r.key)+'" value="'+esc(saved)+'" />'+
+          '<span class="rbadge" data-badge="'+esc(r.key)+'">'+badge(saved)+'</span>'+
+        '</div>';
+      }).join('');
+      Array.prototype.forEach.call(host.querySelectorAll('input[type=date]'), function(inp){
+        inp.addEventListener('change', function(){
+          var key = inp.getAttribute('data-key');
+          if(inp.value) localStorage.setItem(key, inp.value); else localStorage.removeItem(key);
+          var bd = host.querySelector('[data-badge="'+key+'"]'); if(bd) bd.innerHTML = badge(inp.value);
+        });
+      });
+    }
+  })();
+  </script>
+</body>
+</html>
